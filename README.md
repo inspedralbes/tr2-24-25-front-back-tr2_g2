@@ -1,16 +1,23 @@
-# transversals
-Esquema mínim de carpetes pels projectes transversals
+# Transversals - Mentories
 
-És obligatori seguir aquesta estructura tot i que la podeu ampliar.
+## Equip format per:
+* Sara Martínez
+* Climent Fernández
+* Rubén Lora 
+* Julie Villegas
 
-## Atenció
-Un cop comenceu heu de canviar aquesta explicació amb la corresponent al vostre projecte (utilitzant markdown)
+## Breu descripció:
+* L'objectiu del nostre projecte és crear una aplicació web que permeti a les persones usuàries trobar i oferir mentories en diferents àmbits. Aquesta aplicació permetrà posar en contacte a les persones usuàries que vulguin oferir mentories amb les que vulguin rebre-les. A més, també es podrà valorar la mentoria rebuda i oferida.
 
-# Aquest fitxer ha de contenir com a mínim:
- * Nom dels integrants
- * Nom del projecte
- * Petita descripció
- * Adreça del gestor de tasques (taiga, jira, trello...)
- * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
- * URL de producció (quan la tingueu)
- * Estat: (explicació d'en quin punt està)
+## Estat del Projecte:
+* Començant projecte ✈️
+
+## Gestor de tasques:
+* Taiga 🐼: https://tree.taiga.io/project/julsluks-tr2-dam-mentories/timeline
+
+## PenPot -- Prototipatge:
+* Android 🤖: 
+* Web 🕸️:
+
+## URL de producció:
+* En procés...
