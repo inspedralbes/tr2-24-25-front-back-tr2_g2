@@ -1,6 +1,6 @@
 <template>
-    <!-- component -->
-<div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between bg-blue-600 w-11/12 rounded-3xl">
+  <div>
+    <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between bg-blue-600 w-11/12 rounded-3xl">
       <a
         aria-current="page"
         class="inline-flex flex-col items-center text-xs font-medium py-3 px-4 text-white flex-grow"
@@ -16,23 +16,6 @@
         </svg>
         <span class="sr-only">Home</span>
       </a>
-      <!-- <a
-        class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
-        href="#"
-      >
-        <svg
-          class="w-7 h-7"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-            clip-rule="evenodd"
-          ></path>
-        </svg>
-      </a> -->
       <a
         class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
         href="#"
@@ -51,60 +34,67 @@
         </svg>
         <span class="sr-only">Search</span>
       </a>
-      <span class="sr-only">Upload</span>
-      <button class="relative inline-flex flex-col items-center text-xs font-medium text-white py-3 px-6 flex-grow">
+      
+      <button @click="toggleButtonAddPost" class="relative inline-flex flex-col items-center text-xs font-medium text-white py-3 px-6 flex-grow">
         <div class="absolute bottom-5 p-3 rounded-full border-4 border-white bg-blue-600">
-            <svg
-          class="w-7 h-7"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-            clip-rule="evenodd"
-          ></path>
-        </svg>
+          <svg
+            class="w-7 h-7"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
         </div>
-        <span class="sr-only">Chat</span>
+        <span class="sr-only">Upload</span>
+        <button-add-post v-if="showButtonAddPost"></button-add-post>
       </button>
       <a
         class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
         href="#"
       >
         <svg 
-            class="w-7 h-7"
-            viewBox="0 0 24 24" 
-            aria-hidden="true" 
-            fill="currentColor">
-            <path d="M19.993 9.042C19.48 5.017 16.054 2 11.996 2s-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958zM12 20c-1.306 0-2.417-.835-2.829-2h5.658c-.412 1.165-1.523 2-2.829 2zm-6.866-4l.847-6.698C6.364 6.272 8.941 4 11.996 4s5.627 2.268 6.013 5.295L18.864 16H5.134z"></path>
+          class="w-7 h-7"
+          viewBox="0 0 24 24" 
+          aria-hidden="true" 
+          fill="currentColor">
+          <path d="M19.993 9.042C19.48 5.017 16.054 2 11.996 2s-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958zM12 20c-1.306 0-2.417-.835-2.829-2h5.658c-.412 1.165-1.523 2-2.829 2zm-6.866-4l.847-6.698C6.364 6.272 8.941 4 11.996 4s5.627 2.268 6.013 5.295L18.864 16H5.134z"></path>
         </svg>
-            <span class="sr-only">Search</span>
-
       </a>
       <a
         class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
         href="#"
       >
         <svg
-        class="w-8 h-8"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
+          class="w-8 h-8"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
         >
-        <path
-              fill-rule="evenodd"
-              d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-              clip-rule="evenodd"
-            ></path>
+          <path
+            fill-rule="evenodd"
+            d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+            clip-rule="evenodd"
+          ></path>
         </svg>
-        <span class="sr-only">Profile</span>
+        <span class="sr-only">Chat</span>
       </a>
     </div>
-
+    
+  </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import ButtonAddPost from './buttonAddPost.vue';
 
+const showButtonAddPost = ref(false);
+
+function toggleButtonAddPost() {
+  showButtonAddPost.value = !showButtonAddPost.value;
+}
 </script>
