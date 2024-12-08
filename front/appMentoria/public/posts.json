@@ -1,0 +1,32 @@
+[
+    {
+      "id": 1,
+      "authorAvatar": "https://pbs.twimg.com/profile_images/1646143747200000004/662M_9h1_400x400.jpg",
+      "authorName": "Sara Martínez",
+      "authorHandle": "SaraMartinez21",
+      "postDate": "hace 2 horas",
+      "postImage": "https://pbs.twimg.com/media/GeL51inWMAAV5lL?format=jpg&name=900x900",
+      "comments": 6
+    },
+    {
+      "id": 2,
+      "authorAvatar": "/public/mikasa.jpg",
+      "authorName": "María López",
+      "authorHandle": "marialopez",
+      "postDate": "hace 1 hora",
+      "postContent": "Mondongo",
+      "postImage": null,
+      "comments": 18
+    },
+    {
+      "id": 3,
+      "authorAvatar": "/public/levi.jpg",
+      "authorName": "Juan Pérez",
+      "authorHandle": "juanperez",
+      "postDate": "hace 30 minutos",
+      "postContent": "Hoy es un buen día para estudiar",
+      "postImage": "/public/estudiando.jpg",
+      "comments": 0
+    }
+  ]
+  
