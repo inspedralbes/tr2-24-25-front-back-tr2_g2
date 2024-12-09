@@ -1,6 +1,6 @@
 <template>
     <!-- component -->
-<div class="bg-gray-100 h-screen flex items-center justify-center">
+<div class="bg-gray-100 h-screen flex items-center justify-center p-8">
 			<div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
 				<form>
 					<!-- Post Content Section -->
