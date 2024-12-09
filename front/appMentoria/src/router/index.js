@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import mainPage from '../views/mainPage.vue'
-// import profile from '../views/profile.vue'
+// import mainPage from '../views/mainPage.vue'
+import profilePage from '../views/profilePage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
@@ -9,16 +9,16 @@ import mainPage from '../views/mainPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // {
+    //   path: '/',
+    //   name: 'mainPage',
+    //   component: mainPage,
+    // },
     {
       path: '/',
-      name: 'mainPage',
-      component: mainPage,
+      name: 'profile',
+      component: profilePage,
     }
-    // {
-    //   path: '/profile',
-    //   name: 'profile',
-    //   component: profile,
-    // },
     // {
     //   path: '/report',
     //   name: 'reportPage',
