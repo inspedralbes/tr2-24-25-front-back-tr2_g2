@@ -1,7 +1,7 @@
 const { Server } = require('socket.io');
 const { createServer } = require('http');
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const mysql = require('mysql2');
 const path = require('path');
 const cors = require('cors');
