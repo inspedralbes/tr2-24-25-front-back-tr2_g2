@@ -35,3 +35,10 @@ Reemplaza <service_name> con el nombre del servicio, por ejemplo, tr2g2-back.
     docker-compose -f docker-compose.dev.yml down
 ```
 Siguiendo estos pasos, deberías poder probar y verificar que la configuración de Docker Compose funciona correctamente con el proyecto.
+
+## 7. Eliminar los volúmenes (Si es necesario):
+- Si deseas eliminar los volúmenes de Docker, puedes agregar el flag -v al comando docker-compose down:
+```bash
+    docker-compose -f docker-compose.dev.yml down -v
+```
+Esto eliminará los volúmenes de Docker y asegurará que no quede ningún rastro de los contenedores en tu sistema.
