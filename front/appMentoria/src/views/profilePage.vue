@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex justify-right gap-4">
+        <div class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex py-6 top-6 justify-center sm:justify-right gap-4">
             <!-- Botón de Discord -->
             <a href="https://discord.com/invite/tu-invite" target="_blank" rel="noopener noreferrer"
                 class="flex items-center py-3 px-6 bg-indigo-600 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700">
