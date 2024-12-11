@@ -51,7 +51,8 @@ app.get('/', async ({ query }, response) => {
         }
     }
 
-    return response.sendFile('index.html', { root: '.' });
+    // return response.sendFile('index.html', { root: '.' });
+    return response.redirect('http://localhost:5173/');
 });
 
 
