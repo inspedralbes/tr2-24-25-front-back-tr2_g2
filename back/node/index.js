@@ -1,3 +1,4 @@
+const fileUpload = require('express-fileupload');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
 const express = require('express');
@@ -6,10 +7,15 @@ const mysql = require('mysql2');
 const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
-const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(express());
+app.use(cors());
+app.use(fileUpload());
+
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // Create a connection to the database
 // const db = mysql.createConnection({
