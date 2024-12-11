@@ -23,6 +23,42 @@ services:
     links:
       - tr2g2-mysql
       - tr2g2-mongodb
+      - chat
+      - community
+      - employmentexchange
+
+  chat:
+    build: 
+      context: ./back/node/services/chat
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/chat:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3001:3001
+
+  community:
+    build: 
+      context: ./back/node/services/community
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/community:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3002:3002
+
+  employmentexchange:
+    build: 
+      context: ./back/node/services/employmentexchange
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/employmentexchange:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3003:3003
 
   tr2g2-mongodb:
     image: mongo

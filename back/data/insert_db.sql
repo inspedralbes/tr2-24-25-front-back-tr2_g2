@@ -144,7 +144,7 @@ INSERT INTO reportsUsers (reported_user_id, user_id, report) VALUES
 (4, 5, 'Abús');
 
 -- Inserciones para teacherClasses (relaciona a los profesores con sus clases)
-INSERT INTO teachersClasses (teacher_id, class_id) VALUES 
+INSERT INTO teachersClasses (user_id, class_id) VALUES 
 (1, 1), 
 (2, 2), 
 (3, 3), 
