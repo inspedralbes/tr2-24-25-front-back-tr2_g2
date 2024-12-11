@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255),
     token VARCHAR(255),
+    banner VARCHAR(255),
+    profile VARCHAR(255),
     verified BOOLEAN NOT NULL DEFAULT 0,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     review DECIMAL(2,1) DEFAULT 0,
@@ -136,4 +138,22 @@ CREATE TABLE IF NOT EXISTS reportsUsers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reported_user_id) REFERENCES users(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Table 14: newDataUsers (depends on users, typesUsers and classes)
+CREATE TABLE IF NOT EXISTS newDataUsers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    typesUsers_id INT NOT NULL DEFAULT 1,
+    user_id INT NOT NULL,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    password VARCHAR(255),
+    token VARCHAR(255),
+    banner VARCHAR(255),
+    profile VARCHAR(255),
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    class_id INT,
+    FOREIGN KEY (typesUsers_id) REFERENCES typesUsers(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (class_id) REFERENCES classes(id)
 );
