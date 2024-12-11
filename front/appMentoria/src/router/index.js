@@ -1,21 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import mainPage from '../views/mainPage.vue'
+import mainPage from '../views/mainPage.vue'
 import profilePage from '../views/profilePage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
+import loginPage from '../views/loginPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'mainPage',
-    //   component: mainPage,
-    // },
     {
-      path: '/',
+      path: '/login',
+      name: '',
+      component: loginPage,
+    },
+     {
+       path: '/',
+       name: 'mainPage',
+       component: mainPage,
+     },
+    {
+      path: '/profile',
       name: 'profile',
       component: profilePage,
     }
