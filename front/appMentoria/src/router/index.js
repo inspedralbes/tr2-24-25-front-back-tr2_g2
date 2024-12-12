@@ -6,6 +6,8 @@ import profilePage from '../views/profilePage.vue'
 // import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
 import loginPage from '../views/loginPage.vue'
+import addComunityPost from '../views/addComunityPost.vue'
+import addRequestPost from '../views/addRequestPost.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +26,16 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: profilePage,
+    },
+    {
+      path: '/addComunityPost',
+      name: 'addComunityPost',
+      component: addComunityPost,
+    },
+    {
+      path: '/addRequestPost',
+      name: 'addRequestPost',
+      component: addRequestPost,
     }
     // {
     //   path: '/report',
