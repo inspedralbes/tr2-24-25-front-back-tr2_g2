@@ -580,56 +580,76 @@ app.get('/reports/users/:id', async (req, res) => {
     }
 });
 
-app.post('/reports/users', (req, res) => {
+app.post('/reports/users', async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
-    const query = 'INSERT INTO reportsUsers (reported_user_id, user_id, report) VALUES (?, ?, ?)';
-    db.query(query, [reported_user_id, user_id, report], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('INSERT INTO reportsUsers (reported_user_id, user_id, report) VALUES (?, ?, ?)', [reported_user_id, user_id, report]);
+        connection.end();
+
         res.status(201).send({ id: result.insertId });
-    });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
-app.put('/reports/users/:id', (req, res) => {
+app.put('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-    const query = 'UPDATE reportsUsers SET status = ? WHERE id = ?';
-    db.query(query, [status, id], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        if (result.affectedRows == 0) {
-            return res.status(404).send({ message: 'Report not found' });
-        }
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('UPDATE reportsUsers SET status = ? WHERE id = ?', [status, id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Report not found' });
+
         res.status(200).send({ message: 'Status updated successfully' });
-    });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
-app.delete('/reports/users/:id', (req, res) => {
+app.delete('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM reportsUsers WHERE id = ?';
-    db.query(query, [id], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: 'Report not found' });
-        }
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('DELETE FROM reportsUsers WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Report not found' });
+
         res.status(204).send();
-    });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Create users rewiews
-app.post('/reviews', (req, res) => {
-    const { reviewed_user_id, reviewer_user_id, rating } = req.body;
-    const query = 'INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES (?, ?, ?)';
-    db.query(query, [reviewed_user_id, reviewer_user_id, rating], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        res.status(201).send({ id: result.insertId });
-    });
+app.post('/reviews', async (req, res) => { 
+    const { reviewed_user_id, reviewer_user_id, rating } = req.body; 
+
+    try { 
+        const connection = await mysql.createConnection(dbConfig); 
+        await connection.beginTransaction(); 
+        const [result] = await connection.execute('INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES (?, ?, ?)', [reviewed_user_id, reviewer_user_id, rating]); 
+        
+        const [rows] = await connection.execute('SELECT AVG(rating) as rating FROM reviews WHERE reviewed_user_id = ?', [reviewed_user_id]); 
+        if (rows.length == 0) { 
+            throw new Error('No reviews found for the user');
+        } 
+        const averageRating = parseFloat(rows[0].rating).toFixed(2); 
+
+        await connection.execute('UPDATE users SET review = ? WHERE id = ?', [averageRating, reviewed_user_id]); 
+        await connection.commit(); 
+        connection.end(); 
+        res.status(201).send({ id: result.insertId }); 
+    } catch (error) { 
+        console.error('Database error:', error); 
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Define a simple route
