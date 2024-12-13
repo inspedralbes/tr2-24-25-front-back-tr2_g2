@@ -475,6 +475,163 @@ app.delete('/teachersClasses/:id', async (req, res) => {
     }
 });
 
+// CRD operations for reports comments
+app.get('/reports/comments', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [results] = await connection.execute('SELECT * FROM reportsComments');
+        connection.end();
+
+        res.status(200).send(results);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/reports/comments/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('SELECT * FROM reportsComments WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.length === 0) return res.status(404).send({ message: 'Report not found' });
+
+        res.status(200).send(result[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.post('/reports/comments', async (req, res) => {
+    const { comment_id, user_id, report } = req.body;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('INSERT INTO reportsComments (comment_id, user_id, report) VALUES (?, ?, ?)', [comment_id, user_id, report]);
+        connection.end();
+
+        res.status(201).send({ id: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.put('/reports/comments/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('UPDATE reportsComments SET status = ? WHERE id = ?', [status, id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Report not found' });
+
+        res.status(200).send({ message: 'Status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.delete('/reports/comments/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('DELETE FROM reportsComments WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Report not found' });
+
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// CRUD operations for reports users
+app.get('/reports/users', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [results] = await connection.execute('SELECT * FROM reportsUsers');
+        connection.end();
+
+        res.status(200).send(results);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/reports/users/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('SELECT * FROM reportsUsers WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.length === 0) return res.status(404).send({ message: 'Report not found' });
+
+        res.status(200).send(result[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.post('/reports/users', (req, res) => {
+    const { reported_user_id, user_id, report } = req.body;
+    const query = 'INSERT INTO reportsUsers (reported_user_id, user_id, report) VALUES (?, ?, ?)';
+    db.query(query, [reported_user_id, user_id, report], (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.status(201).send({ id: result.insertId });
+    });
+});
+
+app.put('/reports/users/:id', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const query = 'UPDATE reportsUsers SET status = ? WHERE id = ?';
+    db.query(query, [status, id], (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if (result.affectedRows == 0) {
+            return res.status(404).send({ message: 'Report not found' });
+        }
+        res.status(200).send({ message: 'Status updated successfully' });
+    });
+});
+
+app.delete('/reports/users/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'DELETE FROM reportsUsers WHERE id = ?';
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Report not found' });
+        }
+        res.status(204).send();
+    });
+});
+
+// Create users rewiews
+app.post('/reviews', (req, res) => {
+    const { reviewed_user_id, reviewer_user_id, rating } = req.body;
+    const query = 'INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES (?, ?, ?)';
+    db.query(query, [reviewed_user_id, reviewer_user_id, rating], (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.status(201).send({ id: result.insertId });
+    });
+});
+
 // Define a simple route
 app.get('/', (req, res) => {
     res.send('Hello World!');
