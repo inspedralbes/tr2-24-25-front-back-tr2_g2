@@ -43,9 +43,9 @@
             saveForm(event) {
                 event.preventDefault();
                 const formData = {
-                    typesPublications_id: 1,
-                    title: this.postContent.title,
-                    description: this.postContent.description,
+                    typesPublications_id: 2,
+                    title: document.getElementById('title').value,
+                    description: document.getElementById('des').value,
                     user_id: ''
                 };
                 console.log(JSON.stringify(formData));
