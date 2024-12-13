@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
 /* ----------------------------------------- ROUTES ----------------------------------------- */
 // Define a simple route
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Hello World! XDDDDDDDDDDDDDDD');
 });
 
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
@@ -316,6 +316,86 @@ app.delete('/qualifications/:id', async (req, res) => {
         if (result.affectedRows == 0) return res.status(404).json({ error: 'Qualification not found' });
 
         res.json({ message: 'Qualification deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// CRUD operations for usersQualifications
+app.get('/users/qualifications', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM usersQualifications');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/users/qualifications/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM usersQualifications WHERE id = ?', [id]);
+        connection.end();
+
+        if (rows.length == 0) return res.status(404).json({ error: 'UserQualification not found' });
+
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.post('/users/qualifications', async (req, res) => {
+    const { user_id, qualification_id } = req.body;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'INSERT INTO usersQualifications (user_id, qualification_id) VALUES (?, ?)',
+            [user_id, qualification_id]
+        );
+        connection.end();
+        res.status(201).json({ message: 'UserQualification created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.put('/users/qualifications/:id', async (req, res) => {
+    const { id } = req.params;
+    const { user_id, qualification_id } = req.body;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'UPDATE usersQualifications SET user_id = ?, qualification_id = ? WHERE id = ?',
+            [user_id, qualification_id, id]
+        );
+        connection.end();
+
+        if (result.affectedRows == 0) return res.status(404).json({ error: 'UserQualification not found' });
+
+        res.json({ message: 'UserQualification updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.delete('/users/qualifications/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('DELETE FROM usersQualifications WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows == 0) return res.status(404).json({ error: 'UserQualification not found' });
+
+        res.json({ message: 'UserQualification deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
