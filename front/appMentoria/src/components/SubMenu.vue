@@ -14,7 +14,7 @@
               <p class="text-sm font-medium leading-5 text-gray-900 truncate">Carvajal</p>
             </div>
             <div class="py-1">
-              <a href="javascript:void(0)" tabindex="0" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"  role="menuitem" >Perfil</a>
+              <a @click="$router.push('/profile')" tabindex="0" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"  role="menuitem" >Perfil</a>
               <a href="javascript:void(0)" tabindex="1" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"  role="menuitem" >Mis publicacions</a>
               <a href="javascript:void(0)" tabindex="2" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"  role="menuitem" >Mis Peticions</a>
               </div>
