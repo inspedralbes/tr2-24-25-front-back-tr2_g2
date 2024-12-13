@@ -48,6 +48,11 @@ io.on('connection', (socket) => {
 });
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */
+// Define a simple route
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // Register route
@@ -316,6 +321,7 @@ app.delete('/qualifications/:id', async (req, res) => {
     }
 });
 
+// CRUD operations for classes
 app.get('/classes', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
@@ -475,7 +481,7 @@ app.delete('/teachersClasses/:id', async (req, res) => {
     }
 });
 
-// CRD operations for reports comments
+// CRUD operations for reports comments
 app.get('/reports/comments', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
@@ -650,11 +656,6 @@ app.post('/reviews', async (req, res) => {
         console.error('Database error:', error); 
         res.status(500).json({ error: 'Database error' });
     }
-});
-
-// Define a simple route
-app.get('/', (req, res) => {
-    res.send('Hello World!');
 });
 
 // Start the server
