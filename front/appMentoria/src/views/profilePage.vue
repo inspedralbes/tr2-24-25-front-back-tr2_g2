@@ -15,7 +15,6 @@
         </div>
 
         <div class="w-full max-w-7xl mx-auto px-6 md:px-8 flex-grow">
-            <!-- Avatar del Usuario -->
             <div class="flex items-center justify-center sm:justify-start relative z-10 mb-5">
                 <img src="https://pbs.twimg.com/profile_images/1646143747200000004/662M_9h1_400x400.jpg"
                     alt="user-avatar-image"
@@ -44,7 +43,7 @@
                 <div class="flex items-center gap-4">
 
                 </div>
-                <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="flex flex-col md:flex-row items-center sm:justify-end gap-6">
                     <ul class="flex items-center max-sm:justify-center max-sm:flex-wrap gap-2.5">
                         <li
                             class="py-3.5 px-7 rounded-full bg-orange-50 font-semibold text-base leading-7 text-gray-700">
@@ -66,7 +65,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex py-6 top-6 justify-center sm:justify-right gap-4">
+        <div class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex justify-center sm:justify-end gap-4 md:mt-4 relative z-20 -translate-y-6 lg:-translate-y-60">
             <!-- Botón de Discord -->
             <a href="https://discord.com/invite/tu-invite" target="_blank" rel="noopener noreferrer"
                 class="flex items-center py-3 px-6 bg-indigo-600 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700">
@@ -86,7 +85,12 @@
             </a>
         </div>
     </section>
+
+    <div class="relative z-20 -translate-y-16 lg:-translate-y-60">
+        <calendario />
+    </div>
 </template>
 
 <script setup>
+import calendario from '@/components/calendario.vue';
 </script>
