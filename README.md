@@ -15,9 +15,13 @@
 ## Gestor de tasques:
 * Taiga 🐼: https://tree.taiga.io/project/julsluks-tr2-dam-mentories/timeline
 
+## Diagrama casos d'ús:
+![Diagrama de caso de uso (TR2)](https://github.com/user-attachments/assets/3ef4f6bf-aa79-4d59-bde6-243317a8486d)
+
 ## PenPot -- Prototipatge:
-* Android 🤖: 
-* Web 🕸️:
+![pantallesUsuari](https://github.com/user-attachments/assets/ed0e4024-67b8-4084-973e-c3219a56ae23)
+
+![pantallesAdmin](https://github.com/user-attachments/assets/6e5f3627-4436-48b8-a774-f1658542d77c)
 
 ## URL de producció:
 * En procés...
