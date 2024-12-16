@@ -1,0 +1,35 @@
+[
+    {
+      "id": 1,
+      "name": "John Doe",
+      "avatar": "/public/mikasa.jpg",
+      "jobTitle": "Product Designer",
+      "description": "Apparently we had reached a great height in the atmosphere",
+      "image": "https://images.pexels.com/photos/3779448/pexels-photo-3779448.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "following": 561,
+      "tweets": 1337,
+      "followers": 781
+    },
+    {
+      "id": 2,
+      "name": "Sara Matínez",
+      "avatar":  "https://pbs.twimg.com/profile_images/1646143747200000004/662M_9h1_400x400.jpg",
+      "jobTitle": "Software Engineer",
+      "description": "Mondongo",
+      "image": "https://pbs.twimg.com/profile_banners/889046489942675456/1705870682/1500x500",
+      "following": 342,
+      "tweets": 987,
+      "followers": 654
+    },
+    {
+      "id": 3,
+      "name": "Alice Johnson",
+      "avatar": "/public/levi.jpg",
+      "jobTitle": "Data Scientist",
+      "description": "A shining crescent far beneath the flying vessel",
+      "image": "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "following": 123,
+      "tweets": 456,
+      "followers": 789
+    }
+  ]
