@@ -1,15 +1,14 @@
 <template>
-    <!-- component -->
-<div class="bg-gray-100 h-screen flex items-center justify-center p-8">
+<div class="h-screen flex items-center justify-center p-8">
 			<div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-				<form>
+				<form @submit.prevent="saveForm">
 					<!-- Post Content Section -->
 					<div class="mb-6">
 						<label class="block text-gray-700 text-sm font-bold mb-2">Afegeix una Publicació:</label>
                         <div class="pb-4"><textarea id="title" name="postContent" rows="1" class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm
-          sm:leading-5 resize-none focus:outline-none focus:border-blue-500" placeholder="Títol"></textarea></div>
+          sm:leading-5 resize-none focus:outline-none focus:border-blue-500" placeholder="Títol" required></textarea></div>
           <div ><textarea id="des" name="postContent" rows="4" class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm
-          sm:leading-5 resize-none focus:outline-none focus:border-blue-500" placeholder="En que hi penses?"></textarea></div>
+          sm:leading-5 resize-none focus:outline-none focus:border-blue-500" placeholder="En que hi penses?" required></textarea></div>
 					</div>
                     <!-- Tags Section -->
                     <div class="mb-6">
@@ -29,8 +28,31 @@
 		</div>
 </template>
 <script>
-
-</script>
+    export default {
+        data() {
+            return {
+                postContent: {
+                    typesPublications_id: '',
+                    title: '',
+                    description: '',
+                    user_id: ''
+                }
+            };
+        },
+        methods: {
+            saveForm(event) {
+                event.preventDefault();
+                const formData = {
+                    typesPublications_id: 2,
+                    title: document.getElementById('title').value,
+                    description: document.getElementById('des').value,
+                    user_id: ''
+                };
+                console.log(JSON.stringify(formData));
+            }
+        }
+    };
+    </script>
 <style scoped>
 .create-post {
     max-width: 500px;

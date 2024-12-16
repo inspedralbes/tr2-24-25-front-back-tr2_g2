@@ -17,28 +17,32 @@
                     </div>
                     <!-- Availability Section -->
                     <div class="mb-6">
-                        <label for="hours" class="block text-gray-700 text-sm font-bold mb-2">Disponible:</label>
                         <div class="form-group">
-                        <button type="button" @click="addAvailability">+ Afegir Disponibilitat</button>
-                        </div>
-
-                        <div v-for="(availability, index) in availabilities" :key="index" class="availability-group">
-                            <select v-model="availability.day">
-                                <option v-for="day in week" :key="day" :value="day">{{ day }}</option>
-                            </select>
-                            <select v-model="availability.startTime">
-                                <option v-for="hour in hours" :key="hour" :value="hour">{{ hour }}</option>
-                            </select>
-                            <select v-model="availability.endTime">
-                                <option v-for="hour in hours" :key="hour" :value="hour">{{ hour }}</option>
-                            </select>
-                            <button type="addAv" style="margin: 10px;" @click="removeAvailability(index)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <label for="hours" class="block text-gray-700 text-sm font-bold mb-2">Disponible:</label>
+                        <button class="p-3" type="button" @click="addAvailability">+ Afegir Disponibilitat</button>
+                        <div v-for="(availability, index) in availabilities" :key="index" class="availability-group flex flex-col md:flex-row items-center gap-2 mb-4">
+                          <select v-model="availability.day" class="border-2 rounded-md p-2 w-full md:w-auto">
+                            <option disabled value="">Selecciona un dia</option>
+                            <option v-for="day in week" :key="day" :value="day">{{ day }}</option>
+                          </select>
+                          <select v-model="availability.startTime" @change="validateTimes(index)" class="border-2 rounded-md p-2 w-full md:w-auto">
+                            <option disabled value="">Hora d'inici</option>
+                            <option v-for="hour in filteredHours(index, 'start')" :key="hour" :value="hour">{{ hour }}</option>
+                          </select>
+                          <select v-model="availability.endTime" @change="validateTimes(index)" class="border-2 rounded-md p-2 w-full md:w-auto">
+                            <option disabled value="">Hora de final</option>
+                            <option v-for="hour in filteredHours(index, 'end')" :key="hour" :value="hour">{{ hour }}</option>
+                          </select>
+                          <button type="button" @click="removeAvailability(index)" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M9.1709 4C9.58273 2.83481 10.694 2 12.0002 2C13.3064 2 14.4177 2.83481 14.8295 4" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
                             <path d="M20.5001 6H3.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
                             <path d="M18.8332 8.5L18.3732 15.3991C18.1962 18.054 18.1077 19.3815 17.2427 20.1907C16.3777 21 15.0473 21 12.3865 21H11.6132C8.95235 21 7.62195 21 6.75694 20.1907C5.89194 19.3815 5.80344 18.054 5.62644 15.3991L5.1665 8.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
                             <path d="M9.5 11L10 16" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
                             <path d="M14.5 11L14 16" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg></button>
+                            </svg>
+                          </button>
+                        </div>
                         </div>
                     </div>
                             
@@ -54,35 +58,51 @@
 			</div>
 		</div>
 </template>
+
 <script>
 export default {
-    data() {
-        return {
-            hours: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-            week: ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'],
-            availabilities: [],
-            postContent: ''
-        };
+  data() {
+    return {
+      hours: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+      week: ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'],
+      availabilities: [],
+      postContent: ''
+    };
+  },
+  methods: {
+    addAvailability() {
+      this.availabilities.push({ day: '', startTime: '', endTime: '' });
     },
-    methods: {
-        addAvailability() {
-            this.availabilities.push({ day: '', startTime: '', endTime: '' });
-        },
-        removeAvailability(index) {
-            this.availabilities.splice(index, 1);
-        },
-        async submitForm() {
-            const formData = {
-                title: document.getElementById('title').value,
-                description: document.getElementById('des').value,
-                availabilities: this.availabilities
-            };
-
-            const jsonData = JSON.stringify(formData);
-
-            console.log(jsonData);
-        }
+    removeAvailability(index) {
+      this.availabilities.splice(index, 1);
+    },
+    validateTimes(index) {
+      const availability = this.availabilities[index];
+      if (availability.startTime && availability.endTime && availability.startTime >= availability.endTime) {
+        alert('La hora de finalización debe ser posterior a la hora de inicio.');
+        availability.endTime = '';
+      }
+    },
+    filteredHours(index, type) {
+      const availability = this.availabilities[index];
+      const selectedHours = this.availabilities.flatMap(a => [a.startTime, a.endTime]).filter(Boolean);
+      if (type === 'start') {
+        return this.hours.filter(hour => !selectedHours.includes(hour) || hour === availability.startTime);
+      } else {
+        return this.hours.filter(hour => hour > availability.startTime && (!selectedHours.includes(hour) || hour === availability.endTime));
+      }
+    },
+    async submitForm() {
+      const formData = {
+        typesPublications_id: 2,
+        title: document.getElementById('title').value,
+        description: document.getElementById('des').value,
+        availabilities: this.availabilities,
+        user_id: ''
+      };
+      console.log(JSON.stringify(formData));
     }
+  }
 };
 </script>
 
