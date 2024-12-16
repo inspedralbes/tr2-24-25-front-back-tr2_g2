@@ -1,0 +1,6 @@
+const BACK_URL = import.meta.env.VITE_URL_BACK;
+const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
+const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
+const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENTEXCHANGE;
+const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
+
