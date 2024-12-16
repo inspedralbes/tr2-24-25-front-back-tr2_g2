@@ -5,11 +5,11 @@
         <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
           <div class="flex-1 flex justify-center">
             <div class="flex items-center space-x-5 lg:space-x-40">
-              <a href="#" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
+              <a @click="$router.push('/')" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Comunitat
               </a>
-              <a href="#" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
-                Mentoria
+              <a @click="$router.push('/profilesPage')" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
+                Mentors
               </a>
               <a href="#" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Peticions

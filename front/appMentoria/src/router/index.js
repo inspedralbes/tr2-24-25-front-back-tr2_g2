@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import mainPage from '../views/mainPage.vue'
 import profilePage from '../views/profilePage.vue'
+import profilesPage from '@/views/profilesPage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
@@ -17,11 +18,11 @@ const router = createRouter({
       name: '',
       component: loginPage,
     },
-     {
-       path: '/',
-       name: 'mainPage',
-       component: mainPage,
-     },
+    {
+      path: '/',
+      name: 'mainPage',
+      component: mainPage,
+    },
     {
       path: '/profile',
       name: 'profile',
@@ -36,6 +37,11 @@ const router = createRouter({
       path: '/addRequestPost',
       name: 'addRequestPost',
       component: addRequestPost,
+    },
+    {
+      path: '/profilesPage',
+      name: 'profilesPage',
+      component: profilesPage,
     }
     // {
     //   path: '/report',
