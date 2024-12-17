@@ -6,7 +6,7 @@
         src="https://recursos.marketingnews.es/files/666/31.JPG" 
         alt="App Logo"
       />
-      <h2 class="text-2xl font-semibold text-center text-gray-800 mt-6">Inicia sessió</h2>
+      <h2 class="text-2xl font-semibold text-center text-gray-800 mt-6">Registrar-se</h2>
       <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-8 flex flex-col sm:flex-row py-6 top-6 justify-center sm:justify-end gap-4">
         <button @click="signInWithGoogle">
           <p class="flex items-center py-3 px-6 bg-white-800 rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 justify-center">
@@ -51,96 +51,55 @@
   </div>
 </template>
 
-<script>
-// Import the functions you need from the SDKs you need
+<script setup> 
+import { ref } from 'vue'; 
+import { initializeApp } from "firebase/app"; 
+import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth"; 
 
-import { initializeApp } from "firebase/app";
+// Firebase configuration 
+const firebaseConfig = { 
+  apiKey: "AIzaSyAC-O_e7tx6EzkuNiW1j7RBjqVr-iNirBM", 
+  authDomain: "tr2-dam-mentories.firebaseapp.com", 
+  projectId: "tr2-dam-mentories", 
+  storageBucket: "tr2-dam-mentories.firebaseapp.com", 
+  messagingSenderId: "338164475859", 
+  appId: "1:338164475859:web:e69d1ef2426b26d9e0f126", 
+  measurementId: "G-KTW22GCCFB" 
+}; 
 
-import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
+// Initialize Firebase 
+const app = initializeApp(firebaseConfig); 
+const auth = getAuth(app); 
 
-// TODO: Add SDKs for Firebase products that you want to use
+// State and methods 
+const message = ref(''); 
+const messageType = ref(''); 
 
-// https://firebase.google.com/docs/web/setup#available-libraries
+const signInWithGoogle = async () => { 
+  const provider = new GoogleAuthProvider(); 
+  try { 
+    const result = await signInWithPopup(auth, provider); 
+    console.log(result); 
+    const { displayName } = result.user; 
+    message.value = `Benvingut, ${displayName}`;
+    messageType.value = 'success'; 
+  } catch (error) { 
+    message.value = `Error: ${error.message}`; 
+    messageType.value = 'error'; 
+  } 
+}; 
 
-
-// Your web app's Firebase configuration
-
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
-const firebaseConfig = {
-
-  apiKey: "AIzaSyAC-O_e7tx6EzkuNiW1j7RBjqVr-iNirBM",
-
-  authDomain: "tr2-dam-mentories.firebaseapp.com",
-
-  projectId: "tr2-dam-mentories",
-
-  storageBucket: "tr2-dam-mentories.firebasestorage.app",
-
-  messagingSenderId: "338164475859",
-
-  appId: "1:338164475859:web:e69d1ef2426b26d9e0f126",
-
-  measurementId: "G-KTW22GCCFB"
-
-};
-
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-export default {
-  name: 'LoginPage',
-  data() {
-    return {
-      message: '',
-      messageType: ''
-    };
-  },
-  methods: {
-    async signInWithGoogle() {
-      const provider = new GoogleAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        console.log(result);
-        const { displayName, email, photoURL, accessToken } = result.user;
-        let userInfo = {
-          name: displayName,
-          email,
-          photoURL,
-          token: accessToken
-        };
-        userInfo = JSON.stringify(userInfo);
-        console.log(userInfo);
-        this.message = `Benvingut, ${result.user.displayName}`;
-        this.messageType = 'success';
-      } catch (error) {
-        this.message = `Error: ${error.message}`;
-        this.messageType = 'error';
-      }
-    },
-    async signInWithGithub() {
-      const provider = new GithubAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        console.log(result);
-        const { displayName, photoURL, accessToken } = result.user;
-        const email = result._tokenResponse.email;
-        let userInfo = {
-          name: displayName,
-          email,
-          profile: photoURL,
-          token: accessToken
-        };
-        userInfo = JSON.stringify(userInfo);
-        console.log(userInfo);
-        this.message = `Benvingut, ${result.user.displayName}`;
-        this.messageType = 'success';
-      } catch (error) {
-        this.message = `Error: ${error.message}`;
-        this.messageType = 'error';
-      }
-    }
-  }
-};
+const signInWithGithub = async () => { 
+  const provider = new GithubAuthProvider(); 
+  try { 
+    const result = await signInWithPopup(auth, provider); 
+    console.log(result); 
+    const { displayName } = result.user; 
+    message.value = `Benvingut, ${displayName}`; 
+    messageType.value = 'success'; 
+  } catch (error) { 
+    message.value = `Error: ${error.message}`; 
+    messageType.value = 'error'; 
+  } 
+}; 
 </script>

@@ -6,7 +6,7 @@ import profilesPage from '@/views/profilesPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
-import loginPage from '../views/loginPage.vue'
+import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
 import addRequestPost from '../views/addRequestPost.vue'
 
