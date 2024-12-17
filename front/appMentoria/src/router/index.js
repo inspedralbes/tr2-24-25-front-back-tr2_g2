@@ -14,12 +14,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/loginPage',
+      path: '/',
       name: 'loginPage',
       component: loginPage,
     },
     {
-      path: '/',
+      path: '/mainPage',
       name: 'mainPage',
       component: mainPage,
     },
@@ -53,7 +53,6 @@ const router = createRouter({
     //   name: 'validationPage',
     //   component: validationPage,
     // },
-
     // {
     //   path: '/chatList',
     //   name: 'chatListPage',

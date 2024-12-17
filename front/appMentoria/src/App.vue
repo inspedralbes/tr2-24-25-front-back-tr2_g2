@@ -1,24 +1,24 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-// import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import ToggleDarkMode from './components/ToggleDarkMode.vue';
 
-// // Estado del modo oscuro
-// const isDarkMode = ref(false); 
+const isDarkMode = ref(false);
 
-// // Función para alternar el modo oscuro 
-// const toggleDarkMode = () => { 
-//   isDarkMode.value = !isDarkMode.value; 
-//   document.documentElement.classList.toggle('dark', isDarkMode.value); 
-// }; 
-// // Recupera el estado del modo oscuro al montar el componente (opcional) 
-// onMounted(() => { 
-//   isDarkMode.value = document.documentElement.classList.contains('dark'); 
-// });
+onMounted(() => { 
+  const darkModePreference = localStorage.getItem('darkMode'); 
+  if (darkModePreference == 'enabled') { 
+    isDarkMode.value = true; 
+    document.documentElement.classList.add('dark'); 
+  } else { 
+    isDarkMode.value = false; 
+    document.documentElement.classList.remove('dark'); 
+  } 
+});
 </script>
 
 <template>
   <div id="app" :class="darkMode ? 'dark' : ''">
-  <!-- <button @click="toggleDarkMode">a</button> -->
     <RouterView />
   </div>
 </template>

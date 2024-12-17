@@ -31,7 +31,7 @@
             <div class="py-1">
               <div class="flex justify-between px-4 py-2">
                 <span>
-                  <button @click="toggleDarkMode">a</button>
+                  <ToggleDarkMode />
                 </span>
                 <span><svg width="40" height="40" fill="#000000" viewBox="-9 0 32 32" version="1.1"
                     xmlns="http://www.w3.org/2000/svg">
@@ -55,19 +55,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import ToggleDarkMode from './ToggleDarkMode.vue';
 
-// Estado del modo oscuro
-const isDarkMode = ref(false); 
-
-// Función para alternar el modo oscuro 
-const toggleDarkMode = () => { 
-  isDarkMode.value = !isDarkMode.value; 
-  document.documentElement.classList.toggle('dark', isDarkMode.value); 
-}; 
-// Recupera el estado del modo oscuro al montar el componente (opcional) 
-onMounted(() => { 
-  isDarkMode.value = document.documentElement.classList.contains('dark'); 
-});
 </script>
 
 <style>
