@@ -1,0 +1,18 @@
+[
+    {
+        "comment": "Tu idea es estúpida.",
+        "reason": "Contiene lenguaje irrespetuoso o insultante."
+    },
+    {
+        "comment": "Mejor ni te esfuerces, igual no lo harás bien.",
+        "reason": "Comentario desmotivador y con intención de ofender."
+    },
+    {
+        "comment": "Eres el peor en este grupo.",
+        "reason": "Emite un juicio grosero y comparativo de manera irrespetuosa."
+    },
+    {
+        "comment": "Qué ridículo te ves intentando explicar eso.",
+        "reason": "Emite una crítica personal grosera y ofensiva."
+    }
+]

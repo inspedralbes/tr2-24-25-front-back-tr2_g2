@@ -10,5 +10,5 @@
 /services/employmentexchange/node_modules
 /services/employmentexchange/.env
 
-/services/IA/node_modules
-/services/IA/.env
+/services/ia-comment/node_modules
+/services/ia-comment/.env
