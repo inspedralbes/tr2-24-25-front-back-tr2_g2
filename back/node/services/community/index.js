@@ -142,13 +142,13 @@ app.get('/publications/:id', async (req, res) => {
 });
 
 app.post('/publications', async (req, res) => {
-    const { title, description, user_id, reports } = req.body;
+    const { title, description, user_id } = req.body;
 
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
-            'INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES (?, ?, ?, ?, ?)',
-            [ 1, title, description, user_id, reports]
+            'INSERT INTO publications (typesPublications_id, title, description, user_id) VALUES (?, ?, ?, ?)',
+            [ 1, title, description, user_id]
         );
         connection.end();
         res.status(201).json({ message: 'Publication created successfully' });
