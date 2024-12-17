@@ -14,8 +14,8 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/login',
-      name: '',
+      path: '/loginPage',
+      name: 'loginPage',
       component: loginPage,
     },
     {

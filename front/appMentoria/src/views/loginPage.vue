@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-5">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-blue-200 dark:bg-blue-950 p-5">
     <div class="flex flex-col bg-white shadow-lg rounded-lg px-6 py-8 w-full max-w-lg m-4">
       <img 
         class="mx-auto w-24 h-24 rounded-full shadow-lg" 
@@ -40,8 +40,8 @@
       <div 
         v-if="message" 
         :class="{
-          'bg-green-100 border-green-500 text-green-700': messageType === 'success',
-          'bg-red-100 border-red-500 text-red-700': messageType === 'error'
+          'bg-green-100 border-green-500 text-green-700': messageType == 'success',
+          'bg-red-100 border-red-500 text-red-700': messageType == 'error'
         }" 
         class="border-l-4 p-4 mt-6 rounded-lg"
       >
