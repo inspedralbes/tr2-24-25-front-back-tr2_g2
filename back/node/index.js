@@ -2,12 +2,15 @@
 const fileUpload = require('express-fileupload');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
+
+const secretKey = process.env.SECRET_KEY;
 
 const app = express();
 const port = process.env.PORT || 3000;
