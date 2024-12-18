@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
   <div id="app" :class="darkMode ? 'dark' : ''">
-    <RouterView />
+    <RouterView class="bg-white dark:bg-neutral-800 text-gray-900 dark:text-white"/>
   </div>
 </template>
 

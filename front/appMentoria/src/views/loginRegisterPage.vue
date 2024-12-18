@@ -53,21 +53,17 @@
 
 <template>
   <div class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-    <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+    <div class="max-w-screen-xl m-0 sm:m-10 bg-white dark:bg-neutral-600 shadow sm:rounded-lg flex justify-center flex-1">
       <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-        <!-- <div>
-          <img
-            src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
-            class="w-32 mx-auto" />
-        </div> -->
+        <ToggleDarkMode />
         <div class="mt-12 flex flex-col items-center">
           <h1 class="text-2xl xl:text-3xl font-extrabold">
-            Registrat
+            Registrat a CONEXUS
           </h1>
           <div class="w-full flex-1 mt-8">
             <div class="flex flex-col items-center">
-              <button
-                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
+              <button @click="signInWithGoogle"
+                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
                 <div class="bg-white p-2 rounded-full">
                   <svg class="w-4" viewBox="0 0 533.5 544.3">
                     <path
@@ -89,8 +85,8 @@
                 </span>
               </button>
 
-              <button
-                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
+              <button @click="signInWithGithub"
+                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
                 <div class="bg-white p-1 rounded-full">
                   <svg class="w-6" viewBox="0 0 32 32">
                     <path fill-rule="evenodd"
@@ -101,24 +97,36 @@
                   Accedeix amb GitHub
                 </span>
               </button>
+
+              <button @click="signInWithDiscord"
+                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
+                <div class="bg-white p-1 rounded-full">
+                  <svg class="w-6" viewBox="0 0 32 32">
+                    <path xmlns="http://www.w3.org/2000/svg"
+                      d="M23.6361 9.33998C22.212 8.71399 20.6892 8.25903 19.0973 8C18.9018 8.33209 18.6734 8.77875 18.5159 9.13408C16.8236 8.89498 15.1469 8.89498 13.4857 9.13408C13.3283 8.77875 13.0946 8.33209 12.8974 8C11.3037 8.25903 9.77927 8.71565 8.35518 9.3433C5.48276 13.4213 4.70409 17.3981 5.09342 21.3184C6.99856 22.6551 8.84487 23.467 10.66 23.9983C11.1082 23.4189 11.5079 22.8029 11.8523 22.1536C11.1964 21.9195 10.5683 21.6306 9.9748 21.2951C10.1323 21.1856 10.2863 21.071 10.4351 20.9531C14.0551 22.5438 17.9881 22.5438 21.5649 20.9531C21.7154 21.071 21.8694 21.1856 22.0251 21.2951C21.4299 21.6322 20.8 21.9211 20.1442 22.1553C20.4885 22.8029 20.8865 23.4205 21.3364 24C23.1533 23.4687 25.0013 22.6567 26.9065 21.3184C27.3633 16.7738 26.1261 12.8335 23.6361 9.33998ZM12.3454 18.9075C11.2587 18.9075 10.3676 17.9543 10.3676 16.7937C10.3676 15.6331 11.2397 14.6783 12.3454 14.6783C13.4511 14.6783 14.3422 15.6314 14.3232 16.7937C14.325 17.9543 13.4511 18.9075 12.3454 18.9075ZM19.6545 18.9075C18.5678 18.9075 17.6767 17.9543 17.6767 16.7937C17.6767 15.6331 18.5488 14.6783 19.6545 14.6783C20.7602 14.6783 21.6514 15.6314 21.6323 16.7937C21.6323 17.9543 20.7602 18.9075 19.6545 18.9075Z"
+                      fill="#5865F2" />
+                  </svg>
+                </div>
+                <span class="ml-4">Accedeix amb Discord</span>
+              </button>
             </div>
 
             <div class="my-12 border-b text-center">
               <div
-                class="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
-                Or sign up with e-mail
+                class="leading-none px-2 inline-block text-sm text-gray-600 dark:text-white tracking-wide font-medium bg-white dark:bg-neutral-600 transform translate-y-1/2">
+                O Inicia sessió
               </div>
             </div>
 
             <div class="mx-auto max-w-xs">
               <input
-                class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                type="email" placeholder="Email" />
+                class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                type="email" placeholder="Correu electrònic" />
               <input
-                class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password" placeholder="Password" />
+                class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                type="password" placeholder="Contrasenya" />
               <button
-                class="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                class="mt-5 tracking-wide font-semibold bg-indigo-500 dark:bg-indigo-700 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                 <svg class="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -126,10 +134,16 @@
                   <path d="M20 8v6M23 11h-6" />
                 </svg>
                 <span class="ml-3">
-                  Sign Up
+                  Inicia sessió
                 </span>
               </button>
-              <p class="mt-6 text-xs text-gray-600 text-center">
+              <div v-if="message" :class="{
+                'bg-green-100 border-green-500 text-green-700': messageType == 'success',
+                'bg-red-100 border-red-500 text-red-700': messageType == 'error'
+              }" class="border-l-4 p-4 mt-6 rounded-lg">
+                <p>{{ message }}</p>
+              </div>
+              <p class="mt-6 text-xs text-gray-600 dark:text-gray-100 text-center">
                 Projecte realitzat per l'equip de
                 <span class="border-b border-gray-500 border-dotted">
                   Conexus
@@ -156,6 +170,7 @@
 import { ref } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
+import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
 
 // Firebase configuration 
 const firebaseConfig = {
@@ -203,4 +218,9 @@ const signInWithGithub = async () => {
     messageType.value = 'error';
   }
 }; 
+
+const signInWithDiscord = async () => {
+  message.value = 'Aquesta funcionalitat encara no està disponible';
+  messageType.value = 'error';
+};
 </script>
