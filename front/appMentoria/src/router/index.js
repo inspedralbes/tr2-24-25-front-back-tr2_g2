@@ -4,7 +4,7 @@ import profilePage from '../views/profilePage.vue'
 import profilesPage from '@/views/profilesPage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
-// import chatListPage from '../views/chatListPage.vue'
+ import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
 import loginPage from '../views/loginPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
@@ -42,7 +42,7 @@ const router = createRouter({
       path: '/profilesPage',
       name: 'profilesPage',
       component: profilesPage,
-    }
+    },
     // {
     //   path: '/report',
     //   name: 'reportPage',
@@ -54,11 +54,11 @@ const router = createRouter({
     //   component: validationPage,
     // },
 
-    // {
-    //   path: '/chatList',
-    //   name: 'chatListPage',
-    //   component: chatListPage,
-    // },
+    {
+      path: '/chatList',
+      name: 'chatListPage',
+      component: chatListPage,
+    }
     // {
     //   path: '/chat',
     //   name: 'chatPage',

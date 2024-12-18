@@ -1,0 +1,36 @@
+[
+  {
+      "idChat": "abc123",
+      "idUser1": "123456",
+      "idUser2": "789012",
+      "interactions": [
+        {
+          "idUser": "123456",
+          "message": "Este es un mensaje de ejemplo",
+          "timestamp": "2024-12-18T14:35:00Z"
+        },
+        {
+          "idUser": "123456",
+          "message": "Otro mensaje de prueba",
+          "timestamp": "2024-12-18T15:00:00Z"
+        }
+      ]
+    },
+    {
+      "idChat": "abc123",
+      "idUser1": "123456",
+      "idUser2": "789012",
+      "interactions": [
+        {
+          "idUser": "123456",
+          "message": "Este es un mensaje de ejemplo",
+          "timestamp": "2024-12-18T14:35:00Z"
+        },
+        {
+          "idUser": "123456",
+          "message": "Otro mensaje de prueba",
+          "timestamp": "2024-12-18T15:00:00Z"
+        }
+      ]
+    }
+  ]
