@@ -16,16 +16,7 @@ app.use(cors());
 
 app.get('/v1/models', (req, res) => {
 
-    const options = {
-        hostname: '127.0.0.1',
-        port: 3005,
-        path: '/v1/models',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData)
-        }
-    }
+    
 
 });
 
