@@ -57,10 +57,13 @@
       <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
         <ToggleDarkMode />
         <div class="mt-12 flex flex-col items-center">
-          <h1 class="text-2xl xl:text-3xl font-extrabold">
-            Registrat a CONEXUS
+          <h1 class="text-2xl xl:text-3xl font-extrabold mb-5">
+            CONEXUS
           </h1>
-          <div class="w-full flex-1 mt-8">
+          <h2 class="text-xl font-light xl:text-2xl">
+              Correu @inspedralbes.cat
+            </h2>
+          <div class="w-full flex-1 mt-3">
             <div class="flex flex-col items-center">
               <button @click="signInWithGoogle"
                 class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
@@ -200,7 +203,8 @@ const signInWithGoogle = async () => {
     message.value = `Benvingut, ${displayName}`;
     messageType.value = 'success';
   } catch (error) {
-    message.value = `Error: ${error.message}`;
+    console.log(error.message);
+    message.value = `Error al iniciar sessió`;
     messageType.value = 'error';
   }
 };
@@ -214,7 +218,8 @@ const signInWithGithub = async () => {
     message.value = `Benvingut, ${displayName}`;
     messageType.value = 'success';
   } catch (error) {
-    message.value = `Error: ${error.message}`;
+    console.log(error.message);
+    message.value = `Error al iniciar sessió`;
     messageType.value = 'error';
   }
 }; 

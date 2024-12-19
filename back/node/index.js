@@ -58,19 +58,25 @@ app.get('/', (req, res) => {
 
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
-// Register route
-app.post('/register', async (req, res) => {
-    const { name, email, password, typesUsers_id } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+// Login with api's google, github, discord
+app.post('/loginAPI', async (req, res) => {
+    const { email, tokenAPI } = req.body;
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'INSERT INTO users (name, email, password, typesUsers_id) VALUES (?, ?, ?, ?)',
-            [name, email, hashedPassword, typesUsers_id]
-        );
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+        let user;
+
+        if (users.length == 0) {
+            const [result] = await connection.execute('INSERT INTO users (email, token) VALUES (?, ?)', [email, tokenAPI]);
+            user = { id: result.insertId, email };
+        } else {
+            user = users[0];
+        }
         connection.end();
-        res.status(201).json({ message: 'User registered successfully' });
+
+        // Generar token JWT 
+        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
@@ -91,7 +97,9 @@ app.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(400).json({ error: 'Invalid password' });
 
-        res.json({ message: 'Login successful', user });
+        // Generar token JWT
+        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+        res.json({ message: 'Login successful', token });
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
@@ -741,14 +749,15 @@ app.post('/reviews', async (req, res) => {
     }
 });
 
-function verifyToken(req, res, next) { 
-    const token = req.headers['authorization']; 
-    if (!token) return res.status(403).send('Token es requerido'); 
-    
-    jwt.verify(token, secretKey, (err, decoded) => { 
-        if (err) return res.status(500).send('Fallo al autenticar el token'); 
-        req.user = decoded; next(); 
-    }); 
+// Function to verify token
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(403).send('Token es requerido');
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(500).send('Fallo al autenticar el token');
+        req.user = decoded; next();
+    });
 };
 
 // Start the server
