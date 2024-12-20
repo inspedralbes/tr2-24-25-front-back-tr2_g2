@@ -14,4 +14,4 @@ export const useAppStore = defineStore( 'appStore', {
       this.token = token
     }
   }
-})
+});

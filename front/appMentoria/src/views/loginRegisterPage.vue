@@ -121,6 +121,8 @@ import { ref } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
+import { loginAPI } from '@/services/communicationManager';
+import { useAppStore } from '@/stores/index';
 
 // Firebase configuration 
 const firebaseConfig = {
@@ -146,9 +148,32 @@ const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     console.log(result);
-    const { displayName } = result.user;
-    message.value = `Benvingut, ${displayName}`;
-    messageType.value = 'success';
+    const { accessToken, displayName, email, photoURL } = result.user;
+    console.log(accessToken, displayName, email, photoURL);
+
+    if (!email.includes('@inspedralbes.cat')) {
+      message.value = `No tens permís per accedir a aquesta aplicació`;
+      messageType.value = 'error';
+      return;
+    } else {
+      console.log('Usuari vàlid');
+      let user = {
+        email: email,
+        name: displayName,
+        token: accessToken,
+        profile: photoURL
+      };
+      try {
+        const response = await loginAPI(user);
+        console.log(response);
+        useAppStore().setToken(response.token);
+        useAppStore().setUser(response.user);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    // message.value = `Benvingut, ${displayName}`;
+    // messageType.value = 'success';
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;

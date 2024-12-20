@@ -68,7 +68,8 @@ app.post('/loginAPI', async (req, res) => {
 
         if (users.length == 0) {
             const [result] = await connection.execute('INSERT INTO users (email, token) VALUES (?, ?)', [email, tokenAPI]);
-            user = { id: result.insertId, email };
+            console.log(result);
+            // user = { id: result.insertId, name, email, profile };
         } else {
             user = users[0];
         }
@@ -76,7 +77,7 @@ app.post('/loginAPI', async (req, res) => {
 
         // Generar token JWT 
         const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful', token, user });
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
