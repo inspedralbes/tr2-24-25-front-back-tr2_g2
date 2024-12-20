@@ -1,15 +1,22 @@
 <template>
   <div class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-    <div class="max-w-screen-xl m-0 sm:m-10 bg-white dark:bg-neutral-600 shadow sm:rounded-lg flex justify-center flex-1">
+    <div
+      class="max-w-screen-xl m-0 sm:m-10 bg-white dark:bg-neutral-600 shadow sm:rounded-lg flex justify-center flex-1">
       <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
         <ToggleDarkMode />
         <div class="mt-12 flex flex-col items-center">
+          <div v-if="message" :class="{
+            'bg-green-100 border-green-500 text-green-700': messageType == 'success',
+            'bg-red-100 border-red-500 text-red-700': messageType == 'error'
+          }" class="border-l-4 p-4 mb-3 rounded-lg">
+            <p>{{ message }}</p>
+          </div>
           <h1 class="text-2xl xl:text-3xl font-extrabold mb-5">
             CONEXUS
           </h1>
           <h2 class="text-xl font-light xl:text-2xl">
-              Correu @inspedralbes.cat
-            </h2>
+            Correu @inspedralbes.cat
+          </h2>
           <div class="w-full flex-1 mt-3">
             <div class="flex flex-col items-center">
               <button @click="signInWithGoogle"
@@ -87,12 +94,6 @@
                   Inicia sessió
                 </span>
               </button>
-              <div v-if="message" :class="{
-                'bg-green-100 border-green-500 text-green-700': messageType == 'success',
-                'bg-red-100 border-red-500 text-red-700': messageType == 'error'
-              }" class="border-l-4 p-4 mt-6 rounded-lg">
-                <p>{{ message }}</p>
-              </div>
               <p class="mt-6 text-xs text-gray-600 dark:text-gray-100 text-center">
                 Projecte realitzat per l'equip de
                 <span class="border-b border-gray-500 border-dotted">
@@ -117,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
@@ -143,37 +144,32 @@ const auth = getAuth(app);
 const message = ref('');
 const messageType = ref('');
 
+const userLogin = reactive({
+  email: '',
+  password: ''
+});
+
+const userAPIs = reactive({
+  email: '',
+  name: '',
+  token: '',
+  profile: ''
+});
+
 const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
     console.log(result);
-    const { accessToken, displayName, email, photoURL } = result.user;
-    console.log(accessToken, displayName, email, photoURL);
 
-    if (!email.includes('@inspedralbes.cat')) {
-      message.value = `No tens permís per accedir a aquesta aplicació`;
-      messageType.value = 'error';
-      return;
-    } else {
-      console.log('Usuari vàlid');
-      let user = {
-        email: email,
-        name: displayName,
-        token: accessToken,
-        profile: photoURL
-      };
-      try {
-        const response = await loginAPI(user);
-        console.log(response);
-        useAppStore().setToken(response.token);
-        useAppStore().setUser(response.user);
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
-    // message.value = `Benvingut, ${displayName}`;
-    // messageType.value = 'success';
+    userAPIs.token = result.user.accessToken;
+    userAPIs.email = result.user.email;
+    userAPIs.name = result.user.displayName;
+    userAPIs.profile = result.user.photoURL;
+
+    console.log(userAPIs);
+    validateAndLogin(userAPIs);
+
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;
@@ -194,10 +190,33 @@ const signInWithGithub = async () => {
     message.value = `Error al iniciar sessió`;
     messageType.value = 'error';
   }
-}; 
+};
 
 const signInWithDiscord = async () => {
   message.value = 'Aquesta funcionalitat encara no està disponible';
   messageType.value = 'error';
 };
+
+async function validateAndLogin(user) {
+
+  console.log('Validating and logging in');
+
+  if (!userAPIs.email.includes('@inspedralbes.cat')) {
+    message.value = `No tens permís per accedir a aquesta aplicació`;
+    messageType.value = 'error';
+    return;
+  } else {
+    console.log('Usuari vàlid');
+
+    try {
+      const response = await loginAPI(userAPIs);
+      console.log(response);
+      useAppStore().setToken(response.token);
+      useAppStore().setUser(response.user);
+      console.log(useAppStore().getToken);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+}
 </script>

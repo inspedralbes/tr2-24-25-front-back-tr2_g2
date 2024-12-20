@@ -12,6 +12,12 @@ export const useAppStore = defineStore( 'appStore', {
     },
     setToken(token) {
       this.token = token
+    },
+    getToken() {
+      return this.token
+    },
+    getUser() {
+      return this.user
     }
   }
 });

@@ -6,8 +6,9 @@ const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
 
 // Login API firebase
 export const loginAPI = async (user) => {
+    console.log(user, `communicationManager.js`);
     try {
-        const response = await fetch(`${BACK_URL}/login`, {
+        const response = await fetch(`${BACK_URL}loginAPI`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +25,7 @@ export const loginAPI = async (user) => {
 // Create publications
 export const postCommunityPublication = async (publication) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}/publications`, {
+        const response = await fetch(`${COMMUNITY_URL}publications`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
