@@ -68,6 +68,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-db:/data/db
 
   mongo-express:
     image: mongo-express
@@ -89,7 +91,7 @@ services:
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_DATABASE: mentories
     volumes:
-      - bd:/var/lib/mysql:rw
+      - mysql-db:/var/lib/mysql:rw
       - ./back/data/create_db.sql:/docker-entrypoint-initdb.d/create.sql
       - ./back/data/insert_db.sql:/docker-entrypoint-initdb.d/inserts.sql
     ports:
@@ -106,4 +108,5 @@ services:
       - tr2g2-mysql
 
 volumes:
-  bd:
+  mysql-db:
+  mongo-db:

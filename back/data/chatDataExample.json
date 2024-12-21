@@ -1,11 +1,13 @@
 [
-  {
-      "idChat": "abc123",
-      "idUser1": "123456",
-      "idUser2": "789012",
+    {
+      "_id": {
+        "$oid": "6763d86481ee12b5ba22f353"
+      },
+      "user_one_id": "123456",
+      "user_two_id": "789012",
       "interactions": [
         {
-          "idUser": "123456",
+          "userId": "123456",
           "message": "Este es un mensaje de ejemplo",
           "timestamp": "2024-12-18T14:35:00Z"
         },
@@ -17,12 +19,14 @@
       ]
     },
     {
-      "idChat": "abc123",
-      "idUser1": "123456",
-      "idUser2": "789012",
+      "_id": {
+        "$oid": "6763d87c81ee12b5ba22f354"
+      },
+      "user_one_id": "123456",
+      "user_two_id": "789012",
       "interactions": [
         {
-          "idUser": "123456",
+          "userId": "123456",
           "message": "Este es un mensaje de ejemplo",
           "timestamp": "2024-12-18T14:35:00Z"
         },
