@@ -1,0 +1,3 @@
+<template>
+	<ViewChatContent></ViewChatContent>
+</template>

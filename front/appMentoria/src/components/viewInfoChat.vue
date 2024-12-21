@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="chat in chats" :key="chat.id" class="chat-item">
-      <h3>{{ chat.idUser1 }}</h3>
+      <h3>{{ chat.user_one_id }}</h3>
       <p>{{ chat.interactions[chat.interactions.length - 1].message }}</p>
     </div>
   </div>
