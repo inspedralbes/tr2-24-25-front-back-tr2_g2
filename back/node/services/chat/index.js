@@ -78,6 +78,18 @@ app.get('/getChats/:id', async (req, res) => {
     }
 });
 
+app.get('/getChat/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const messages = await Message.find({ _id: id });
+        console.log(messages);
+        res.json(messages);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
 app.listen(3004, () => {
     console.log('listening on *: ' + 3004);
 });
