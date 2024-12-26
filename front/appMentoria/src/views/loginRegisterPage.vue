@@ -162,13 +162,13 @@ const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     console.log(result);
 
-    userAPIs.token = result.user.accessToken;
+    userAPIs.token = result.user.uid;
     userAPIs.email = result.user.email;
     userAPIs.name = result.user.displayName;
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
-    validateAndLogin(userAPIs);
+    validateAndLogin();
 
   } catch (error) {
     console.log(error.message);
@@ -182,9 +182,14 @@ const signInWithGithub = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     console.log(result);
-    const { displayName } = result.user;
-    message.value = `Benvingut, ${displayName}`;
-    messageType.value = 'success';
+
+    userAPIs.token = result.user.uid;
+    userAPIs.email = result.user.email;
+    userAPIs.name = result.user.displayName;
+    userAPIs.profile = result.user.photoURL;
+
+    console.log(userAPIs);
+    validateAndLogin();
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;
@@ -197,7 +202,7 @@ const signInWithDiscord = async () => {
   messageType.value = 'error';
 };
 
-async function validateAndLogin(user) {
+async function validateAndLogin() {
 
   console.log('Validating and logging in');
 
@@ -212,8 +217,7 @@ async function validateAndLogin(user) {
       const response = await loginAPI(userAPIs);
       console.log(response);
       useAppStore().setToken(response.token);
-      useAppStore().setUser(response.user);
-      console.log(useAppStore().getToken);
+      useAppStore().setUser(response.userLogin);
     } catch (error) {
       console.log(error.message);
     }

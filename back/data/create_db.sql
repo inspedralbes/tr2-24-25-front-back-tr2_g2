@@ -33,14 +33,14 @@ CREATE TABLE IF NOT EXISTS typesPublications (
 -- Table 5: users (initial creation without foreign key reference to classes)
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    typesUsers_id INT NOT NULL DEFAULT 1,
+    typesUsers_id INT DEFAULT 1,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255),
     token VARCHAR(255),
     banner VARCHAR(255),
     profile VARCHAR(255),
-    verified BOOLEAN NOT NULL DEFAULT 0,
+    verified BOOLEAN DEFAULT 0,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     review DECIMAL(2,1) DEFAULT 0,
     class_id INT,

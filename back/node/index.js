@@ -67,26 +67,41 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // Login with api's google, github, discord
 app.post('/loginAPI', async (req, res) => {
-    const { email, tokenAPI } = req.body;
+    console.log('req.body: ', req.body);
+    const { email, name, token, profile } = req.body;
+    const connection = await mysql.createConnection(dbConfig);
+    let userLogin = {};
+
     try {
-        const connection = await mysql.createConnection(dbConfig);
         const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        let user;
+        
+        console.log('users: ', users);
 
         if (users.length == 0) {
-            const [result] = await connection.execute('INSERT INTO users (email, token) VALUES (?, ?)', [email, tokenAPI]);
-            console.log(result);
-            // user = { id: result.insertId, name, email, profile };
+            console.log('User not found, creating new user...');
+            const [result] = await connection.query('INSERT INTO users (name, email, token, profile) VALUES (?, ?, ?, ?)', [name, email, token, profile]);
+            console.log('result aaaaa');
+            userLogin = { 
+                'id': result.insertId, 
+                'name': name, 
+                'email': email, 
+                'profile': profile 
+            };
+
         } else {
-            user = users[0];
+            console.log('User found');
+            userLogin = users[0];
         }
-        connection.end();
 
         // Generar token JWT 
-        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
-        res.status(200).json({ message: 'Login successful', token, user });
+        const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
+        console.log('Connection closed');
     }
 });
 
