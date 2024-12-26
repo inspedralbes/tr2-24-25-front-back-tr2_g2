@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 p-2 sm:p-6 justify-between flex flex-col h-screen max-h-[800px]">
+   <div class="flex-1 p-2 sm:p-6 justify-between flex flex-col h-screen max-h-[675px]">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
         <div class="relative">
@@ -113,7 +113,7 @@ export default {
   methods: {
     async fetchMessages() {
       try {
-        const response = await fetch('http://localhost:3004/getChat/6766db5270a7a50be762d5f0');
+        const response = await fetch('http://localhost:3004/getChat/676dda54b8d8076e5c24f40c');
         const data = await response.json();
         chatData = data[0];
         this.userName = chatData.user_one_name || 'User';
