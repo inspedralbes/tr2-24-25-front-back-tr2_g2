@@ -1,8 +1,8 @@
 <template>
-   <div class="flex-1 p-2 sm:p-6 justify-between flex flex-col h-screen max-h-[675px]">
+  <div class="flex flex-col h-screen max-h-[800px]">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
-        <div class="relative">
+        <div class="relative ps-5">
           <img 
             :src="'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
             alt="" 
@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div id="messages" ref="messageContainer" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
+    <div id="messages" ref="messageContainer" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch flex-grow">
       <div 
         v-for="(interaction, index) in interactions" 
         :key="index" 

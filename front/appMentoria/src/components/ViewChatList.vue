@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="chats.length === 0">Cargando chats...</div>
-    <div v-else>
+    <div v-else class="max-h-[800px] overflow-auto">
       <ViewChat :chats="chats" />
     </div>
   </div>
