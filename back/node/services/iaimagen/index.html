@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Image</title>
+</head>
+<body>
+  <form id="uploadForm">
+    <input type="file" id="image" name="image" accept="image/*" required />
+    <button type="submit">Upload</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("image");
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        resultDiv.textContent = "Please select a file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await fetch("http://localhost:3006/classify-image", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Error uploading image.");
+        }
+
+        const data = await response.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        console.error("Error:", error);
+        resultDiv.textContent = "An error occurred.";
+      }
+    });
+  </script>
+</body>
+</html>
