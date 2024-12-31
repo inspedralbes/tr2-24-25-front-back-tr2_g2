@@ -93,13 +93,16 @@ import io from 'socket.io-client';
 
 let chatData = {};
 
+const userId = "111111";
+
 export default {
+  props: ['chatId'],
   data() {
     return {
       socket: null,
       userName: 'User',
       interactions: [],
-      currentUser: '555555'
+      currentUser: userId
     };
   },
   mounted() {
@@ -112,8 +115,10 @@ export default {
   },
   methods: {
     async fetchMessages() {
+      console.log('http://localhost:3004/getChat/' + this.$parent.selectedChatId);
       try {
-        const response = await fetch('http://localhost:3004/getChat/676dda54b8d8076e5c24f40c');
+        const response = await fetch(`http://localhost:3004/getChat/${this.chatId}`);
+        console.log(`http://localhost:3004/getChat/${this.chatId}`);
         const data = await response.json();
         chatData = data[0];
         this.userName = chatData.user_one_name || 'User';

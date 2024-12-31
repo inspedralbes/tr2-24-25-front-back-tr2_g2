@@ -7,13 +7,13 @@
           alt="" 
           class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
         >
-        <div style="margin-left: 1rem;" @click="selectChat(chat.id)">
+        <div style="margin-left: 1rem;" @click="selectChat(chat._id)">
           <h3>{{ chat.user_one_id }}</h3>
           <p v-if="chat.interactions && chat.interactions.length > 0 && chat.interactions[chat.interactions.length - 1].message !== null">
             {{ chat.interactions[chat.interactions.length - 1].message }}
           </p>
         </div>
-        <viewChatContent v-if="selectedChatId === true" :chatId="selectedChatId" @back="selectedChatId = false" class="overlay mt-16" />
+        <viewChatContent v-if="selectedChatId !== false" :chatId="selectedChatId" @back="selectedChatId = false" class="overlay mt-16" />
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
 
 
   const selectChat = (chatId) => {
-    selectedChatId.value = true;
+    selectedChatId.value = chatId;
     console.log('selectedChatId:', selectedChatId.value);
   };
 
