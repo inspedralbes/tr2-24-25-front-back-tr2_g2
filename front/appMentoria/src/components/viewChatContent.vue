@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen max-h-[800px]">
+  <div class="flex flex-col h-screen">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
@@ -16,9 +16,12 @@
           <span class="text-lg text-gray-600">Junior Developer</span>
         </div>
       </div>
+    <div class="flex items-center space-x-2 pr-4">
+      <button @click="$emit('closeChat')" type="button" class="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">Close</button>
+      </div>
     </div>
 
-    <div id="messages" ref="messageContainer" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch flex-grow">
+    <div id="messages" ref="messageContainer" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch flex-grow h-full">
       <div 
         v-for="(interaction, index) in interactions" 
         :key="index" 
@@ -47,7 +50,7 @@
       </div>
     </div>
 
-    <div class="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
+    <div class="border-t-2 border-gray-200 px-4 p-4 mb-2 sm:mb-0">
       <div class="relative flex">
         <input 
           ref="messageInput"
