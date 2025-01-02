@@ -124,6 +124,7 @@ import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from
 import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
 import { loginAPI } from '@/services/communicationManager';
 import { useAppStore } from '@/stores/index';
+import router from '@/router';
 
 // Firebase configuration 
 const firebaseConfig = {
@@ -216,11 +217,16 @@ async function validateAndLogin() {
     try {
       const response = await loginAPI(userAPIs);
       console.log(response);
-      useAppStore().setToken(response.token);
+      //useAppStore().setToken(response.token);
       useAppStore().setUser(response.userLogin);
     } catch (error) {
       console.log(error.message);
-    }
+    } finally {
+      console.log('Redirecting to main page + info en pinia');
+      //console.log('Token: ', useAppStore().getToken());
+      console.log('User: ', useAppStore().getUser());
+      router.push({ name: 'main' });
+    }    
   }
 }
 </script>

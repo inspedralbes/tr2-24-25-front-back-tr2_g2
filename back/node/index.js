@@ -79,7 +79,7 @@ app.post('/loginAPI', async (req, res) => {
 
         if (users.length == 0) {
             console.log('User not found, creating new user...');
-            const [result] = await connection.query('INSERT INTO users (name, email, token, profile) VALUES (?, ?, ?, ?)', [name, email, token, profile]);
+            const [result] = await connection.execute('INSERT INTO users (name, email, token, profile) VALUES (?, ?, ?, ?)', [name, email, token, profile]);
             console.log('result aaaaa');
             userLogin = { 
                 'id': result.insertId, 
@@ -87,15 +87,16 @@ app.post('/loginAPI', async (req, res) => {
                 'email': email, 
                 'profile': profile 
             };
-
         } else {
             console.log('User found');
             userLogin = users[0];
         }
 
         // Generar token JWT 
-        const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
+        // const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        //res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
+        console.log('secret key: ', secretKey);
+        res.status(200).json({ message: 'Login successful', userLogin });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
@@ -126,6 +127,11 @@ app.post('/login', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    
 });
 
 // CRUD operations for users
