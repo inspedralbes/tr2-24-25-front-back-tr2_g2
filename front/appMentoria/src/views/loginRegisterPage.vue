@@ -186,7 +186,7 @@ const signInWithGithub = async () => {
 
     userAPIs.token = result.user.uid;
     userAPIs.email = result.user.email;
-    userAPIs.name = result.user.displayName;
+    userAPIs.name = 'GitHub User';
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
@@ -207,12 +207,12 @@ async function validateAndLogin() {
 
   console.log('Validating and logging in');
 
-  if (!userAPIs.email.includes('@inspedralbes.cat')) {
-    message.value = `No tens permís per accedir a aquesta aplicació`;
-    messageType.value = 'error';
-    return;
-  } else {
-    console.log('Usuari vàlid');
+  // if (!userAPIs.email.includes('@inspedralbes.cat')) {
+  //   message.value = `No tens permís per accedir a aquesta aplicació`;
+  //   messageType.value = 'error';
+  //   return;
+  // } else {
+    // console.log('Usuari vàlid');
 
     try {
       const response = await loginAPI(userAPIs);
@@ -227,6 +227,6 @@ async function validateAndLogin() {
       console.log('User: ', useAppStore().getUser());
       router.push({ name: 'main' });
     }    
-  }
+  // }
 }
 </script>

@@ -87,9 +87,11 @@ app.post('/loginAPI', async (req, res) => {
                 'email': email, 
                 'profile': profile 
             };
+            console.log('userLogin: ', result);
         } else {
             console.log('User found');
             userLogin = users[0];
+            console.log('userLogin: ', userLogin);
         }
 
         // Generar token JWT 
