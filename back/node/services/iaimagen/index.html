@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Image</title>
+  <title>Subir Imagen</title>
 </head>
 <body>
-  <form id="uploadForm">
+  <h1>Subir Imagen</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
     <input type="file" id="image" name="image" accept="image/*" required />
-    <button type="submit">Upload</button>
+    <button type="submit">Subir</button>
   </form>
   <div id="result"></div>
 
@@ -22,7 +23,7 @@
       const file = fileInput.files[0];
       
       if (!file) {
-        resultDiv.textContent = "Please select a file.";
+        resultDiv.textContent = "Por favor, selecciona un archivo.";
         return;
       }
 
@@ -36,14 +37,14 @@
         });
 
         if (!response.ok) {
-          throw new Error("Error uploading image.");
+          throw new Error("Error al subir la imagen.");
         }
 
         const data = await response.json();
-        resultDiv.textContent = JSON.stringify(data, null, 2);
+        resultDiv.textContent = data.message;
       } catch (error) {
         console.error("Error:", error);
-        resultDiv.textContent = "An error occurred.";
+        resultDiv.textContent = "Ocurrió un error al subir la imagen.";
       }
     });
   </script>
