@@ -1,68 +1,52 @@
 import express from "express";
-import multer from "multer";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fileURLToPath } from 'url';
 import { encode } from 'gpt-tokenizer';
-import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import cors from "cors";
+import fileUpload from 'express-fileupload';
 
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors());
+app.use(fileUpload());
 
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-}
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
-
-const upload = multer({ storage });
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-function fileToGenerativePart(filePath, mimeType) {
-    return {
-        inlineData: {
-            data: fs.readFileSync(filePath).toString("base64"),
-            mimeType,
-        },
-    };
-}
 
 function extractJsonContent(responseText) {
-  const jsonStart = responseText.indexOf("{");
-  const jsonEnd = responseText.lastIndexOf("}") + 1;
-  return responseText.substring(jsonStart, jsonEnd);
+    const jsonStart = responseText.indexOf("{");
+    const jsonEnd = responseText.lastIndexOf("}") + 1;
+    return responseText.substring(jsonStart, jsonEnd);
 }
 
 let totalTokensAcumulados = 0;
-app.post("/classify-image", upload.single("image"), async (req, res) => {
+app.post("/classify-image", async (req, res) => {
     try {
-        if (!req.file) {
+        if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).json({ error: "No se recibió ningún archivo." });
         }
 
-       const filePath = req.file.path;
-       const mimeType = req.file.mimetype;
+        const imageFile = req.files.image;
+        const mimeType = imageFile.mimetype;
+        const imageBuffer = imageFile.data;
 
-        const imagePart = fileToGenerativePart(filePath, mimeType);
-        
+        const imagePart = {
+            inlineData: {
+                data: imageBuffer.toString("base64"),
+                mimeType,
+            },
+        };
+
         const prompt = `Eres un detector de imágenes en binario. Para cada imagen que te pase mediante una URL, debes clasificarla en una de las siguientes categorías:
 
         ADECUADA:
