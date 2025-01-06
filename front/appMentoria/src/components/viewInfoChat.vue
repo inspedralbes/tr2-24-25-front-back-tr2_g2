@@ -52,7 +52,9 @@
   .chat-item {
     margin-bottom: 1rem;
     padding: 1rem;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin: 10px;
     scriptder-radius: 8px;
     cursor: pointer;
   }
@@ -66,4 +68,4 @@
     background: white;
     z-index: 10;
   }
-  </style>style
+  </style>

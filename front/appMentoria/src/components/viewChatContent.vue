@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-screen dark:bg-black ">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
@@ -11,13 +11,15 @@
         </div>
         <div class="flex flex-col leading-tight">
           <div class="text-2xl mt-1 flex items-center">
-            <span class="text-gray-700 mr-3">{{ userName }}</span>
+            <span class="text-gray-700 mr-3 dark:text-white">{{ userName }}</span>
           </div>
-          <span class="text-lg text-gray-600">Junior Developer</span>
+          <span class="text-lg text-gray-600 dark:text-white">Junior Developer</span>
         </div>
       </div>
     <div class="flex items-center space-x-2 pr-4">
-      <button @click="$emit('closeChat')" type="button" class="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">Close</button>
+      <button @click="$emit('closeChat')" type="button" class="inline-flex items-center justify-center rounded-lg h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 1H4L0 5L4 9H5V6H11C12.6569 6 14 7.34315 14 9C14 10.6569 12.6569 12 11 12H4V14H11C13.7614 14 16 11.7614 16 9C16 6.23858 13.7614 4 11 4H5V1Z" fill="currentColor"></path> </g></svg>
+      </button>
       </div>
     </div>
 
@@ -56,7 +58,7 @@
           ref="messageInput"
           type="text" 
           placeholder="Write your message!" 
-          class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-5 pr-20 bg-gray-200 rounded-md py-3"
+          class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-5 pr-20 bg-gray-200 rounded-md py-3 dark:bg-gray-800 dark:text-white"
         >
         <div class="absolute right-0 items-center inset-y-0 flex">
             <button @click="sendMessageInMongo" type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none mr-4">
