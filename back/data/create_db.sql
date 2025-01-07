@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255),
-    token VARCHAR(255),
     banner VARCHAR(255),
     profile VARCHAR(255),
     verified BOOLEAN DEFAULT 0,

@@ -16,11 +16,17 @@ export const loginAPI = async (user) => {
             body: JSON.stringify(user),
         });
 
-        return response.json();
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
     } catch (error) {
-        console.error(error);
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
     }
 };
+
 
 // Create publications
 export const postCommunityPublication = async (publication) => {

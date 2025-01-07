@@ -49,43 +49,43 @@ INSERT INTO classes (name) VALUES
 ('CURS ESPECIALITZACIÓ');
 
 -- Inserciones para users (profesores)
-INSERT INTO users (typesUsers_id, name, email, password, token, verified, status, review, class_id) VALUES 
-(2, 'Dídac Pérez', 'didac@example.com', 'password1', 'token1', true, 'approved', 4.7, 1),
-(2, 'Ana María Sossa', 'ana@example.com', 'password2', 'token2', true, 'approved', 4.8, 2),
-(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', 'token3', true, 'approved', 4.6, 3),
-(2, 'Raül Pons', 'raul@example.com', 'password4', 'token4', true, 'approved', 4.9, 4),
-(2, 'Albert Casas', 'albert@example.com', 'password5', 'token5', true, 'approved', 4.5, 5),
-(2, 'Joan Sánchez', 'joan@example.com', 'password6', 'token6', true, 'approved', 4.4, 6),
-(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', 'token7', true, 'approved', 4.3, 7),
-(2, 'Emma Morales', 'emma@example.com', 'password8', 'token8', true, 'approved', 4.2, 8),
-(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', 'token9', true, 'approved', 4.1, 9),
-(2, 'Noah Escartí', 'noah@example.com', 'password10', 'token10', true, 'approved', 4.0, 10),
-(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', 'token11', true, 'approved', 3.9, 11),
-(2, 'Rafa Monje', 'rafa@example.com', 'password12', 'token12', true, 'approved', 3.8, 12),
-(2, 'Segundo González', 'segundo@example.com', 'password13', 'token13', true, 'approved', 3.7, 13),
-(2, 'Marc Aribau', 'marc@example.com', 'password14', 'token14', true, 'approved', 3.6, 14),
-(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', 'token15', true, 'approved', 3.5, 15),
-(2, 'Juan Delgado', 'juan@example.com', 'password16', 'token16', true, 'approved', 3.4, 16),
-(2, 'Pol Prats', 'pol@example.com', 'password17', 'token17', true, 'approved', 3.3, 17),
-(2, 'Gerard Torrent', 'gerard@example.com', 'password18', 'token18', true, 'approved', 3.2, 18),
-(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', 'token19', true, 'approved', 3.1, 19),
-(2, 'David Sierra', 'david@example.com', 'password20', 'token20', true, 'approved', 3.0, 20),
-(2, 'Laura Carrillo', 'laura@example.com', 'password21', 'token21', true, 'approved', 2.9, 21),
-(2, 'Oriol Pelino', 'oriol@example.com', 'password22', 'token22', true, 'approved', 2.8, 22),
-(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', 'token23', true, 'approved', 2.7, 23);
+INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
+(2, 'Dídac Pérez', 'didac@example.com', 'password1', true, 'approved', 4.7, 1),
+(2, 'Ana María Sossa', 'ana@example.com', 'password2', true, 'approved', 4.8, 2),
+(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', true, 'approved', 4.6, 3),
+(2, 'Raül Pons', 'raul@example.com', 'password4', true, 'approved', 4.9, 4),
+(2, 'Albert Casas', 'albert@example.com', 'password5', true, 'approved', 4.5, 5),
+(2, 'Joan Sánchez', 'joan@example.com', 'password6', true, 'approved', 4.4, 6),
+(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', true, 'approved', 4.3, 7),
+(2, 'Emma Morales', 'emma@example.com', 'password8', true, 'approved', 4.2, 8),
+(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', true, 'approved', 4.1, 9),
+(2, 'Noah Escartí', 'noah@example.com', 'password10', true, 'approved', 4.0, 10),
+(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', true, 'approved', 3.9, 11),
+(2, 'Rafa Monje', 'rafa@example.com', 'password12', true, 'approved', 3.8, 12),
+(2, 'Segundo González', 'segundo@example.com', 'password13', true, 'approved', 3.7, 13),
+(2, 'Marc Aribau', 'marc@example.com', 'password14', true, 'approved', 3.6, 14),
+(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', true, 'approved', 3.5, 15),
+(2, 'Juan Delgado', 'juan@example.com', 'password16', true, 'approved', 3.4, 16),
+(2, 'Pol Prats', 'pol@example.com', 'password17', true, 'approved', 3.3, 17),
+(2, 'Gerard Torrent', 'gerard@example.com', 'password18', true, 'approved', 3.2, 18),
+(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', true, 'approved', 3.1, 19),
+(2, 'David Sierra', 'david@example.com', 'password20', true, 'approved', 3.0, 20),
+(2, 'Laura Carrillo', 'laura@example.com', 'password21', true, 'approved', 2.9, 21),
+(2, 'Oriol Pelino', 'oriol@example.com', 'password22', true, 'approved', 2.8, 22),
+(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', true, 'approved', 2.7, 23);
 
 -- Inserciones para users (estudiantes)
-INSERT INTO users (typesUsers_id, name, email, password, token, verified, status, review, class_id) VALUES 
-(1, 'Laura Puig', 'laura@example.com', 'password24', 'token24', true, 'approved', 4.2, 1),
-(1, 'Martí Vila', 'marti@example.com', 'password25', 'token25', true, 'approved', 3.9, 2),
-(1, 'Gemma Riera', 'gemma@example.com', 'password26', 'token26', true, 'approved', 4.3, 3),
-(1, 'Oriol Serra', 'oriol@example.com', 'password27', 'token27', true, 'approved', 4.1, 4),
-(1, 'Anna Martí', 'anna@example.com', 'password28', 'token28', true, 'approved', 4.4, 5);
+INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
+(1, 'Laura Puig', 'laura@example.com', 'password24', true, 'approved', 4.2, 1),
+(1, 'Martí Vila', 'marti@example.com', 'password25', true, 'approved', 3.9, 2),
+(1, 'Gemma Riera', 'gemma@example.com', 'password26', true, 'approved', 4.3, 3),
+(1, 'Oriol Serra', 'oriol@example.com', 'password27', true, 'approved', 4.1, 4),
+(1, 'Anna Martí', 'anna@example.com', 'password28', true, 'approved', 4.4, 5);
 
 -- Inserciones para users (administradores)
-INSERT INTO users (typesUsers_id, name, email, password, token, verified, status, review, class_id) VALUES 
-(3, 'Administradora A', 'adminA@example.com', 'password29', 'adminTokenA', true, 'approved', 0.0, NULL),
-(3, 'Administrador B', 'adminB@example.com', 'password30', 'adminTokenB', true, 'approved', 0.0, NULL);
+INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
+(3, 'Administradora A', 'adminA@example.com', 'password29', true, 'approved', 0.0, NULL),
+(3, 'Administrador B', 'adminB@example.com', 'password30', true, 'approved', 0.0, NULL);
 
 -- Inserciones para usersQualifications
 INSERT INTO usersQualifications (user_id, qualification_id) VALUES 

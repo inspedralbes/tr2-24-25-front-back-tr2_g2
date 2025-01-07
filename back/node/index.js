@@ -27,7 +27,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
@@ -74,29 +73,33 @@ app.post('/loginAPI', async (req, res) => {
 
     try {
         const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        
-        console.log('users: ', users);
 
         if (users.length == 0) {
             console.log('User not found, creating new user...');
-            const [result] = await connection.execute('INSERT INTO users (name, email, token, profile) VALUES (?, ?, ?, ?)', [name, email, token, profile]);
-            console.log('result aaaaa');
-            userLogin = { 
-                'id': result.insertId, 
-                'name': name, 
-                'email': email, 
-                'profile': profile 
-            };
-            console.log('userLogin: ', result);
+            let tokenHash = await hashPassword(token);
+            const [result] = await connection.execute('INSERT INTO users (name, email, password, profile) VALUES (?, ?, ?, ?)', [name, email, tokenHash, profile]);
+            console.log('User created:', result.insertId);
+
+            const [resultNewUser] = await connection.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+            console.log('resultNewUser: ', resultNewUser);
+            userLogin = resultNewUser[0];
         } else {
             console.log('User found');
-            userLogin = users[0];
-            console.log('userLogin: ', userLogin);
+            let password = users[0].password;
+            let match = await comparePassword(token, password);
+
+            if (!match) {
+                console.log('Invalid password');
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                userLogin = users[0];
+                console.log('userLogin: ', userLogin);
+            }
         }
 
         // Generar token JWT 
         // const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        //res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
+        // res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
         console.log('secret key: ', secretKey);
         res.status(200).json({ message: 'Login successful', userLogin });
     } catch (error) {
@@ -133,7 +136,7 @@ app.post('/login', async (req, res) => {
 
 // Logout route
 app.get('/logout', (req, res) => {
-    
+
 });
 
 // CRUD operations for users
@@ -787,9 +790,23 @@ function verifyToken(req, res, next) {
 
     jwt.verify(token, secretKey, (err, decoded) => {
         if (err) return res.status(500).send('Fallo al autenticar el token');
-        req.user = decoded; next();
+        req.user = decoded;
+        next();
     });
 };
+
+// Function to hash password
+async function hashPassword(password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword
+}
+
+// Function to compare password
+async function comparePassword(password, hashedPassword) {
+    const match = await bcrypt.compare(password, hashedPassword);
+    return match
+}
 
 // Start the server
 server.listen(port, () => {

@@ -204,6 +204,7 @@ const signInWithDiscord = async () => {
 };
 
 async function validateAndLogin() {
+  let succes = false;
 
   console.log('Validating and logging in');
 
@@ -212,21 +213,29 @@ async function validateAndLogin() {
   //   messageType.value = 'error';
   //   return;
   // } else {
-    // console.log('Usuari vàlid');
+  // console.log('Usuari vàlid');
 
-    try {
-      const response = await loginAPI(userAPIs);
-      console.log(response);
-      //useAppStore().setToken(response.token);
-      useAppStore().setUser(response.userLogin);
-    } catch (error) {
-      console.log(error.message);
-    } finally {
+  try {
+    const response = await loginAPI(userAPIs);
+
+    if (response.error) {
+      return;
+    } else {
+      succes = true;
+    }
+
+    //useAppStore().setToken(response.token);
+    useAppStore().setUser(response.userLogin);
+  } catch (error) {
+    console.log(error.message);
+  } finally {
+    if (succes) {
       console.log('Redirecting to main page + info en pinia');
       //console.log('Token: ', useAppStore().getToken());
       console.log('User: ', useAppStore().getUser());
       router.push({ name: 'main' });
-    }    
+    }
+  }
   // }
 }
 </script>
