@@ -8,7 +8,8 @@
           class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
         >
         <div style="margin-left: 1rem;" @click="selectChat(chat._id)">
-          <h3>{{ chat.user_one_id }}</h3>
+          <h3 v-if="chat.user_one_id === userid">{{ chat.user_two_id }}</h3>
+          <h3 v-if="chat.user_two_id === userid">{{ chat.user_one_id }}</h3>
           <p v-if="chat.interactions && chat.interactions.length > 0 && chat.interactions[chat.interactions.length - 1].message !== null">
             {{ chat.interactions[chat.interactions.length - 1].message }}
           </p>
@@ -24,6 +25,8 @@
   import { ref, onMounted } from 'vue';
   import { defineProps } from 'vue';
   import viewChatContent from './viewChatContent.vue';
+
+  const userid = ref(111111);
 
   const props = defineProps({
     chats: {

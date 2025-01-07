@@ -87,6 +87,16 @@ app.get('/getChat/:id', async (req, res) => {
 app.post('/addChat', async (req, res) => {
   console.log('addChat')
   const { _id, user_one_id, user_two_id, interactions } = req.body;
+  const existingChat = await Message.findOne({
+    $or: [
+      { user_one_id: user_one_id, user_two_id: user_two_id },
+      { user_one_id: user_two_id, user_two_id: user_one_id }
+    ]
+  });
+
+  if (existingChat) {
+    return res.status(400).send('A chat between these users already exists');
+  }
   try {
     let message;
     if (_id) {

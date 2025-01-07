@@ -83,6 +83,10 @@
                 </svg>
                 GitHub
             </a>
+            <a @click="chatButton" href="#" rel="noopener noreferrer"
+                class="flex items-center py-3 px-6 bg-gray-800 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-gray-900">
+                Chat
+            </a>
         </div>
     </section>
 
@@ -93,4 +97,41 @@
 
 <script setup>
 import calendario from '@/components/calendario.vue';
+
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const messageInput = ref('');
+const router = useRouter();
+
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3004');
+
+const chatButton = async () => {
+    const newMessage = {
+        user_one_id: 111111,
+        user_two_id: 237897,
+        interactions: [],
+        __v: 0
+    };
+    try {
+        const response = await fetch('http://localhost:3004/addChat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newMessage)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+        socket.emit('sendMessage', newMessage);
+        router.push('/chatList');
+    } catch (error) {
+        console.error('Error sending message:', error);
+        router.push('/chatList');
+    }
+};
+
 </script>

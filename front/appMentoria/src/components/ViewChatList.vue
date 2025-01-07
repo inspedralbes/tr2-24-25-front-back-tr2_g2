@@ -1,6 +1,11 @@
 <template>
   <div>
-    <div v-if="chats.length === 0">Cargando chats...</div>
+    <div v-if="chats.length === 0 && chatsInfo == true" class="flex items-center justify-center h-full">
+      <p class="text-gray-500">No hi tens chats</p>
+    </div>
+    <div v-if="chatsInfo == false" class="flex items-center justify-center h-full">
+      <p class="text-gray-500">Error</p>
+    </div>
     <div v-else class="overflow-auto">
       <ViewChat :chats="chats" />
       <div class="h-20"></div>
@@ -19,6 +24,8 @@ const userId = "111111";
 
 const chats = ref([]);
 
+const chatsInfo = ref(false);
+
 const fetchChats = async () => {
   console.log(chatsUrl + 'getChats' + "/" + userId);
   try {
@@ -26,6 +33,7 @@ const fetchChats = async () => {
     const data = await response.json();
     console.log('datos:', data);
     chats.value = data;
+    chatsInfo.value = true;
   } catch (err) {
     console.error('Error al obtener los chats', err);
   }
