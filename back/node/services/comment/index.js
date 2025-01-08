@@ -1,7 +1,5 @@
-const { Server } = require('socket.io');
-const { createServer } = require('http');
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const path = require('path');
 const http = require('http');
 const cors = require('cors');
@@ -9,24 +7,30 @@ const { strict } = require('assert');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.APP_PORT;
+const port = process.env.PORT;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    allowedHeaders: ["Access-Control-Allow-Origin"],
+}));
 
-app.get('/v1/models', (req, res) => {
+/* ----------------------------------------- DATABASE ----------------------------------------- */
 
+const dbConfig = {
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASS,
+    database: process.env.MYSQL_DB
+};
 
-
-});
-
-app.get('/v1/models/:model', (req, res) => {
-
-
+app.get('/', (req, res) => {
+    res.send('Hello World! XDDDDDDDDDDDDDDD I am a comment service');
 });
 
 //POST COMMENT PASSED BY USER TO IA
 
+//EJEMPLO DE UTILIZACIÓN DE LA IA EN LOCAL
 app.post('/v1/chat/completions', (req, res) => {
 
     const postData = JSON.stringify({
@@ -136,6 +140,121 @@ app.post('/v1/chat/completions', (req, res) => {
 
     request.write(postData);
     request.end();
+});
+
+/*---------------------------------------------------------------------------------------------- */
+app.get('/comments', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM comments');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/comments/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM comments WHERE id = ?', [id]);
+        connection.end();
+
+        if (rows.length == 0) return res.status(404).json({ error: 'Comment not found' });
+
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.post('/comments', async (req, res) => {
+    const { publication_id, user_id, commentReply_id, comment } = req.body;
+
+    try {
+        const responseAI = await fetch("http://ia.inspedralbes.cat/iaconexus/postComment", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ content: comment }),
+        });
+
+        if (!responseAI.ok) {
+            return res.status(500).json({ error: 'Error making request to IA server.' });
+        }
+
+        const aiResult = await responseAI.json();
+        const { category, reason } = aiResult;
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'INSERT INTO comments (publication_id, user_id, commentReply_id, comment, category, reason, reported) VALUES (?, ?, ?, ?, ?)',
+            [
+                publication_id,
+                user_id,
+                commentReply_id,
+                comment,
+                category,
+                reason,
+                category === 'TOXIC' || category === 'OFFENSIVE' || category === 'FORBIDDEN' ? 1 : 0,
+            ]
+        );
+        connection.end();
+
+        if (category === 'POSITIVE' || category === 'LITTLE_OFFENSIVE') {
+            res.status(201).json({
+                message: 'Comment created successfully',
+            });
+
+        } else {
+            res.status(201).json({
+                message: 'Comment created successfully',
+                aiAnalysis: { category, reason },
+                error: 'Comment has been reported'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/comments/:id', async (req, res) => {
+    const { id } = req.params;
+    const { publication_id, user_id, commentReply_id, comment } = req.body;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'UPDATE comments SET publication_id = ?, user_id = ?, commentReply_id = ?, comment = ? WHERE id = ?',
+            [publication_id, user_id, commentReply_id, comment, id]
+        );
+        connection.end();
+
+        if (result.affectedRows == 0) return res.status(404).json({ error: 'Comment not found' });
+
+        res.json({ message: 'Comment updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.delete('/comments/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('DELETE FROM comments WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows == 0) return res.status(404).json({ error: 'Comment not found' });
+
+        res.json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 app.listen(port, () => {
