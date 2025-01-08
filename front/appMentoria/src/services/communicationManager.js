@@ -37,7 +37,7 @@ export const postCommunityPublication = async (formData) => {
         });
 
         console.log(response);
-        return await response.json();
+        return response;
     } catch (error) {
         console.error(error);
     }

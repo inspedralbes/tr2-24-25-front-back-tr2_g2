@@ -70,6 +70,7 @@
 import Header from '@/components/Header.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { postCommunityPublication } from '@/services/communicationManager';
 
 const router = useRouter();
 const title = ref('');
@@ -104,10 +105,7 @@ async function submitPost() {
 
 
     try {
-      const response = await fetch('http://localhost:3002/publications', {
-          method: 'POST',
-          body: formData,
-        });
+      const response = await postCommunityPublication(formData);
 
         if (!response.ok) {
             const errorData = await response.json();

@@ -117,16 +117,16 @@ app.delete('/comments/:id', async (req, res) => {
 });
 
 // CRUD operations for publications
-// app.get('/publications', async (req, res) => {
-//     try {
-//         const connection = await mysql.createConnection(dbConfig);
-//         const [rows] = await connection.execute('SELECT * FROM publications');
-//         connection.end();
-//         res.json(rows);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Database error' });
-//     }
-// });
+app.get('/publications', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM publications');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 // Post publications conectada a la ia 
 app.post('/publications', async (req, res) => {
@@ -134,10 +134,6 @@ app.post('/publications', async (req, res) => {
         // Extraer datos del request
         const { typesPublications_id, title, description, user_id, expired_at } = req.body;
         
-        console.log('req.body:', req.body);
-        console.log('req.files:', req.files);
-        
-
         // Validación de datos (AÑADIDO)
         if (!title || !description || !req.files || !req.files.image) {
             return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
@@ -165,15 +161,15 @@ app.post('/publications', async (req, res) => {
               headers: formData.getHeaders(),
           });
           if (!response.ok) {
-              const error = await response.json(); // Tratar de obtener el error de la IA
+              const error = await response.json();
               throw new Error(`Error al analizar la imagen: ${response.status} - ${JSON.stringify(error)}`);
           }
           imageAnalysis = await response.json();
 
         } catch (fetchError) {
-            // Manejo de error en la llamada a la IA
+
             console.error("Error al llamar a la IA:", fetchError);
-            // Eliminar la imagen temporal si falla la IA
+
             fs.unlink(imagePath, (err) => {
                 if (err) console.error("Error al eliminar la imagen temporal:", err);
             });
