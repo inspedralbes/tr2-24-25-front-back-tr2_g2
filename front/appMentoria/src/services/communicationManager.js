@@ -29,18 +29,15 @@ export const loginAPI = async (user) => {
 
 
 // Create publications
-export const postCommunityPublication = async (publication) => {
+export const postCommunityPublication = async (formData) => {
     try {
         const response = await fetch(`${COMMUNITY_URL}publications`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(publication),
+           body: formData,
         });
 
         console.log(response);
-        return response.json();
+        return await response.json();
     } catch (error) {
         console.error(error);
     }

@@ -47,7 +47,7 @@ app.post("/classify-image", async (req, res) => {
             },
         };
 
-        const prompt = `Eres un detector de imágenes en binario. Para cada imagen que te pase mediante una URL, debes clasificarla en una de las siguientes categorías:
+        const prompt = `Eres un detector de imágenes en binario. Para cada imagen que te pase, debes clasificarla en una de las siguientes categorías:
 
         ADECUADA:
         

@@ -4,6 +4,8 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
@@ -12,8 +14,9 @@ const port = process.env.PORT || 3002;
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
 app.use(cors({
+    origin: `*`,
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(fileUpload());
 
@@ -114,14 +117,96 @@ app.delete('/comments/:id', async (req, res) => {
 });
 
 // CRUD operations for publications
-app.get('/publications', async (req, res) => {
+// app.get('/publications', async (req, res) => {
+//     try {
+//         const connection = await mysql.createConnection(dbConfig);
+//         const [rows] = await connection.execute('SELECT * FROM publications');
+//         connection.end();
+//         res.json(rows);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Database error' });
+//     }
+// });
+
+// Post publications conectada a la ia 
+app.post('/publications', async (req, res) => {
     try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM publications');
-        connection.end();
-        res.json(rows);
+        // Extraer datos del request
+        const { typesPublications_id, title, description, user_id, expired_at } = req.body;
+        
+        console.log('req.body:', req.body);
+        console.log('req.files:', req.files);
+        
+
+        // Validación de datos (AÑADIDO)
+        if (!title || !description || !req.files || !req.files.image) {
+            return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
+        }
+
+        const imageFile = req.files.image;
+        const imageName = `${Date.now()}-${imageFile.name}`;
+        const imagePath = path.join(__dirname, 'upload', imageName);
+
+        // Mover el archivo a la carpeta 'upload'
+        await imageFile.mv(imagePath);
+
+
+        const formData = new FormData();
+        formData.append('image', fs.createReadStream(imagePath));
+
+        const serverMjsUrl = 'http://localhost:3006/classify-image'; //URL del servidor de IA.
+        let imageAnalysis;
+        try {
+          const fetchPromise = await import('node-fetch');
+          const fetch = fetchPromise.default;
+          const response = await fetch(serverMjsUrl, {
+              method: 'POST',
+              body: formData,
+              headers: formData.getHeaders(),
+          });
+          if (!response.ok) {
+              const error = await response.json(); // Tratar de obtener el error de la IA
+              throw new Error(`Error al analizar la imagen: ${response.status} - ${JSON.stringify(error)}`);
+          }
+          imageAnalysis = await response.json();
+
+        } catch (fetchError) {
+            // Manejo de error en la llamada a la IA
+            console.error("Error al llamar a la IA:", fetchError);
+            // Eliminar la imagen temporal si falla la IA
+            fs.unlink(imagePath, (err) => {
+                if (err) console.error("Error al eliminar la imagen temporal:", err);
+            });
+            return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
+        }
+
+
+        let result;
+        try {
+            const connection = await mysql.createConnection(dbConfig);
+            [result] = await connection.execute(
+                'INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [typesPublications_id || null, title, description, user_id || null, `/upload/${imageName}`, expired_at || null]
+            );
+            connection.end();
+        } catch (dbError) {
+            // Manejo de error en la base de datos
+            console.error("Error en la base de datos:", dbError);
+            // Eliminar la imagen temporal si falla la base de datos
+            fs.unlink(imagePath, (err) => {
+                if (err) console.error("Error al eliminar la imagen temporal:", err);
+            });
+            return res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.' });
+        }
+
+        res.status(201).json({
+            publicationId: result.insertId,
+            imageAnalysis,
+        });
+
     } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+        console.error("Error general en /publications:", error);
+        res.status(500).json({ error: 'Error interno del servidor al crear la publicación' });
     }
 });
 

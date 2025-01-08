@@ -13,11 +13,11 @@ import addRequestPost from '../views/addRequestPost.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/login',
-      name: 'login',
-      component: loginPage,
-    },
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   component: loginPage,
+    // },
     {
       path: '/',
       name: 'main',

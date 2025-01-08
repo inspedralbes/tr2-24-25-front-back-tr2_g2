@@ -835,66 +835,6 @@ async function comparePassword(password, hashedPassword) {
     return match
 }
 
-// Post publications conectada a la ia 
-app.post('/publications', async (req, res) => {
-    try {
-        const { typesPublications_id, title, description, user_id, expired_at } = req.body;
-
-        const imageFile = req.files.image;
-        const imageName = `${Date.now()}-${imageFile.name}`;
-        const imagePath = path.join(__dirname, 'upload', imageName);
-
-        try {
-            await imageFile.mv(imagePath);
-        } catch (mvError) {
-           return res.status(500).json({ error: 'Error al guardar la imagen' });
-        }
-
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream(imagePath));
-
-        const serverMjsUrl = 'http://localhost:3006/classify-image';
-         let imageAnalysis;
-         try{
-            const fetchPromise = await import('node-fetch');
-            const fetch = fetchPromise.default;
-            const response = await fetch(serverMjsUrl, {
-               method: 'POST',
-                 body: formData,
-             });
-             
-          if(!response.ok){
-               const error = await response.json();
-                return res.status(500).json({error: 'Error al analizar la imagen', details: error});
-            }
-          imageAnalysis = await response.json();
-
-         }catch (fetchError){
-             return res.status(500).json({error: 'Error al analizar la imagen', details: fetchError});
-         }
-    
-        let result;
-        try{
-            const connection = await mysql.createConnection(dbConfig);
-           [result] = await connection.execute(
-                'INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at) VALUES (?, ?, ?, ?, ?, ?)',
-                [typesPublications_id != undefined ? typesPublications_id : null, title != undefined ? title : null, description != undefined ? description : null, user_id != undefined ? user_id : null, `/upload/${imageName}`, expired_at != undefined ? expired_at : null]
-            );
-            connection.end();
-        }catch (dbError){
-            return res.status(500).json({error: 'Error al insertar en la base de datos', details: dbError});
-        }
-
-        //mensaje de devulve la ia 
-        res.status(201).json({
-            publicationId: result.insertId,
-            imageAnalysis,
-        });
-
-    } catch (error) {
-        res.status(500).json({ error: 'Error al crear la publicación o analizar la imagen.' });
-    }
-});
 // Start the server
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

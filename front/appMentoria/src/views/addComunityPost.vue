@@ -104,7 +104,7 @@ async function submitPost() {
 
 
     try {
-      const response = await fetch('http://localhost:3000/publications', {
+      const response = await fetch('http://localhost:3002/publications', {
           method: 'POST',
           body: formData,
         });
