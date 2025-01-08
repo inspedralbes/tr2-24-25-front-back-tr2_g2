@@ -1,6 +1,6 @@
 <template>
     <section class="relative pt-40 pb-24 min-h-screen flex flex-col justify-between">
-        <img src="https://pbs.twimg.com/profile_banners/889046489942675456/1705870682/1500x500" alt="cover-image"
+        <img :src="`${import.meta.env.VITE_URL_BACK}${user.banner}`" alt="cover-image"
             class="w-full absolute top-0 left-0 z-0 h-60 object-cover shadow-lg shadow-black/30">
 
         <div class="absolute right-4 md:right-5 top-60 transform -translate-y-8 md:-translate-y-8">
@@ -92,5 +92,15 @@
 </template>
 
 <script setup>
+import { ref, onMounted, reactive } from 'vue';  
+import { useAppStore } from '@/stores/index';
 import calendario from '@/components/calendario.vue';
+
+var user = reactive({});
+
+onMounted(() => {
+    console.log('onMounted profilePage');
+    user = useAppStore().getUser();
+    console.log('user:', user);
+});
 </script>

@@ -77,7 +77,8 @@ app.post('/loginAPI', async (req, res) => {
         if (users.length == 0) {
             console.log('User not found, creating new user...');
             let tokenHash = await hashPassword(token);
-            const [result] = await connection.execute('INSERT INTO users (name, email, password, profile) VALUES (?, ?, ?, ?)', [name, email, tokenHash, profile]);
+            let banner = '/upload/banner_default.png';
+            const [result] = await connection.execute('INSERT INTO users (name, email, password, banner, profile) VALUES (?, ?, ?, ?)', [name, email, tokenHash, banner, profile]);
             console.log('User created:', result.insertId);
 
             const [resultNewUser] = await connection.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
