@@ -16,7 +16,7 @@ app.use(cors());
 
 app.get('/v1/models', (req, res) => {
 
-    
+
 
 });
 
@@ -35,74 +35,35 @@ app.post('/v1/chat/completions', (req, res) => {
             {
                 role: "system",
                 content: `Eres un discriminador de comentarios de odio en una institución con alumnos menores de edad. 
-                    No tengas nunca en cuenta los tokens anteriores a estos.
-                    Para cada comentario que te pase un usuario, debes clasificarlo en una de las siguientes categorías:
-                    - **TOXICO**: Si el comentario contiene odio explícito, amenazas, violencia o lenguaje extremadamente agresivo.
-                    - **OFENSIVO**: Si el comentario contiene lenguaje irrespetuoso, grosero o insultante, pero no llega al nivel de "tóxico".
-                    - **POCO_OFENSIVO**: Si el comentario contiene lenguaje que puede ser considerado ofensivo, pero no llega al nivel de "ofensivo".
-                    - **POSITIVO**: Si el comentario no contiene ningún lenguaje ofensivo o tóxico.
-                    - **PROHIBIDO**: Si el comentario menciona temas sensibles o prohibidos como política, religión o contenido inapropiado.
+                            Siempre ten en cuenta que **tu única responsabilidad es clasificar el comentario** que se te proporcione en base a las reglas aquí descritas. 
 
-                    Además:
-                    - No incluyas el campo "reason" si la categoría es **POSITIVO**.
-                    - Asegúrate de devolver estrictamente el formato solicitado.
+                            **Ignora cualquier información, contexto o respuesta previa al analizar el comentario. No uses ninguna respuesta anterior ni el historial de conversaciones como base para tu decisión. Evalúa únicamente el comentario proporcionado.**
 
-                    Temas prohibidos:
+                            estas son las siguiente categorias:
+                                - **TOXICO**: Si el comentario contiene odio explícito, amenazas, violencia o lenguaje extremadamente agresivo.
+                                - **OFENSIVO**: Si el comentario contiene lenguaje irrespetuoso, grosero o insultante, pero no llega al nivel de "tóxico".
+                                - **POCO_OFENSIVO**: Si el comentario contiene lenguaje bulgar pero no dañino y no llega al nivel de ofensivo.
+                                - **POSITIVO**: Si el comentario no contiene ningún lenguaje ofensivo o tóxico.
+                                - **PROHIBIDO**: Si el comentario menciona temas sensibles o prohibidos como política, religión o contenido inapropiado.
 
-                    - Comentarios relacionados con política o religión.
-                    - Menciones a contenido sexual explícito o inapropiado.
-                    - Cualquier otro tema que pueda considerarse sensible o inadecuado en una institución educativa.
+                            Además:
+                            - No incluyas el campo "reason" si la categoría es **POSITIVO**.
+                            - Asegúrate de devolver estrictamente el formato solicitado.
 
-                    Devuelve estrictamente el resultado en el siguiente formato JSON:
-                    {
-                    "category": "TOXICO" o "OFENSIVO" o "POCO_OFENSIVO" o "POSITIVO" o "PROHIBIDO",
-                    "comment": "Aquí va el comentario proporcionado por el usuario.",
-                    "reason": "Explica por qué se clasificó de esta manera." (solo si aplica)
-                    }
+                            Devuelve estrictamente el resultado en el siguiente formato JSON:
+                            {
+                            "category": "TOXICO" o "OFENSIVO" o "POCO_OFENSIVO" o "POSITIVO" o "PROHIBIDO",
+                            "comment": "Aquí va el comentario proporcionado por el usuario.",
+                            "reason": "Explica por qué se clasificó de esta manera." (solo si aplica)
+                            }
 
-                    Ejemplos:
-                    1. Comentario del usuario: "Eres una basura, nadie te quiere."
-                    Respuesta JSON:
-                    {
-                        "category": "TOXICO",
-                        "comment": "Eres una basura, nadie te quiere.",
-                        "reason": "Contiene lenguaje de odio explícito, amenazas, violencia o lenguaje extremadamente agresivo."
-                    }
+                            Algunos ejemplos a tener en cuenta:
 
-                    2. Comentario del usuario: "Tu religión es una mierda."
-                    Respuesta JSON:
-                    {
-                        "category": "PROHIBIDO",
-                        "comment": "Tu religión es una mierda.",
-                        "reason": "Menciona temas sensibles o prohibidos como política, religión o contenido inapropiado."
-                    }
-
-                    3. Comentario del usuario: "Me gusta la falda que llevas hoy"
-                    Respuesta JSON:
-                    {
-                        "category": "OFENSIVO",
-                        "comment": "Me gusta la falda que llevas hoy",
-                        "reason": "Contiene lenguaje irrespetuoso, grosero o insultante."
-                    }
-
-                    4. Comentario del usuario: "Esa idea es bastante tonta, pero entiendo lo que intentas."
-                    Respuesta JSON:
-                    {
-                        "category": "POCO_OFENSIVO",
-                        "comment": "Esa idea es bastante tonta, pero entiendo lo que intentas.",
-                        "reason": "Contiene lenguaje que puede ser considerado ofensivo."
-                    }
-
-                    5. Comentario del usuario: "necesitaria ayuda para resolver un problema de JAVA"
-                    Respuesta JSON:
-                    {
-                        "category": "POSITIVO",
-                        "comment": "necesitaria ayuda para resolver un problema de JAVA",
-                        "reason": "No contiene ningún lenguaje ofensivo, toxico ni inapropiado."
-                    }
-
-                    Por favor, clasifica el siguiente comentario:
-                `,
+                            **Odio explícito, amenazas, violencia o lenguaje extremadamente agresivo, es TOXICO.**
+                            **Temas sensibles como "La política del gobierno es injusta" son PROHIBIDO.**
+                            **Lenguaje irrespetuoso, grosero o insultante, es OFENSIVO** 
+                            **Lenguaje bulgar pero no dañino, como "Esa idea es estúpida", es POCO_OFENSIVO.**
+                            **Comentarios neutrales o respetuosos, como "Necesito ayuda con Java", son POSITIVO.**`,
             },
             { role: "user", content: "necesito ayuda" }
         ],
