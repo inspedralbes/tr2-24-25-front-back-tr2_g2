@@ -1,6 +1,7 @@
 <template>
+    <Header class="fixed top-0 left-0 right-0 z-10"></Header>
     <section class="relative pt-40 pb-24 min-h-screen flex flex-col justify-between">
-        <img :src="`${import.meta.env.VITE_URL_BACK}${user.banner}`" alt="cover-image"
+        <img :src="`${bannerURL}`" alt="cover-image"
             class="w-full absolute top-0 left-0 z-0 h-60 object-cover shadow-lg shadow-black/30">
 
         <div class="absolute right-4 md:right-5 top-60 transform -translate-y-8 md:-translate-y-8">
@@ -86,21 +87,28 @@
         </div>
     </section>
 
-    <div class="relative z-20 -translate-y-16 lg:-translate-y-60">
+    <div class="relative -translate-y-16 lg:-translate-y-60">
         <calendario />
     </div>
+
+    <NavBar></NavBar>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue';  
 import { useAppStore } from '@/stores/index';
 import calendario from '@/components/calendario.vue';
+import NavBar from '@/components/NavBar.vue';
+import Header from '@/components/Header.vue';
 
 var user = reactive({});
+var bannerURL = ref('');
 
 onMounted(() => {
     console.log('onMounted profilePage');
     user = useAppStore().getUser();
     console.log('user:', user);
+    bannerURL.value = import.meta.env.VITE_URL_BACK + user.bannerURL;
+    console.log('bannerURL:', bannerURL);
 });
 </script>
