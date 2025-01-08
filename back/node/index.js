@@ -2,6 +2,7 @@
 const fileUpload = require('express-fileupload');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
@@ -11,6 +12,8 @@ const FormData = require('form-data');
 const fs = require('fs');
 require('dotenv').config();
 
+const secretKey = process.env.SECRET_KEY;
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -18,8 +21,14 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin"],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+});
+
 app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
@@ -57,21 +66,50 @@ app.get('/', (req, res) => {
 
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
-// Register route
-app.post('/register', async (req, res) => {
-    const { name, email, password, typesUsers_id } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+// Login with api's google, github, discord
+app.post('/loginAPI', async (req, res) => {
+    console.log('req.body: ', req.body);
+    const { email, name, token, profile } = req.body;
+    const connection = await mysql.createConnection(dbConfig);
+    let userLogin = {};
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'INSERT INTO users (name, email, password, typesUsers_id) VALUES (?, ?, ?, ?)',
-            [name, email, hashedPassword, typesUsers_id]
-        );
-        connection.end();
-        res.status(201).json({ message: 'User registered successfully' });
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+        if (users.length == 0) {
+            console.log('User not found, creating new user...');
+            let tokenHash = await hashPassword(token);
+            const [result] = await connection.execute('INSERT INTO users (name, email, password, profile) VALUES (?, ?, ?, ?)', [name, email, tokenHash, profile]);
+            console.log('User created:', result.insertId);
+
+            const [resultNewUser] = await connection.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
+            console.log('resultNewUser: ', resultNewUser);
+            userLogin = resultNewUser[0];
+        } else {
+            console.log('User found');
+            let password = users[0].password;
+            let match = await comparePassword(token, password);
+
+            if (!match) {
+                console.log('Invalid password');
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                userLogin = users[0];
+                console.log('userLogin: ', userLogin);
+            }
+        }
+
+        // Generar token JWT 
+        // const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        // res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
+        console.log('secret key: ', secretKey);
+        res.status(200).json({ message: 'Login successful', userLogin });
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
+        console.log('Connection closed');
     }
 });
 
@@ -90,14 +128,21 @@ app.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(400).json({ error: 'Invalid password' });
 
-        res.json({ message: 'Login successful', user });
+        // Generar token JWT
+        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+        res.json({ message: 'Login successful', token });
     } catch (error) {
         res.status(500).json({ error: 'Database error' });
     }
 });
 
+// Logout route
+app.get('/logout', (req, res) => {
+
+});
+
 // CRUD operations for users
-app.get('/users', async (req, res) => {
+app.get('/users', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM users');
@@ -108,7 +153,7 @@ app.get('/users', async (req, res) => {
     }
 });
 
-app.get('/users/:id', async (req, res) => {
+app.get('/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -124,7 +169,7 @@ app.get('/users/:id', async (req, res) => {
     }
 });
 
-app.put('/users/:id', async (req, res) => {
+app.put('/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { name, email, password, typesUsers_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -145,7 +190,7 @@ app.put('/users/:id', async (req, res) => {
     }
 });
 
-app.delete('/users/:id', async (req, res) => {
+app.delete('/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -162,7 +207,7 @@ app.delete('/users/:id', async (req, res) => {
 });
 
 // CRUD operations for newDataUsers
-app.get('/newDataUsers', async (req, res) => {
+app.get('/newDataUsers', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM newDataUsers');
@@ -173,7 +218,7 @@ app.get('/newDataUsers', async (req, res) => {
     }
 });
 
-app.get('/newDataUsers/:id', async (req, res) => {
+app.get('/newDataUsers/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -189,7 +234,7 @@ app.get('/newDataUsers/:id', async (req, res) => {
     }
 });
 
-app.post('/newDataUsers', async (req, res) => {
+app.post('/newDataUsers', verifyToken, async (req, res) => {
     const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -206,7 +251,7 @@ app.post('/newDataUsers', async (req, res) => {
     }
 });
 
-app.put('/newDataUsers/:id', async (req, res) => {
+app.put('/newDataUsers/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -227,7 +272,7 @@ app.put('/newDataUsers/:id', async (req, res) => {
     }
 });
 
-app.delete('/newDataUsers/:id', async (req, res) => {
+app.delete('/newDataUsers/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -244,7 +289,7 @@ app.delete('/newDataUsers/:id', async (req, res) => {
 });
 
 // CRUD operations for qualifications
-app.get('/qualifications', async (req, res) => {
+app.get('/qualifications', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM qualifications');
@@ -255,7 +300,7 @@ app.get('/qualifications', async (req, res) => {
     }
 });
 
-app.get('/qualifications/:id', async (req, res) => {
+app.get('/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -271,7 +316,7 @@ app.get('/qualifications/:id', async (req, res) => {
     }
 });
 
-app.post('/qualifications', async (req, res) => {
+app.post('/qualifications', verifyToken, async (req, res) => {
     const { name } = req.body;
 
     try {
@@ -287,7 +332,7 @@ app.post('/qualifications', async (req, res) => {
     }
 });
 
-app.put('/qualifications/:id', async (req, res) => {
+app.put('/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -307,7 +352,7 @@ app.put('/qualifications/:id', async (req, res) => {
     }
 });
 
-app.delete('/qualifications/:id', async (req, res) => {
+app.delete('/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -324,7 +369,7 @@ app.delete('/qualifications/:id', async (req, res) => {
 });
 
 // CRUD operations for usersQualifications
-app.get('/users/qualifications', async (req, res) => {
+app.get('/users/qualifications', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM usersQualifications');
@@ -335,7 +380,7 @@ app.get('/users/qualifications', async (req, res) => {
     }
 });
 
-app.get('/users/qualifications/:id', async (req, res) => {
+app.get('/users/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -351,7 +396,7 @@ app.get('/users/qualifications/:id', async (req, res) => {
     }
 });
 
-app.post('/users/qualifications', async (req, res) => {
+app.post('/users/qualifications', verifyToken, async (req, res) => {
     const { user_id, qualification_id } = req.body;
 
     try {
@@ -367,7 +412,7 @@ app.post('/users/qualifications', async (req, res) => {
     }
 });
 
-app.put('/users/qualifications/:id', async (req, res) => {
+app.put('/users/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { user_id, qualification_id } = req.body;
 
@@ -387,7 +432,7 @@ app.put('/users/qualifications/:id', async (req, res) => {
     }
 });
 
-app.delete('/users/qualifications/:id', async (req, res) => {
+app.delete('/users/qualifications/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -404,7 +449,7 @@ app.delete('/users/qualifications/:id', async (req, res) => {
 });
 
 // CRUD operations for classes
-app.get('/classes', async (req, res) => {
+app.get('/classes', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM classes');
@@ -415,7 +460,7 @@ app.get('/classes', async (req, res) => {
     }
 });
 
-app.get('/classes/:id', async (req, res) => {
+app.get('/classes/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -431,7 +476,7 @@ app.get('/classes/:id', async (req, res) => {
     }
 });
 
-app.post('/classes', async (req, res) => {
+app.post('/classes', verifyToken, async (req, res) => {
     const { name } = req.body;
 
     try {
@@ -447,7 +492,7 @@ app.post('/classes', async (req, res) => {
     }
 });
 
-app.put('/classes/:id', async (req, res) => {
+app.put('/classes/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -467,7 +512,7 @@ app.put('/classes/:id', async (req, res) => {
     }
 });
 
-app.delete('/classes/:id', async (req, res) => {
+app.delete('/classes/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -484,7 +529,7 @@ app.delete('/classes/:id', async (req, res) => {
 });
 
 // CRUD operations for teachersClasses
-app.get('/teachersClasses', async (req, res) => {
+app.get('/teachersClasses', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM teachersClasses');
@@ -495,7 +540,7 @@ app.get('/teachersClasses', async (req, res) => {
     }
 });
 
-app.get('/teachersClasses/:id', async (req, res) => {
+app.get('/teachersClasses/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -511,7 +556,7 @@ app.get('/teachersClasses/:id', async (req, res) => {
     }
 });
 
-app.post('/teachersClasses', async (req, res) => {
+app.post('/teachersClasses', verifyToken, async (req, res) => {
     const { user_id, class_id } = req.body;
 
     try {
@@ -527,7 +572,7 @@ app.post('/teachersClasses', async (req, res) => {
     }
 });
 
-app.put('/teachersClasses/:id', async (req, res) => {
+app.put('/teachersClasses/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { user_id, class_id } = req.body;
 
@@ -547,7 +592,7 @@ app.put('/teachersClasses/:id', async (req, res) => {
     }
 });
 
-app.delete('/teachersClasses/:id', async (req, res) => {
+app.delete('/teachersClasses/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -564,7 +609,7 @@ app.delete('/teachersClasses/:id', async (req, res) => {
 });
 
 // CRUD operations for reports comments
-app.get('/reports/comments', async (req, res) => {
+app.get('/reports/comments', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [results] = await connection.execute('SELECT * FROM reportsComments');
@@ -576,7 +621,7 @@ app.get('/reports/comments', async (req, res) => {
     }
 });
 
-app.get('/reports/comments/:id', async (req, res) => {
+app.get('/reports/comments/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -592,7 +637,7 @@ app.get('/reports/comments/:id', async (req, res) => {
     }
 });
 
-app.post('/reports/comments', async (req, res) => {
+app.post('/reports/comments', verifyToken, async (req, res) => {
     const { comment_id, user_id, report } = req.body;
 
     try {
@@ -606,7 +651,7 @@ app.post('/reports/comments', async (req, res) => {
     }
 });
 
-app.put('/reports/comments/:id', async (req, res) => {
+app.put('/reports/comments/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -623,7 +668,7 @@ app.put('/reports/comments/:id', async (req, res) => {
     }
 });
 
-app.delete('/reports/comments/:id', async (req, res) => {
+app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -640,7 +685,7 @@ app.delete('/reports/comments/:id', async (req, res) => {
 });
 
 // CRUD operations for reports users
-app.get('/reports/users', async (req, res) => {
+app.get('/reports/users', verifyToken, async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [results] = await connection.execute('SELECT * FROM reportsUsers');
@@ -652,7 +697,7 @@ app.get('/reports/users', async (req, res) => {
     }
 });
 
-app.get('/reports/users/:id', async (req, res) => {
+app.get('/reports/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -668,7 +713,7 @@ app.get('/reports/users/:id', async (req, res) => {
     }
 });
 
-app.post('/reports/users', async (req, res) => {
+app.post('/reports/users', verifyToken, async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
 
     try {
@@ -682,7 +727,7 @@ app.post('/reports/users', async (req, res) => {
     }
 });
 
-app.put('/reports/users/:id', async (req, res) => {
+app.put('/reports/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -699,7 +744,7 @@ app.put('/reports/users/:id', async (req, res) => {
     }
 });
 
-app.delete('/reports/users/:id', async (req, res) => {
+app.delete('/reports/users/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -716,29 +761,79 @@ app.delete('/reports/users/:id', async (req, res) => {
 });
 
 // Create users rewiews
-app.post('/reviews', async (req, res) => { 
-    const { reviewed_user_id, reviewer_user_id, rating } = req.body; 
+app.post('/reviews', async (req, res) => {
+    const { reviewed_user_id, reviewer_user_id, rating } = req.body;
 
-    try { 
-        const connection = await mysql.createConnection(dbConfig); 
-        await connection.beginTransaction(); 
-        const [result] = await connection.execute('INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES (?, ?, ?)', [reviewed_user_id, reviewer_user_id, rating]); 
-        
-        const [rows] = await connection.execute('SELECT AVG(rating) as rating FROM reviews WHERE reviewed_user_id = ?', [reviewed_user_id]); 
-        if (rows.length == 0) { 
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        await connection.beginTransaction();
+        const [result] = await connection.execute('INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES (?, ?, ?)', [reviewed_user_id, reviewer_user_id, rating]);
+
+        const [rows] = await connection.execute('SELECT AVG(rating) as rating FROM reviews WHERE reviewed_user_id = ?', [reviewed_user_id]);
+        if (rows.length == 0) {
             throw new Error('No reviews found for the user');
-        } 
-        const averageRating = parseFloat(rows[0].rating).toFixed(2); 
+        }
+        const averageRating = parseFloat(rows[0].rating).toFixed(2);
 
-        await connection.execute('UPDATE users SET review = ? WHERE id = ?', [averageRating, reviewed_user_id]); 
-        await connection.commit(); 
-        connection.end(); 
-        res.status(201).send({ id: result.insertId }); 
-    } catch (error) { 
-        console.error('Database error:', error); 
+        await connection.execute('UPDATE users SET review = ? WHERE id = ?', [averageRating, reviewed_user_id]);
+        await connection.commit();
+        connection.end();
+        res.status(201).send({ id: result.insertId });
+    } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+// Function to verify token
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(403).send('Token es requerido');
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(500).send('Fallo al autenticar el token');
+        req.user = decoded;
+        next();
+    });
+};
+
+// Function to hash password
+async function hashPassword(password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword
+}
+
+// Function to compare password
+async function comparePassword(password, hashedPassword) {
+    const match = await bcrypt.compare(password, hashedPassword);
+    return match
+}
+
+// Function to verify token
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(403).send('Token es requerido');
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(500).send('Fallo al autenticar el token');
+        req.user = decoded;
+        next();
+    });
+};
+
+// Function to hash password
+async function hashPassword(password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword
+}
+
+// Function to compare password
+async function comparePassword(password, hashedPassword) {
+    const match = await bcrypt.compare(password, hashedPassword);
+    return match
+}
 
 // Post publications conectada a la ia 
 app.post('/publications', async (req, res) => {
