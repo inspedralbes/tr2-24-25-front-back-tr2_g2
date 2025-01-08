@@ -33,86 +33,6 @@ app.get('/', (req, res) => {
 
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
-// CRUD operations for comments
-app.get('/comments', async (req, res) => {
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM comments');
-        connection.end();
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.get('/comments/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM comments WHERE id = ?', [id]);
-        connection.end();
-
-        if (rows.length == 0) return res.status(404).json({ error: 'Comment not found' });
-
-        res.json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.post('/comments', async (req, res) => {
-    const { publication_id, user_id, commentReply_id, comment } = req.body;
-
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES (?, ?, ?, ?)',
-            [publication_id, user_id, commentReply_id, comment]
-        );
-        connection.end();
-        res.status(201).json({ message: 'Comment created successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.put('/comments/:id', async (req, res) => {
-    const { id } = req.params;
-    const { publication_id, user_id, commentReply_id, comment } = req.body;
-
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'UPDATE comments SET publication_id = ?, user_id = ?, commentReply_id = ?, comment = ? WHERE id = ?',
-            [publication_id, user_id, commentReply_id, comment, id]
-        );
-        connection.end();
-
-        if (result.affectedRows == 0) return res.status(404).json({ error: 'Comment not found' });
-
-        res.json({ message: 'Comment updated successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.delete('/comments/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute('DELETE FROM comments WHERE id = ?', [id]);
-        connection.end();
-
-        if (result.affectedRows == 0) return res.status(404).json({ error: 'Comment not found' });
-
-        res.json({ message: 'Comment deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
 // CRUD operations for publications
 app.get('/publications', async (req, res) => {
     try {
@@ -148,7 +68,7 @@ app.post('/publications', async (req, res) => {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
             'INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES (?, ?, ?, ?, ?)',
-            [ 2, title, description, user_id, reports]
+            [2, title, description, user_id, reports]
         );
         connection.end();
         res.status(201).json({ message: 'Publication created successfully' });
