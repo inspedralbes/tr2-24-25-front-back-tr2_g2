@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import socket from './sockets';
+import { useRouter } from 'vue-router';
 
 const CHAT_URL = import.meta.env.VITE_CHATS_URL;
 
@@ -67,4 +68,30 @@ export const fetchChats = async (userId) => {
     chatsInfo.value = false;
   }
   return { chats: chats.value, chatsInfo: chatsInfo.value };
+};
+
+export const chatButton = async (userid1, userid2, router) => {
+  const newMessage = {
+      "user_one_id": userid1,
+      "user_two_id": userid2,
+      "interactions": [],
+      "__v": 0
+  };
+  console.log(newMessage);
+  try {
+      const response = await fetch(`${CHAT_URL}newChat`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newMessage)
+      });
+      if (!response.ok) {
+          throw new Error('Failed to send message');
+      }
+        router.push('/chatList');
+  } catch (error) {
+      console.error('Error sending message:', error);
+      router.push('/chatList');
+  }
 };

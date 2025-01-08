@@ -25,7 +25,7 @@ const chats = ref([]);
 const chatsInfo = ref(false);
 
 onMounted(() => {
-  socket.on('receiveMessage', () => fetchChats(userId));
+  socket.on('receiveMessage', () => fetchChatsNow(userId));
   fetchChatsNow(userId);
 });
 

@@ -134,10 +134,6 @@ export default {
         console.log(chatData)
         this.$refs.messageInput.value = '';
       }
-    },
-    scrollToBottom() {
-      const container = this.$refs.messageContainer;
-      container.scrollTop = container.scrollHeight;
     }
   },
   updated() {
