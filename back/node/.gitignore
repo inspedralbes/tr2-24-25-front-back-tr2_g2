@@ -12,3 +12,6 @@
 
 /services/comment/node_modules
 /services/comment/.env
+
+/services/iaimage/node_modules
+/services/iaimage/.env
