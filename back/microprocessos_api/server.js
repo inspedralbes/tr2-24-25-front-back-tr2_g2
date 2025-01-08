@@ -14,7 +14,7 @@ const { DateTime } = require('luxon');
 const app = express();
 app.use(express.json());
 app.use(cors());
-const PORT = 4000;
+const PORT = process.env.PORT;
 dotenv.config();
 
 // `__dirname` está disponible automáticamente en CommonJS
