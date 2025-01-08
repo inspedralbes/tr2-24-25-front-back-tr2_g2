@@ -93,13 +93,13 @@ app.post("/classify-image", async (req, res) => {
         
         
         Por mas ofensivo que sea una imagen devuelve por lo menos un mensaje de error.`;
-        
+
         const promptTokens = encode(prompt).length;
-        
+
         const result = await model.generateContent([prompt, imagePart]);
-          
+
         const responseText = result.response.text();
-        
+
         const responseTokens = encode(responseText).length;
 
         const totalTokens = promptTokens + responseTokens;
