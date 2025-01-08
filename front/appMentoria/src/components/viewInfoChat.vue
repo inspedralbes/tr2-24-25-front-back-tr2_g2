@@ -20,55 +20,48 @@
   </div>
 </template>
 
-  <script setup>
-  
-  import { ref, onMounted } from 'vue';
-  import { defineProps } from 'vue';
-  import viewChatContent from './viewChatContent.vue';
+<script setup>
+import { ref, onMounted } from 'vue';
+import { defineProps } from 'vue';
+import viewChatContent from './viewChatContent.vue';
 
-  const userid = ref(111111);
+const userid = ref(111111);
 
-  const props = defineProps({
-    chats: {
+const props = defineProps({
+  chats: {
     type: Array,
     required: true
-    }
-  });
-
-  const selectedChatId = ref(false);
-
-  console.log('selectedChatId:', selectedChatId.value);
-
-
-  const selectChat = (chatId) => {
-    selectedChatId.value = chatId;
-    console.log('selectedChatId:', selectedChatId.value);
-  };
-
-  onMounted(() => {
-    selectedChatId.value = false;
-  });
-
-  </script>
-
-  <style scoped>
-  .chat-item {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    margin: 10px;
-    scriptder-radius: 8px;
-    cursor: pointer;
   }
+});
 
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: white;
-    z-index: 10;
-  }
-  </style>
+const selectedChatId = ref(false);
+
+const selectChat = (chatId) => {
+  selectedChatId.value = chatId;
+};
+
+onMounted(() => {
+  selectedChatId.value = false;
+});
+</script>
+
+<style scoped>
+.chat-item {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 10;
+}
+</style>

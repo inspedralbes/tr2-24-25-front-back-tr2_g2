@@ -104,19 +104,16 @@ import { useRouter } from 'vue-router';
 const messageInput = ref('');
 const router = useRouter();
 
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3004');
-
 const chatButton = async () => {
     const newMessage = {
-        user_one_id: 111111,
-        user_two_id: 237897,
-        interactions: [],
-        __v: 0
+        "user_one_id": 111111,
+        "user_two_id": 237897,
+        "interactions": [],
+        "__v": 0
     };
+    console.log(newMessage);
     try {
-        const response = await fetch('http://localhost:3004/addChat', {
+        const response = await fetch('http://localhost:3004/newChat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -126,7 +123,6 @@ const chatButton = async () => {
         if (!response.ok) {
             throw new Error('Failed to send message');
         }
-        socket.emit('sendMessage', newMessage);
         router.push('/chatList');
     } catch (error) {
         console.error('Error sending message:', error);
