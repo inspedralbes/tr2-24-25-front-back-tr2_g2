@@ -24,8 +24,9 @@ export const fetchMessages = async (chatId) => {
 };
 
 export const sendMessageInMongo = async (chatData, currentUser, messageInput) => {
+  console.log('sendMessageInMongo:', chatData, currentUser, messageInput);
   const newMessage = {
-    message: messageInput.value.value,
+    message: messageInput,
     userId: currentUser,
     timestamp: new Date().toISOString()
   };
@@ -38,9 +39,10 @@ export const sendMessageInMongo = async (chatData, currentUser, messageInput) =>
       },
       body: JSON.stringify(chatData)
     });
-    messageInput.value.value = '';
-    socket.value.emit('sendMessage', {
-      socket,
+    if (typeof messageInput === 'object' && messageInput !== null) {
+      messageInput.value = ''; // Clear the input if it's an object
+    }
+    socket.emit('sendMessage', {
       chatId: chatData._id,
       userId: currentUser,
       message: newMessage.message
@@ -48,4 +50,21 @@ export const sendMessageInMongo = async (chatData, currentUser, messageInput) =>
   } catch (error) {
     console.error('Error sending message:', error);
   }
+};
+
+export const fetchChats = async (userId) => {
+
+  const chats = ref([]);
+  const chatsInfo = ref(false);
+  
+  try {
+    const response = await fetch(`${CHAT_URL}getChats/${userId}`);
+    const data = await response.json();
+    chats.value = data;
+    chatsInfo.value = true;
+  } catch (err) {
+    console.error('Error al obtener los chats', err);
+    chatsInfo.value = false;
+  }
+  return { chats: chats.value, chatsInfo: chatsInfo.value };
 };

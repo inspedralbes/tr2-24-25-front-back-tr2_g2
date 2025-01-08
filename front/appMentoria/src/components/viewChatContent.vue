@@ -112,14 +112,15 @@ export default {
       currentUser: userId
     };
   },
-  mounted() {
+  async mounted() {
     this.socket = socket;
     this.socket.on('receiveMessage', (newMessage) => {
       this.interactions.push(newMessage);
       this.scrollToBottom();
     });
     console.log(this.chatId)
-    chatData =fetchMessages(this.chatId);
+    chatData = await fetchMessages(this.chatId);
+    this.interactions = chatData.value.interactions;
   },
   methods: {
     scrollToBottom() {
@@ -129,10 +130,18 @@ export default {
      sendMessageInMongoNow() {
       const message = this.$refs.messageInput.value;
       if (message) {
-        sendMessageInMongo(chatdata, userId, message);
+        sendMessageInMongo(chatData.value, userId, message);
+        console.log(chatData)
         this.$refs.messageInput.value = '';
       }
+    },
+    scrollToBottom() {
+      const container = this.$refs.messageContainer;
+      container.scrollTop = container.scrollHeight;
     }
+  },
+  updated() {
+    this.scrollToBottom();
   }
 };
 </script>

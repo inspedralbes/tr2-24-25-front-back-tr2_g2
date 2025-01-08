@@ -17,26 +17,26 @@
 import { ref, onMounted } from 'vue';
 import ViewChat from '@/components/viewInfoChat.vue';
 import socket from '../services/sockets.js';
-const chatsUrl = import.meta.env.VITE_CHATS_URL;
 const userId = "111111";
+
+import { fetchChats } from '@/services/communicationManager';
 
 const chats = ref([]);
 const chatsInfo = ref(false);
 
-const fetchChats = async () => {
+onMounted(() => {
+  socket.on('receiveMessage', () => fetchChats(userId));
+  fetchChatsNow(userId);
+});
+
+const fetchChatsNow = async (userId) => {
   try {
-    const response = await fetch(`${chatsUrl}getChats/${userId}`);
-    const data = await response.json();
-    chats.value = data;
-    chatsInfo.value = true;
-  } catch (err) {
-    console.error('Error al obtener los chats', err);
-    chatsInfo.value = false;
+    const result = await fetchChats(userId);
+    chats.value = result.chats;
+    chatsInfo.value = result.chatsInfo;
+    console.log(chats.value);
+  } catch (error) {
+    console.log(error);
   }
 };
-
-onMounted(() => {
-  socket.on('receiveMessage', fetchChats);
-  fetchChats();
-});
 </script>
