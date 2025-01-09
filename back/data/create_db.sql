@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     chat_id VARCHAR(255) NULL,
     report_id INT NULL,
     publication_id INT NULL,
+    request_id INT NULL,
     comment_id INT NULL,
     revised BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

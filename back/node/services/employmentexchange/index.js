@@ -6,6 +6,7 @@ const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
 const FormData = require('form-data');
+const { request } = require('http');
 require('dotenv').config();
 
 const app = express();
@@ -145,14 +146,51 @@ app.post('/publications', async (req, res) => {
         );
         const publication_id = result.insertId;
 
-        if (isReportableCommentPeticio(titleAnalysisPeticio) || isReportableCommentPeticio(descriptionAnalysisPeticio) || imageAnalysisPeticio.category === 'OFENSIVA' || (imageAnalysisPeticio.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysisPeticio.subcategory === 'OFENSIVO')) {
+        let reasons = [];
+
+        if (isReportableCommentPeticio(titleAnalysisPeticio))
+            reasons.push(`titul: ${titleAnalysisPeticio.reason}`);
+
+        if (isReportableCommentPeticio(descriptionAnalysisPeticio))
+            reasons.push(`descripció: ${descriptionAnalysisPeticio.reason}`);
+
+        if (imageAnalysisPeticio.category === 'OFENSIVA' || (imageAnalysisPeticio.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysisPeticio.subcategory === 'OFENSIVO'))
+            reasons.push(`imatge: ${imageAnalysisPeticio.reason}`);
+
+        if (reasons.length > 0) {
+            const notificationDescription = `S'ha generat un report en aquesta petició: ${publication_id}. Reasons: ${reasons.join(', ')}`;
+
             await connection.execute(
                 `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
                 [publication_id, user_id, report, 'pending']
             );
+
+            const notificationPayload = {
+                user_id,
+                description: notificationDescription,
+                request_id: publication_id,
+                report_id: publication_id,
+            };
+            try {
+                const fetchPromise = await import('node-fetch');
+                const fetch = fetchPromise.default;
+
+                const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notificationPayload),
+                });
+
+                if (!notificationResponse.ok) {
+                    console.error("Error al enviar la notificación:", await notificationResponse.text());
+                }
+            } catch (notificationError) {
+                console.error("Error al realizar el fetch de la notificación:", notificationError);
+            }
         }
+
         res.status(201).json({
-            message: 'Publication created successfully',
+            message: 'Peticio created successfully',
             publicationID: result.insertId,
             titleAnalysisPeticio,
             descriptionAnalysisPeticio,

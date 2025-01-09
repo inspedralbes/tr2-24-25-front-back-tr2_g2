@@ -1,45 +1,43 @@
 <template>
-    <li class="flex items-center p-4 hover:bg-gray-100 cursor-pointer">
-      <div class="flex-shrink-0">
-        <img :src="avatar" alt="Avatar" class="w-10 h-10 rounded-full" />
+  <li class="flex items-center justify-between p-4">
+    <div class="flex items-center">
+      <span class="text-2xl mr-4">{{ icon }}</span>
+      <div>
+        <p class="text-sm font-semibold">{{ name }}</p>
+        <p class="text-xs text-gray-500">{{ message }}</p>
       </div>
-      <div class="ml-3 flex-1">
-        <p class="text-sm font-semibold text-gray-800">{{ name }}</p>
-        <p class="text-sm text-gray-600">{{ message }}</p>
-      </div>
+    </div>
+    <div class="flex space-x-2">
       <button
-        class="ml-auto text-gray-400 hover:text-red-600"
+        class="px-2 py-1 text-xs bg-green-200 rounded-md"
+        @click="$emit('markAsRead')"
+      >
+        Marcar como leído
+      </button>
+      <button
+        class="px-2 py-1 text-xs bg-red-200 rounded-md"
         @click="$emit('remove')"
       >
-        <i class="fas fa-times"></i>
+        Eliminar
       </button>
-    </li>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      name: {
-        type: String,
-        required: true,
-      },
-      message: {
-        type: String,
-        required: true,
-      },
-      avatar: {
-        type: String,
-        required: true,
-      },
-      icon: {
-        type: String,
-        required: false,
-      },
-    },
-  };
-  </script>
-  
-  <style>
-  @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css";
-  </style>
-  
+    </div>
+  </li>
+</template>
+
+<script setup>
+defineProps({
+  name: String,
+  message: String,
+  icon: String,
+  type: String,
+});
+</script>
+
+<style scoped>
+button.bg-green-200 {
+  background-color: #a5d6a7;
+}
+button.bg-red-200 {
+  background-color: #ef9a9a;
+}
+</style>

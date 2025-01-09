@@ -189,7 +189,7 @@ app.post('/publications', async (req, res) => {
         if (!response.ok)
             throw new Error(`Error IA imagen: ${response.statusText}`);
 
-        imageAnalysis = await response.json()
+        imageAnalysis = await response.json();
 
     } catch (fetchError) {
         console.error("Error al llamar a la IA:", fetchError);
@@ -200,7 +200,7 @@ app.post('/publications', async (req, res) => {
         return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
     }
 
-    const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category)
+    const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category);
 
     // Guardar en base de datos
     try {
@@ -214,15 +214,53 @@ app.post('/publications', async (req, res) => {
         );
         const publication_id = result.insertId;
 
-        if (isReportableComment(titleAnalysis) || isReportableComment(descriptionAnalysis) || imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+        let reasons = [];
+        if (isReportableComment(titleAnalysis)) {
+            reasons.push(`títul: ${titleAnalysis.reason}`);
+        }
+        if (isReportableComment(descriptionAnalysis)) {
+            reasons.push(`descripción: ${descriptionAnalysis.reason}`);
+        }
+        if (imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+            reasons.push(`imagen: ${imageAnalysis.reason}`);
+        }
+
+        if (reasons.length > 0) {
+            const notificationDescription = `S'ha generat un report en aquesta publicació: ${publication_id}. Reasons: ${reasons.join(', ')}.`;
+
             await connection.execute(
                 `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
                 [publication_id, user_id, report, 'pending']
             );
+
+            // Hacer fetch a las notificaciones
+            const notificationPayload = {
+                user_id,
+                description: notificationDescription,
+                publication_id: publication_id,
+                report_id: publication_id,
+            };
+
+            try {
+                const fetchPromise = await import('node-fetch');
+                const fetch = fetchPromise.default;
+
+                const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notificationPayload),
+                });
+
+                if (!notificationResponse.ok) {
+                    console.error("Error al enviar la notificación:", await notificationResponse.text());
+                }
+            } catch (notificationError) {
+                console.error("Error al realizar el fetch de la notificación:", notificationError);
+            }
         }
 
         res.status(201).json({
-            publicationId: result.insertId,
+            publicationId: publication_id,
             titleAnalysis,
             descriptionAnalysis,
             imageAnalysis,
