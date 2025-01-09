@@ -158,3 +158,21 @@ CREATE TABLE IF NOT EXISTS newDataUsers (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (class_id) REFERENCES classes(id)
 );
+
+-- Table 15: notifications (depends on users)
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    description TEXT NULL,
+    chat_id VARCHAR(255) NULL,
+    report_id INT NULL,
+    publication_id INT NULL,
+    comment_id INT NULL,
+    revised BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (report_id) REFERENCES reportsPublications(id),
+    FOREIGN KEY (publication_id) REFERENCES publications(id),
+    FOREIGN KEY (comment_id) REFERENCES comments(id)
+);
