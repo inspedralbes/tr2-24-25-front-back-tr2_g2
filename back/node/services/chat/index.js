@@ -7,16 +7,27 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+
+const PORT = process.env.PORT;
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: '*',
-  }
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+        allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
+    }
 });
 
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
+}));
 
 mongoose.connect(process.env.MONGO_URI, { dbName: 'Chat' })
   .then(() => console.log('Conexión exitosa a MongoDB'))
@@ -87,6 +98,23 @@ app.get('/getChat/:id', async (req, res) => {
 app.post('/addChat', async (req, res) => {
   console.log('addChat')
   const { _id, user_one_id, user_two_id, interactions } = req.body;
+  try {
+    let message;
+    if (_id) {
+      message = await Message.findByIdAndUpdate(_id, { user_one_id, user_two_id, interactions }, { new: true, upsert: true });
+    } else {
+      message = new Message({ user_one_id, user_two_id, interactions });
+      await message.save();
+    }
+    res.json(message);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post('/newChat', async (req, res) => {
+  console.log('newChat')
+  const { _id, user_one_id, user_two_id, interactions } = req.body;
   const existingChat = await Message.findOne({
     $or: [
       { user_one_id: user_one_id, user_two_id: user_two_id },
@@ -98,14 +126,9 @@ app.post('/addChat', async (req, res) => {
     return res.status(400).send('A chat between these users already exists');
   }
   try {
-    let message;
-    if (_id) {
-      message = await Message.findByIdAndUpdate(_id, { user_one_id, user_two_id, interactions }, { new: true, upsert: true });
-    } else {
       message = new Message({ user_one_id, user_two_id, interactions });
       await message.save();
-    }
-    res.json(message);
+      res.json(message);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -139,6 +162,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3004, () => {
-  console.log('listening on *:3004');
+server.listen(PORT, () => {
+  console.log('listening on *:' + PORT);
 });

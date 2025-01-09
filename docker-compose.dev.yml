@@ -31,12 +31,15 @@ services:
     build: 
       context: ./back/node/services/chat
       dockerfile: ../../dev.Dockerfile
-    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    command: sh -c "cp .env.DEV .env && npm install && node index.js"
     volumes:
       - ./back/node/services/chat:/usr/src/app
     working_dir: /usr/src/app
     ports:
       - 3001:3001
+    depends_on:
+      - tr2g2-mongodb
+      - tr2g2-back
 
   community:
     build: 

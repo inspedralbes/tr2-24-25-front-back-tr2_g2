@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div v-if="chats.length === 0 && chatsInfo == true" class="flex items-center justify-center h-full">
+    <div v-if="chats.length === 0 && chatsInfo" class="flex items-center justify-center h-full">
       <p class="text-gray-500">No hi tens chats</p>
     </div>
-    <div v-if="chatsInfo == false" class="flex items-center justify-center h-full">
+    <div v-if="!chatsInfo" class="flex items-center justify-center h-full">
       <p class="text-gray-500">Error</p>
     </div>
     <div v-else class="overflow-auto">
@@ -14,36 +14,29 @@
 </template>
 
 <script setup>
-import io from 'socket.io-client';
 import { ref, onMounted } from 'vue';
 import ViewChat from '@/components/viewInfoChat.vue';
-
-const chatsUrl = import.meta.env.VITE_CHATS_URL;
-
+import socket from '../services/sockets.js';
 const userId = "111111";
 
-const chats = ref([]);
+import { fetchChats } from '@/services/communicationManager';
 
+const chats = ref([]);
 const chatsInfo = ref(false);
 
-const fetchChats = async () => {
-  console.log(chatsUrl + 'getChats' + "/" + userId);
+onMounted(() => {
+  socket.on('receiveMessage', () => fetchChatsNow(userId));
+  fetchChatsNow(userId);
+});
+
+const fetchChatsNow = async (userId) => {
   try {
-    const response = await fetch(chatsUrl + 'getChats' + "/" + userId);
-    const data = await response.json();
-    console.log('datos:', data);
-    chats.value = data;
-    chatsInfo.value = true;
-  } catch (err) {
-    console.error('Error al obtener los chats', err);
+    const result = await fetchChats(userId);
+    chats.value = result.chats;
+    chatsInfo.value = result.chatsInfo;
+    console.log(chats.value);
+  } catch (error) {
+    console.log(error);
   }
 };
-
-onMounted(() => {
-  const socket = io('http://localhost:3004');
-  socket.on('receiveMessage', (newMessage) => {
-    fetchChats();
-  });
-});
-onMounted(fetchChats);
 </script>
