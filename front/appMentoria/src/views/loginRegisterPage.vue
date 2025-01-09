@@ -231,9 +231,11 @@ async function validateAndLogin() {
     // useAppStore().setToken(response.token);
 
     let user = response.userLogin;
-    let profile = user.value.profile;
+    // let profile = user.value.profile;
 
-    console.log('User: ', user.value.profile);
+    // console.log('User - profile: ', user.value.profile);
+
+    console.log('User: ', user.value);
 
     bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.value.banner}`;
     if (profile.includes('/upload/', 0)) {
