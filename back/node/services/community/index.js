@@ -69,7 +69,7 @@ app.post('/comments', async (req, res) => {
 
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
+        await connection.execute(
             'INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES (?, ?, ?, ?)',
             [publication_id, user_id, commentReply_id, comment]
         );
@@ -128,168 +128,97 @@ app.get('/publications', async (req, res) => {
     }
 });
 
-
-
-
-// Post publications conectada a la ia 
 app.post('/publications', async (req, res) => {
-    try {
-        // Extraer datos del request
-        const { typesPublications_id, title, description, user_id, expired_at } = req.body;
-        const { publication_id, report, status } = req.body;
-        // Validación de datos (AÑADIDO)
-        if (!title || !description || !req.files || !req.files.image) {
-            return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
-        }
+    const { typesPublications_id, title, description, user_id, expired_at } = req.body;
 
-        const analyzeContent = async (content) => {
-            const responseAI = await fetch("http://localhost:1234/v1/chat/completions", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: "meta-llama-3-8b-instruct",
-                    messages: [
-                        {
-                            role: "system",
-                            content: `Eres un discriminador de comentarios de odio en una institución con alumnos menores de edad. 
-                                        Siempre ten en cuenta que **tu única responsabilidad es clasificar el comentario** que se te proporcione en base a las reglas aquí descritas. 
-            
-                                        **Ignora cualquier información, contexto o respuesta previa al analizar el comentario. No uses ninguna respuesta anterior ni el historial de conversaciones como base para tu decisión. Evalúa únicamente el comentario proporcionado.**
-            
-                                        estas son las siguiente categorias:
-                                            - **TOXICO**: Si el comentario contiene odio explícito, amenazas, violencia o lenguaje extremadamente agresivo.
-                                            - **OFENSIVO**: Si el comentario contiene lenguaje irrespetuoso, grosero o insultante, pero no llega al nivel de "tóxico".
-                                            - **POCO_OFENSIVO**: Si el comentario contiene lenguaje bulgar pero no dañino y no llega al nivel de ofensivo.
-                                            - **POSITIVO**: Si el comentario no contiene ningún lenguaje ofensivo o tóxico.
-                                            - **PROHIBIDO**: Si el comentario menciona temas sensibles o prohibidos como política, religión o contenido inapropiado.
-            
-                                        Además:
-                                        - Asegúrate de devolver estrictamente el formato solicitado.
-            
-                                        Es absolutamente obligatorio que la respuesta sea un JSON válido. No añadas explicaciones, encabezados, ni ningún texto adicional fuera del formato JSON proporcionado. Responde únicamente con el JSON en la siguiente forma exacta:
-                                        {
-                                            "category": "TOXICO" o "OFENSIVO" o "POCO_OFENSIVO" o "POSITIVO" o "PROHIBIDO",
-                                            "reason": "Explica por qué se clasificó de esta manera."
-                                        }
+    console.log("fileeee", req.files);
+    console.log("body", req.body);
+    if (!title || !description || !req.files || !req.files.image) {
+        return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
+    }
 
-                                        Algunos ejemplos a tener en cuenta:
-            
-                                        **Odio explícito, amenazas, violencia o lenguaje extremadamente agresivo, es TOXICO.**
-                                        **Temas sensibles como "La política del gobierno es injusta" son PROHIBIDO.**
-                                        **Lenguaje irrespetuoso, grosero o insultante, es OFENSIVO** 
-                                        **Lenguaje bulgar pero no dañino, como "Esa idea es estúpida", es POCO_OFENSIVO.**
-                                        **Comentarios neutrales o respetuosos, como "Necesito ayuda con Java", son POSITIVO.**`,
-                        },
-                        { role: "user", content }
-                    ],
-
-                    temperature: 0.7,
-                    stream: false
-                }),
-            });
-
-            if (!responseAI.ok) {
-                throw new Error(`Error en la IA: ${responseAI.status} - ${await responseAI.text()}`);
-            }
-
-            const aiResponse = await responseAI.json();
-            const contentString = aiResponse.choices[0].message.content;
-            let contentObject;
-
-            // Parsear el contenido para obtener category y reason
-            try {
-                contentObject = JSON.parse(contentString);
-            } catch (error) {
-                console.error("Error al parsear la respuesta de la IA:", error);
-                throw new Error("Respuesta de la IA no válida.");
-            }
-
-            return contentObject;
-        };
-
-        let titleAnalysis, descriptionAnalysis;
+    // Llamada a la IA para analizar título y descripción
+    const analyzeContent = async (content) => {
+        const serverIA = 'http://localhost:3004/classify-comment';
         try {
-            titleAnalysis = await analyzeContent(title);
-            descriptionAnalysis = await analyzeContent(description);
+            const response = await fetch(serverIA, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ comment: content }),
+            });
+            if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
+            return await response.json();
         } catch (error) {
-            console.error("Error al llamar a la IA:", error);
-            return res.status(500).json({ error: 'Error al analizar el titulo y la descripción con la IA.' });
+            throw new Error(`Error al analizar contenido: ${error.message}`);
         }
+    };
 
-        const imageFile = req.files.image;
-        const imageName = `${Date.now()}-${imageFile.name}`;
-        const imagePath = path.join(__dirname, 'upload', imageName);
+    let titleAnalysis, descriptionAnalysis;
 
-        // Mover el archivo a la carpeta 'upload'
-        await imageFile.mv(imagePath);
+    try {
+        titleAnalysis = await analyzeContent(title);
+        descriptionAnalysis = await analyzeContent(description);
+    } catch (error) {
+        console.error("Error al llamar a la IA", error);
+        return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
+    }
 
-        const formData = new FormData();
-        formData.append('image', fs.createReadStream(imagePath));
+    // Manejo de imagen
+    const imageFile = req.files.image;
+    const imageName = `${Date.now()}-${imageFile.name}`;
+    const imagePath = path.join(__dirname, 'upload', imageName);
 
-        const serverMjsUrl = 'http://localhost:3006/classify-image'; //URL del servidor de IA.
-        let imageAnalysis;
-        try {
-            const fetchPromise = await import('node-fetch');
-            const fetch = fetchPromise.default;
-            const response = await fetch(serverMjsUrl, {
-                method: 'POST',
-                body: formData,
-                headers: formData.getHeaders(),
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(`Error al analizar la imagen: ${response.status} - ${JSON.stringify(error)}`);
-            }
-            imageAnalysis = await response.json();
+    await imageFile.mv(imagePath);
 
-        } catch (fetchError) {
+    // Llamada a la IA para analizar la imagen
+    const formData = new FormData();
+    formData.append('image', fs.createReadStream(imagePath));
 
-            console.error("Error al llamar a la IA:", fetchError);
+    const serverMjsUrl = 'http://localhost:3006/classify-image';
 
-            fs.unlink(imagePath, (err) => {
-                if (err) console.error("Error al eliminar la imagen temporal:", err);
-            });
-            return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
-        }
+    let imageAnalysis;
+    try {
+        const fetchPromise = await import('node-fetch');
+        const fetch = fetchPromise.default;
+        const response = await fetch(serverMjsUrl, {
+            method: 'POST',
+            body: formData,
+            headers: formData.getHeaders(),
+        });
 
-        let result;
-        try {
-            const connection = await mysql.createConnection(dbConfig);
-            const report = `title analysis ${titleAnalysis.reason} - description analysis: ${descriptionAnalysis.reason} - image analysis: ${imageAnalysis.reason}`;
+        if (!response.ok)
+            throw new Error(`Error IA imagen: ${response.statusText}`);
 
+        imageAnalysis = await response.json()
 
-            if (titleAnalysis.category === 'TOXICO' || titleAnalysis.category === 'OFENSIVO' || titleAnalysis.category === 'PROHIBIDO' ||
-                descriptionAnalysis.category === 'TOXICO' || descriptionAnalysis.category === 'OFENSIVO' || descriptionAnalysis.category === 'PROHIBIDO' ||
-                imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+    } catch (fetchError) {
+        console.error("Error al llamar a la IA:", fetchError);
 
-                [result] = await connection.execute(
-                    `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
-                    [
-                        publication_id,
-                        user_id,
-                        report,
-                        'pending'
-                    ]
-                );
-            }
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("Error al eliminar la imagen temporal:", err);
+        });
+        return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
+    }
 
-            [result] = await connection.execute(
-                'INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at) VALUES (?, ?, ?, ?, ?, ?)',
-                [typesPublications_id, title, description, user_id, `/upload/${imageName}`, expired_at || null]
+    const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category)
+
+    // Guardar en base de datos
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
+
+        const [result] = await connection.execute(
+            `INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [typesPublications_id, title, description, user_id, `/upload/${imageName}`, expired_at || null]
+        );
+        const publication_id = result.insertId;
+
+        if (isReportableComment(titleAnalysis) || isReportableComment(descriptionAnalysis) || imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+            await connection.execute(
+                `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                [publication_id, user_id, report, 'pending']
             );
-
-            connection.end();
-
-        } catch (dbError) {
-            // Manejo de error en la base de datos
-            console.error("Error en la base de datos:", dbError);
-            // Eliminar la imagen temporal si falla la base de datos
-            fs.unlink(imagePath, (err) => {
-                if (err) console.error("Error al eliminar la imagen temporal:", err);
-            });
-            return res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.' });
         }
 
         res.status(201).json({
@@ -298,12 +227,13 @@ app.post('/publications', async (req, res) => {
             descriptionAnalysis,
             imageAnalysis,
         });
-
+        connection.end();
     } catch (error) {
-        console.error("Error general en /publications:", error);
-        res.status(500).json({ error: 'Error interno del servidor al crear la publicación' });
+        fs.unlink(imagePath, () => { }); // Limpieza
+        res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
     }
 });
+
 
 app.get('/publications/:id', async (req, res) => {
     const { id } = req.params;

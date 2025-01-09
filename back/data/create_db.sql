@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS publications (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     image VARCHAR(255) NULL,
+    availability VARCHAR(255) NULL,
     user_id INT NOT NULL,
     reports INT DEFAULT 0,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

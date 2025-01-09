@@ -49,7 +49,7 @@ app.post("/classify-comment", async (req, res) => {
         Devuelve estrictamente el resultado en el siguiente formato JSON:
         {
         "category": "TOXICO" o "OFENSIVO" o "POCO_OFENSIVO" o "POSITIVO" o "PROHIBIDO",
-        "reason": "Explica por qué se clasificó de esta manera." (solo si aplica)
+        "reason": "Explica por qué se clasificó de esta manera. Que se muestre en catalan" (solo si aplica)
         }
 
         Algunos ejemplos a tener en cuenta:
@@ -72,8 +72,11 @@ app.post("/classify-comment", async (req, res) => {
         totalTokensAcumulados += totalTokens;
 
         const jsonResponse = extractJsonContent(responseText);
-
+        console.log("comment", req.body.comment);
         res.json(JSON.parse(jsonResponse));
+
+        console.log("Clasificación comments:");
+        console.log(jsonResponse);
 
     } catch (error) {
         console.error("Error processing request:", error);
