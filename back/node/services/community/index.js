@@ -4,6 +4,8 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
@@ -12,8 +14,9 @@ const port = process.env.PORT || 3002;
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
 app.use(cors({
+    origin: `*`,
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(fileUpload());
 
@@ -66,7 +69,7 @@ app.post('/comments', async (req, res) => {
 
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
+        await connection.execute(
             'INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES (?, ?, ?, ?)',
             [publication_id, user_id, commentReply_id, comment]
         );
@@ -125,6 +128,113 @@ app.get('/publications', async (req, res) => {
     }
 });
 
+app.post('/publications', async (req, res) => {
+    const { title, description, user_id, expired_at } = req.body;
+
+    console.log("fileeee", req.files);
+    console.log("body", req.body);
+    if (!title || !description || !req.files || !req.files.image) {
+        return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
+    }
+
+    // Llamada a la IA para analizar título y descripción
+    const analyzeContent = async (content) => {
+        const serverIA = 'http://localhost:3004/classify-comment';
+        try {
+            const response = await fetch(serverIA, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ comment: content }),
+            });
+            if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
+            return await response.json();
+        } catch (error) {
+            throw new Error(`Error al analizar contenido: ${error.message}`);
+        }
+    };
+
+    let titleAnalysis, descriptionAnalysis;
+
+    try {
+        titleAnalysis = await analyzeContent(title);
+        descriptionAnalysis = await analyzeContent(description);
+    } catch (error) {
+        console.error("Error al llamar a la IA", error);
+        return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
+    }
+
+    // Manejo de imagen
+    const imageFile = req.files.image;
+    const imageName = `${Date.now()}-${imageFile.name}`;
+    const imagePath = path.join(__dirname, 'upload', imageName);
+
+    await imageFile.mv(imagePath);
+
+    // Llamada a la IA para analizar la imagen
+    const formData = new FormData();
+    formData.append('image', fs.createReadStream(imagePath));
+
+    const serverMjsUrl = 'http://localhost:3006/classify-image';
+
+    let imageAnalysis;
+    try {
+        const fetchPromise = await import('node-fetch');
+        const fetch = fetchPromise.default;
+        const response = await fetch(serverMjsUrl, {
+            method: 'POST',
+            body: formData,
+            headers: formData.getHeaders(),
+        });
+
+        if (!response.ok)
+            throw new Error(`Error IA imagen: ${response.statusText}`);
+
+        imageAnalysis = await response.json()
+
+    } catch (fetchError) {
+        console.error("Error al llamar a la IA:", fetchError);
+
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("Error al eliminar la imagen temporal:", err);
+        });
+        return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
+    }
+
+    const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category)
+
+    // Guardar en base de datos
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
+
+        const [result] = await connection.execute(
+            `INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [1, title, description, user_id, `/upload/${imageName}`, expired_at || null]
+        );
+        const publication_id = result.insertId;
+
+        if (isReportableComment(titleAnalysis) || isReportableComment(descriptionAnalysis) || imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+            await connection.execute(
+                `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                [publication_id, user_id, report, 'pending']
+            );
+        }
+
+        res.status(201).json({
+            publicationId: result.insertId,
+            titleAnalysis,
+            descriptionAnalysis,
+            imageAnalysis,
+        });
+        connection.end();
+    } catch (error) {
+        fs.unlink(imagePath, () => { }); // Limpieza
+        res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
+    }
+});
+
+
 app.get('/publications/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -142,13 +252,13 @@ app.get('/publications/:id', async (req, res) => {
 });
 
 app.post('/publications', async (req, res) => {
-    const { title, description, user_id, reports } = req.body;
+    const { title, description, user_id } = req.body;
 
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
-            'INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES (?, ?, ?, ?, ?)',
-            [ 1, title, description, user_id, reports]
+            'INSERT INTO publications (typesPublications_id, title, description, user_id) VALUES (?, ?, ?, ?)',
+            [1, title, description, user_id]
         );
         connection.end();
         res.status(201).json({ message: 'Publication created successfully' });

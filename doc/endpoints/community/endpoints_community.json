@@ -60,8 +60,7 @@
                 "typesPublications_id": "integer",
                 "title": "string",
                 "description": "string",
-                "user_id": "integer",
-                "reports": "integer"
+                "user_id": "integer"
             }
         },
         {

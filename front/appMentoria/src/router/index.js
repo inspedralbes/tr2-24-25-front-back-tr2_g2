@@ -6,7 +6,7 @@ import profilesPage from '@/views/profilesPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
-import loginPage from '../views/loginPage.vue'
+import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
 import addRequestPost from '../views/addRequestPost.vue'
 import notificationPage from '../views/notifiationPage.vue'
@@ -14,19 +14,19 @@ import notificationPage from '../views/notifiationPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/login',
-      name: '',
-      component: loginPage,
-    },
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   component: loginPage,
+    // },
     {
       path: '/',
-      name: 'mainPage',
+      name: 'main',
       component: mainPage,
     },
     {
-      path: '/profile',
-      name: 'profile',
+      path: '/myprofile',
+      name: 'myprofile',
       component: profilePage,
     },
     {
@@ -40,8 +40,8 @@ const router = createRouter({
       component: addRequestPost,
     },
     {
-      path: '/profilesPage',
-      name: 'profilesPage',
+      path: '/profiles',
+      name: 'profiles',
       component: profilesPage,
     },
     {
@@ -59,7 +59,6 @@ const router = createRouter({
     //   name: 'validationPage',
     //   component: validationPage,
     // },
-
     // {
     //   path: '/chatList',
     //   name: 'chatListPage',
