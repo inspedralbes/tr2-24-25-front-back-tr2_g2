@@ -1,7 +1,7 @@
 <template>
     <Header class="fixed top-0 left-0 right-0 z-10"></Header>
     <section class="relative pt-40 pb-24 min-h-screen flex flex-col justify-between">
-        <img :src="`${user.banner}`" alt="cover-image"
+        <img :src="`${banner}`" alt="cover-image"
             class="w-full absolute top-0 left-0 z-0 h-60 object-cover shadow-lg shadow-black/30">
 
         <div class="absolute right-4 md:right-5 top-60 transform -translate-y-8 md:-translate-y-8">
@@ -17,7 +17,7 @@
 
         <div class="w-full max-w-7xl mx-auto px-6 md:px-8 flex-grow">
             <div class="flex items-center justify-center sm:justify-start relative mb-5">
-                <img :src="`${user.profile}`"
+                <img :src="`${profile}`"
                     alt="user-avatar-image"
                     class="border-4 border-solid border-white rounded-full object-cover w-40 h-40">
             </div>
@@ -110,14 +110,12 @@ import Header from '@/components/Header.vue';
 const appStore = useAppStore();
 
 var user = reactive({});
+var profile = ref(null);
+var banner = ref(null);
 
-onMounted( async () => {
-    console.log('onMounted profilePage');
-    try {
-        user.value = await appStore.getUser();
-        console.log('user:', user.value);
-    } catch (error) {
-        console.error('Error obteniendo el usuario:', error);
-    }
+onMounted(() => {
+    user.value = appStore.getUser();
+    profile.value = user.value.profile;
+    banner.value = user.value.banner;
 });
 </script>
