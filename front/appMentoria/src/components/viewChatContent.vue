@@ -118,7 +118,6 @@ export default {
       this.interactions.push(newMessage);
       this.scrollToBottom();
     });
-    console.log(this.chatId)
     chatData = await fetchMessages(this.chatId);
     this.interactions = chatData.value.interactions;
   },
@@ -141,4 +140,3 @@ export default {
   }
 };
 </script>
-
