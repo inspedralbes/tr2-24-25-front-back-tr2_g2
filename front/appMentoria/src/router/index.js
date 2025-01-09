@@ -4,8 +4,7 @@ import profilePage from '../views/profilePage.vue'
 import profilesPage from '@/views/profilesPage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
-// import chatListPage from '../views/chatListPage.vue'
-// import chatPage from '../views/chatPage.vue'
+import chatListPage from '../views/chatListPage.vue'
 import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
 import addRequestPost from '../views/addRequestPost.vue'
@@ -59,16 +58,11 @@ const router = createRouter({
     //   name: 'validationPage',
     //   component: validationPage,
     // },
-    // {
-    //   path: '/chatList',
-    //   name: 'chatListPage',
-    //   component: chatListPage,
-    // },
-    // {
-    //   path: '/chat',
-    //   name: 'chatPage',
-    //   component: chatPage, 
-    // },
+    {
+      path: '/chatList',
+      name: 'chatListPage',
+      component: chatListPage,
+    }
   ],
 })
 
