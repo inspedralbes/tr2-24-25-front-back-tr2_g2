@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore( 'appStore', {  
   state: () => ({
     user: {},
-    token: ''
+    token: '',
   }),
   actions: {
     setUser(user) {
@@ -12,11 +12,15 @@ export const useAppStore = defineStore( 'appStore', {
     setToken(token) {
       this.token = token
     },
+
     getToken() {
       return this.token
     },
     getUser() {
       return this.user
-    }
+    },
+    getTypeUser() {
+      return this.user.typesUsers_id
+    },
   }
 });

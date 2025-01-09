@@ -27,6 +27,19 @@
               <button href="javascript:void(0)" tabindex="2"
                 class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                 role="menuitem">Mis Peticions</button>
+                <div v-if="userTypes == 2" class="py-1">
+                  <button @click="$router.push('/admin')" tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Admin</button>
+                </div>
+                <div v-if="userTypes == 3" class="py-1">
+                  <button @click="$router.push('/admin')" tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Admin</button>
+                    <button tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Estadisticas</button>
+                </div>
             </div>
             <div class="py-1">
               <div class="flex justify-between px-4 py-2">
@@ -56,6 +69,15 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import ToggleDarkMode from './ToggleDarkMode.vue';
+import { useAppStore } from '@/stores/index';
+
+const appStore = useAppStore();
+var userTypes = ref('');
+
+onMounted(() => {
+  userTypes.value = appStore.getTypeUser();
+  console.log("Greetings loved ones",userTypes.value);
+});
 
 </script>
 
