@@ -9,6 +9,7 @@ import profilesPage from '@/views/profilesPage.vue'
 import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
 import addRequestPost from '../views/addRequestPost.vue'
+import adminPanel from '../views/adminPanel.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,6 +43,11 @@ const router = createRouter({
       path: '/profiles',
       name: 'profiles',
       component: profilesPage,
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: adminPanel,
     }
     // {
     //   path: '/report',
