@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen dark:bg-black ">
+  <div class="flex flex-col h-screen dark:bg-neutral-900 ">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
@@ -113,6 +113,7 @@ export default {
     };
   },
   async mounted() {
+    this.scrollToBottom();
     this.socket = socket;
     this.socket.on('receiveMessage', (newMessage) => {
       this.interactions.push(newMessage);
@@ -123,8 +124,10 @@ export default {
   },
   methods: {
     scrollToBottom() {
-      const container = this.$refs.messageContainer;
-      container.scrollTop = container.scrollHeight;
+      const messageContainer = this.$refs.messageContainer;
+      if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
     },
      sendMessageInMongoNow() {
       const message = this.$refs.messageInput.value;
