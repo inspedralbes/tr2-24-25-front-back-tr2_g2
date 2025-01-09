@@ -62,18 +62,103 @@ app.get('/publications/:id', async (req, res) => {
 });
 
 app.post('/publications', async (req, res) => {
-    const { title, description, user_id, reports } = req.body;
+    const { title, description, user_id, availability, reports } = req.body;
+
+    console.log("bodyy", req.body);
+
+    if (!title || !description || !req.files || !req.files.image) {
+        return res.status(400).json({ error: 'Faltan dades' })
+    }
+
+    const analyzeContent = async (content) => {
+        const serverIA = 'http://localhost:3004/classify-comment';
+        try {
+            const response = await fetch(serverIA, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ comment: content }),
+            });
+            if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
+            return await response.json();
+        } catch (error) {
+            throw new Error(`Error al analizar contenido: ${error.message}`);
+        }
+    };
+
+    let titleAnalysisPeticio, descriptionAnalysisPeticio;
+
+    try {
+        titleAnalysisPeticio = await analyzeContent(title);
+        descriptionAnalysisPeticio = await analyzeContent(description);
+    } catch (error) {
+        console.error("Error al llamar a la IA", error);
+        return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
+    }
+
+    const imageFile = req.files.image;
+    const imageName = `${Date.now()}-${imageFile.name}`;
+    const imagePath = path.join(__dirname, 'upload', imageName);
+
+    await imageFile.mv(imagePath);
+
+    const formData = new FormData();
+    formData.append('image', fs.createReadStream(imagePath));
+
+    const serverMjsUrl = 'http://localhost:3006/classify-image';
+
+    let imageAnalysisPeticio;
+    try {
+        const fetchPromise = await import('node-fetch');
+        const fetch = fetchPromise.default;
+        const response = await fetch(serverMjsUrl, {
+            method: 'POST',
+            body: formData,
+            headers: formData.getHeaders(),
+        });
+
+        if (!response.ok)
+            throw new Error(`Error IA imagen: ${response.statusText}`);
+
+        imageAnalysisPeticio = await response.json()
+
+    } catch (fetchError) {
+        console.error("Error al llamar a la IA:", fetchError);
+
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("Error al eliminar la imagen temporal:", err);
+        });
+        return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
+    }
+
+    const isReportableCommentPeticio = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category)
 
     try {
         const connection = await mysql.createConnection(dbConfig);
+        const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
+
         const [result] = await connection.execute(
-            'INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES (?, ?, ?, ?, ?)',
-            [2, title, description, user_id, reports]
+            'INSERT INTO publications (typesPublications_id, title, description, user_id, reports, availability) VALUES (?, ?, ?, ?, ?, ?)',
+            [2, title, description, user_id, reports, availability]
         );
+        const publication_id = result.insertId;
+
+        if (isReportableCommentPeticio(titleAnalysisPeticio) || isReportableCommentPeticio(descriptionAnalysisPeticio) || imageAnalysisPeticio.category === 'OFENSIVA' || (imageAnalysisPeticio.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysisPeticio.subcategory === 'OFENSIVO')) {
+            await connection.execute(
+                `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                [publication_id, user_id, report, 'pending']
+            );
+        }
+        res.status(201).json({
+            message: 'Publication created successfully',
+            publicationID: result.insertId,
+            titleAnalysisPeticio,
+            descriptionAnalysisPeticio,
+            imageAnalysisPeticio
+        });
         connection.end();
-        res.status(201).json({ message: 'Publication created successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+        fs.unlink(imagePath, () => { }); // Limpieza
+        res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
     }
 });
 

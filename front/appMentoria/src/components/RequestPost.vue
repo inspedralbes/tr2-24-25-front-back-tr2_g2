@@ -27,6 +27,21 @@
             ></textarea>
           </div>
         </div>
+        <div class="mb-4">
+          <label
+            for="image-upload"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Pujar imatge:
+          </label>
+          <input
+            id="image-upload"
+            type="file"
+            accept="image/*"
+            @change="handleImageUpload"
+            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </div>
         <!-- Tags Section -->
         <div class="mb-6">
           <!-- TAGS -->

@@ -129,7 +129,7 @@ app.get('/publications', async (req, res) => {
 });
 
 app.post('/publications', async (req, res) => {
-    const { typesPublications_id, title, description, user_id, expired_at } = req.body;
+    const { title, description, user_id, expired_at } = req.body;
 
     console.log("fileeee", req.files);
     console.log("body", req.body);
@@ -210,7 +210,7 @@ app.post('/publications', async (req, res) => {
         const [result] = await connection.execute(
             `INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [typesPublications_id, title, description, user_id, `/upload/${imageName}`, expired_at || null]
+            [1, title, description, user_id, `/upload/${imageName}`, expired_at || null]
         );
         const publication_id = result.insertId;
 
