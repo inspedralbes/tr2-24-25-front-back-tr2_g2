@@ -4,6 +4,8 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
@@ -65,8 +67,9 @@ app.post('/publications', async (req, res) => {
     const { title, description, user_id, availability, reports } = req.body;
 
     console.log("bodyy", req.body);
+    console.log("files", req.files);
 
-    if (!title || !description || !req.files || !req.files.image) {
+    if (!title || !description) {
         return res.status(400).json({ error: 'Faltan dades' })
     }
 
@@ -134,11 +137,11 @@ app.post('/publications', async (req, res) => {
 
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
+        const report = `Análisis: título (${titleAnalysisPeticio.category} | ${titleAnalysisPeticio.reason}), Descripció (${descriptionAnalysisPeticio.category} | ${descriptionAnalysisPeticio.reason}), imagen (${imageAnalysisPeticio.category} | ${imageAnalysisPeticio.reason})`;
 
         const [result] = await connection.execute(
-            'INSERT INTO publications (typesPublications_id, title, description, user_id, reports, availability) VALUES (?, ?, ?, ?, ?, ?)',
-            [2, title, description, user_id, reports, availability]
+            'INSERT INTO publications (typesPublications_id, title, description, user_id, image, availability) VALUES (?, ?, ?, ?, ?, ?)',
+            [2, title, description, user_id, `/upload/${imageName}`, availability]
         );
         const publication_id = result.insertId;
 

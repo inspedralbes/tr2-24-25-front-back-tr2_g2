@@ -1,7 +1,7 @@
 const BACK_URL = import.meta.env.VITE_URL_BACK;
 const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
 const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
-const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENTEXCHANGE;
+const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENT_EXCHANGE;
 const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
 
 // Login API firebase
@@ -33,7 +33,21 @@ export const postCommunityPublication = async (formData) => {
     try {
         const response = await fetch(`${COMMUNITY_URL}publications`, {
             method: 'POST',
-           body: formData,
+            body: formData,
+        });
+
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const postEmploymentExchangePublication = async (formData) => {
+    try {
+        const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}publications`, {
+            method: 'POST',
+            body: formData,
         });
 
         console.log(response);

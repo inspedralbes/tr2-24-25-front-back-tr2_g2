@@ -1,11 +1,16 @@
 <template>
   <!-- component -->
-  <div class="bg-gray-100 h-screen flex items-center justify-center p-8">
-    <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+  <div
+    class="bg-gray-100 h-screen flex items-center justify-center p-8 dark:bg-neutral-800"
+  >
+    <div
+      class="max-w-md w-full bg-white p-8 rounded-lg shadow-md dark:bg-neutral-600"
+    >
       <form>
         <!-- Post Content Section -->
         <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-bold mb-2"
+          <label
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-white"
             >Afegeix una Petició:</label
           >
           <div class="pb-4">
@@ -13,7 +18,8 @@
               id="title"
               name="postContent"
               rows="1"
-              class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-blue-500"
+              v-model="title"
+              class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-blue-500 dark:bg-slate-800 dark:text-white"
               placeholder="Títol"
             ></textarea>
           </div>
@@ -22,7 +28,8 @@
               id="des"
               name="postContent"
               rows="4"
-              class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-blue-500"
+              v-model="description"
+              class="w-full border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-blue-500 dark:bg-slate-800 dark:text-white"
               placeholder="Que Busques?"
             ></textarea>
           </div>
@@ -30,7 +37,7 @@
         <div class="mb-4">
           <label
             for="image-upload"
-            class="block text-sm font-medium text-gray-700 mb-2"
+            class="block text-sm font-medium text-gray-700 mb-2 dark:text-white"
           >
             Pujar imatge:
           </label>
@@ -39,7 +46,7 @@
             type="file"
             accept="image/*"
             @change="handleImageUpload"
-            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-white"
           />
         </div>
         <!-- Tags Section -->
@@ -48,23 +55,28 @@
         </div>
         <!-- Availability Section -->
         <div class="mb-6">
-          <div class="form-group">
+          <div class="form-group p-4 rounded-md">
             <label
               for="hours"
-              class="block text-gray-700 text-sm font-bold mb-2"
-              >Disponible:</label
+              class="block text-gray-700 text-sm font-bold mb-2 dark:text-white"
             >
-            <button class="p-3" type="button" @click="addAvailability">
+              Disponible:
+            </label>
+            <button
+              class="p-2 bg-blue-100 rounded-md mb-2 w-full md:w-auto dark:bg-blue-600 dark:text-white"
+              type="button"
+              @click="addAvailability"
+            >
               + Afegir Disponibilitat
             </button>
             <div
               v-for="(availability, index) in availabilities"
               :key="index"
-              class="availability-group flex flex-col md:flex-row items-center gap-2 mb-4"
+              class="availability-group flex flex-wrap items-center gap-2 mb-4"
             >
               <select
                 v-model="availability.day"
-                class="border-2 rounded-md p-2 w-full md:w-auto"
+                class="border-2 rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:bg-indigo-400"
               >
                 <option disabled value="">Selecciona un dia</option>
                 <option v-for="day in week" :key="day" :value="day">
@@ -74,7 +86,7 @@
               <select
                 v-model="availability.startTime"
                 @change="validateTimes(index)"
-                class="border-2 rounded-md p-2 w-full md:w-auto"
+                class="border-2 rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:bg-indigo-400"
               >
                 <option disabled value="">Hora d'inici</option>
                 <option
@@ -88,7 +100,7 @@
               <select
                 v-model="availability.endTime"
                 @change="validateTimes(index)"
-                class="border-2 rounded-md p-2 w-full md:w-auto"
+                class="border-2 rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:bg-indigo-400"
               >
                 <option disabled value="">Hora de final</option>
                 <option
@@ -102,7 +114,7 @@
               <button
                 type="button"
                 @click="removeAvailability(index)"
-                class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md"
+                class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md dark:bg-red-800"
               >
                 <svg
                   width="19"
@@ -151,8 +163,8 @@
         <div class="flex items-center justify-between">
           <button
             type="button"
-            @click.prevent="submitForm"
-            class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue text-white py-2 px-4 rounded-md transition duration-300 gap-2"
+            @click="submitPostPeticio"
+            class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue text-white py-2 px-4 rounded-md transition duration-300 gap-2 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
           >
             Post
             <svg
@@ -172,7 +184,9 @@
             </svg>
           </button>
 
-          <span class="text-gray-500 text-sm">Max 280 characters</span>
+          <span class="text-gray-500 text-sm dark:text-white"
+            >Max 280 characters</span
+          >
         </div>
       </form>
     </div>
@@ -181,6 +195,14 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { postEmploymentExchangePublication } from "@/services/communicationManager";
+
+const router = useRouter();
+const title = ref("");
+const description = ref("");
+const imageFile = ref(null);
+const availabilities = ref([]);
 
 const hours = ref([
   "00:00",
@@ -217,8 +239,6 @@ const week = ref([
   "Dissabte",
   "Diumenge",
 ]);
-const availabilities = ref([]);
-const postContent = ref("");
 
 const addAvailability = () => {
   availabilities.value.push({ day: "", startTime: "", endTime: "" });
@@ -227,6 +247,13 @@ const addAvailability = () => {
 const removeAvailability = (index) => {
   availabilities.value.splice(index, 1);
 };
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    imageFile.value = file;
+  }
+}
 
 const validateTimes = (index) => {
   const availability = availabilities.value[index];
@@ -258,16 +285,53 @@ const filteredHours = (index, type) => {
   }
 };
 
-const submitForm = async () => {
-  const formData = {
-    typesPublications_id: 2,
-    title: document.getElementById("title").value,
-    description: document.getElementById("des").value,
-    availabilities: availabilities.value,
-    user_id: "",
-  };
-  console.log(JSON.stringify(formData));
-};
+async function submitPostPeticio() {
+  if (!title.value || !description.value) {
+    alert("Por favor, completa todos los campos");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("typesPublications_id", 1);
+  formData.append("title", title.value);
+  formData.append("description", description.value);
+  formData.append("availability", JSON.stringify(availabilities.value));
+  formData.append("user_id", 1);
+  formData.append("image", imageFile.value);
+
+  try {
+    const response = await postEmploymentExchangePublication(formData);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error al crear la publicación:", errorData);
+      alert("Error al crear la publicación.");
+      return;
+    }
+
+    const responseData = await response.json();
+    console.log("Publicación creada con éxito:", responseData);
+    router.push("/");
+  } catch (error) {
+    console.error("Error al enviar la publicación:", error);
+    alert("Error al enviar la publicación.");
+  }
+}
+
+function goBack() {
+  router.back();
+}
+
+// const submitForm = async () => {
+//   const formData = {
+//     typesPublications_id: 2,
+//     title: document.getElementById("title").value,
+//     description: document.getElementById("des").value,
+//     availabilities: availabilities.value,
+//     user_id: "",
+//   };
+//   console.log(JSON.stringify(formData));
+// };
 </script>
 
 <style scoped>
