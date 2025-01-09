@@ -45,3 +45,37 @@ export const postCommunityPublication = async (publication) => {
         console.error(error);
     }
 };
+
+export const getCommunityPublication = async () => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/publications`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+export const getUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/users`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};

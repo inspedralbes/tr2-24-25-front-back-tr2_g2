@@ -1,26 +1,36 @@
 <template>
-    <ViewPost :posts="posts" />
+    <ViewPost :posts="posts" :users="users" />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import ViewPost from '@/components/viewPost.vue';
+import { getCommunityPublication, getUsers } from '../services/communicationManager';
 
 const posts = ref([]);
+const users = ref([]);
+
 
 const fetchPosts = async () => {
   try {
-    const response = await fetch('/posts.json');
-    if (!response.ok) {
-      throw new Error('Error al obtener los posts');
-    }
-    const data = await response.json();
-    console.log('datos:', data); 
-    posts.value = data;
+    posts.value = await getCommunityPublication();
+    console.log("post", posts.value);
   } catch (err) {
     console.error('Error al obtener los posts'); 
   }
 };
 
-onMounted(fetchPosts);
+const fetchUsers = async () => {
+  try {
+    users.value = getUsers();
+  } catch (err) {
+    console.error('Error al obtener los users'); 
+  }
+  console.log("users" + users.value);
+};
+
+onMounted(() => {
+  fetchPosts();
+  fetchUsers();
+});
 </script>
