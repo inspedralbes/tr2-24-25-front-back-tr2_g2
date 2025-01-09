@@ -4,8 +4,8 @@ import profilePage from '../views/profilePage.vue'
 import profilesPage from '@/views/profilesPage.vue'
 // import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
- import chatListPage from '../views/chatListPage.vue'
-import loginPage from '../views/loginPage.vue'
+import chatListPage from '../views/chatListPage.vue'
+import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
 import addRequestPost from '../views/addRequestPost.vue'
 
@@ -14,17 +14,17 @@ const router = createRouter({
   routes: [
     {
       path: '/login',
-      name: '',
+      name: 'login',
       component: loginPage,
     },
     {
       path: '/',
-      name: 'mainPage',
+      name: 'main',
       component: mainPage,
     },
     {
-      path: '/profile',
-      name: 'profile',
+      path: '/myprofile',
+      name: 'myprofile',
       component: profilePage,
     },
     {
@@ -38,8 +38,8 @@ const router = createRouter({
       component: addRequestPost,
     },
     {
-      path: '/profilesPage',
-      name: 'profilesPage',
+      path: '/profiles',
+      name: 'profiles',
       component: profilesPage,
     },
     // {
