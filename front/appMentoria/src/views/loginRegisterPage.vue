@@ -55,7 +55,7 @@
                 </span>
               </button>
 
-            <!-- <button @click="signInWithDiscord"
+              <!-- <button @click="signInWithDiscord"
                 class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
                 <div class="bg-white p-1 rounded-full">
                   <svg class="w-6" viewBox="0 0 32 32">
@@ -191,6 +191,7 @@ const signInWithGithub = async () => {
 
     console.log(userAPIs);
     validateAndLogin();
+
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;
@@ -205,6 +206,8 @@ const signInWithGithub = async () => {
 
 async function validateAndLogin() {
   let succes = false;
+  let profileURL = ref('');
+  let bannerURL = ref('');
 
   console.log('Validating and logging in');
 
@@ -224,8 +227,27 @@ async function validateAndLogin() {
       succes = true;
     }
 
-    //useAppStore().setToken(response.token);
-    useAppStore().setUser(response.userLogin);
+    
+    // useAppStore().setToken(response.token);
+
+    let user = response.userLogin;
+    let profile = user.value.profile;
+
+    console.log('User: ', user.value.profile);
+
+    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.value.banner}`;
+    if (profile.includes('/upload/', 0)) {
+      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.value.profile}`;
+    } else {
+      profileURL.value = user.value.profile;
+    }
+
+    user.value.profile = profileURL.value;
+    user.value.banner = bannerURL.value;
+
+    // useAppStore().setUser(response.userLogin);
+    useAppStore().setUser(user.value);
+
   } catch (error) {
     console.log(error.message);
   } finally {
