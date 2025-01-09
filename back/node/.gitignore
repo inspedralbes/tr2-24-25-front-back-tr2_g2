@@ -9,3 +9,7 @@
 
 /services/employmentexchange/node_modules
 /services/employmentexchange/.env
+
+/services/iaimage/node_modules
+/services/iaimage/.env
+
