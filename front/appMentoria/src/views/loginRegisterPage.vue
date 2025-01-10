@@ -242,6 +242,7 @@ async function validateAndLogin() {
 
     // useAppStore().setToken(response.token);
     useAppStore().setUser(user);
+    localStorage.setItem('user', JSON.stringify(user.email));
 
   } catch (error) {
     console.log(error.message);

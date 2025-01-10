@@ -7,9 +7,10 @@ import router from '@/router';
 const isDarkMode = ref(false);
 
 function validateLogin() {
-  console.log('hola token pinia:', useAppStore().getToken());
-  console.log('hola user pinia:', useAppStore().getUser());
-  if (!useAppStore().getToken() || !useAppStore().getUser()) {
+  console.log('hola token local:', localStorage.getItem('token'));
+  console.log('hola user local:', localStorage.getItem('user'));
+
+  if (!localStorage.getItem('token') && !localStorage.getItem('user')) {
     console.log('no hay token o user');
     router.push({ name: 'login' });
   }
@@ -31,7 +32,7 @@ onMounted(() => {
 
 <template>
   <div id="app" :class="darkMode ? 'dark' : ''">
-    <RouterView class="bg-white dark:bg-neutral-800 text-gray-900 dark:text-white"/>
+    <RouterView class="bg-slate-200 dark:bg-neutral-800 text-gray-900 dark:text-white"/>
   </div>
 </template>
 

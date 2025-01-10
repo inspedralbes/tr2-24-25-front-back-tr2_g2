@@ -49,38 +49,40 @@ INSERT INTO classes (name) VALUES
 ('CURS ESPECIALITZACIÓ');
 
 -- Inserciones para users (profesores)
-INSERT INTO users (typesUsers_id, name, email, password, city, verified, status, review, class_id) VALUES 
-(2, 'Dídac Pérez', 'didac@example.com', 'password1', true, 'approved', 4.7, 1),
-(2, 'Ana María Sossa', 'ana@example.com', 'password2', true, 'approved', 4.8, 2),
-(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', true, 'approved', 4.6, 3),
-(2, 'Raül Pons', 'raul@example.com', 'password4', true, 'approved', 4.9, 4),
-(2, 'Albert Casas', 'albert@example.com', 'password5', true, 'approved', 4.5, 5),
-(2, 'Joan Sánchez', 'joan@example.com', 'password6', true, 'approved', 4.4, 6),
-(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', true, 'approved', 4.3, 7),
-(2, 'Emma Morales', 'emma@example.com', 'password8', true, 'approved', 4.2, 8),
-(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', true, 'approved', 4.1, 9),
-(2, 'Noah Escartí', 'noah@example.com', 'password10', true, 'approved', 4.0, 10),
-(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', true, 'approved', 3.9, 11),
-(2, 'Rafa Monje', 'rafa@example.com', 'password12', true, 'approved', 3.8, 12),
-(2, 'Segundo González', 'segundo@example.com', 'password13', true, 'approved', 3.7, 13),
-(2, 'Marc Aribau', 'marc@example.com', 'password14', true, 'approved', 3.6, 14),
-(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', true, 'approved', 3.5, 15),
-(2, 'Juan Delgado', 'juan@example.com', 'password16', true, 'approved', 3.4, 16),
-(2, 'Pol Prats', 'pol@example.com', 'password17', true, 'approved', 3.3, 17),
-(2, 'Gerard Torrent', 'gerard@example.com', 'password18', true, 'approved', 3.2, 18),
-(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', true, 'approved', 3.1, 19),
-(2, 'David Sierra', 'david@example.com', 'password20', true, 'approved', 3.0, 20),
-(2, 'Laura Carrillo', 'laura@example.com', 'password21', true, 'approved', 2.9, 21),
-(2, 'Oriol Pelino', 'oriol@example.com', 'password22', true, 'approved', 2.8, 22),
-(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', true, 'approved', 2.7, 23);
+INSERT INTO users (typesUsers_id, name, email, password, city, availibility, verified, status, review, class_id) VALUES
+(2, 'Dídac Pérez', 'didac@example.com', 'password1', 'Barcelona, Espanya', '{"monday": "9-5", "tuesday": "9-5"}', true, 'approved', 4.7, 1),
+(2, 'Ana María Sossa', 'ana@example.com', 'password2', 'Girona, Espanya', '{"monday": "10-6", "wednesday": "10-6"}', true, 'approved', 4.8, 2),
+(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', 'Tarragona, Espanya', '{"thursday": "9-5", "friday": "9-5"}', true, 'approved', 4.6, 3),
+(2, 'Raül Pons', 'raul@example.com', 'password4', 'Lleida, Espanya', '{"monday": "8-4", "tuesday": "8-4"}', true, 'approved', 4.9, 4),
+(2, 'Albert Casas', 'albert@example.com', 'password5', 'Manresa, Espanya', '{"wednesday": "10-6", "thursday": "10-6"}', true, 'approved', 4.5, 5),
+(2, 'Joan Sánchez', 'joan@example.com', 'password6', 'Reus, Espanya', '{"monday": "9-5", "friday": "9-5"}', true, 'approved', 4.4, 6),
+(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', 'Mataró, Espanya', '{"tuesday": "8-4", "thursday": "8-4"}', true, 'approved', 4.3, 7),
+(2, 'Emma Morales', 'emma@example.com', 'password8', 'Sabadell, Espanya', '{"monday": "9-6", "friday": "9-6"}', true, 'approved', 4.2, 8),
+(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', 'Terrassa, Espanya', '{"tuesday": "10-7", "wednesday": "10-7"}', true, 'approved', 4.1, 9),
+(2, 'Noah Escartí', 'noah@example.com', 'password10', 'Badalona, Espanya', '{"thursday": "8-3", "friday": "8-3"}', true, 'approved', 4.0, 10),
+(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', 'Granollers, Espanya', '{"monday": "9-6", "tuesday": "9-6"}', true, 'approved', 3.9, 11),
+(2, 'Rafa Monje', 'rafa@example.com', 'password12', 'Vic, Espanya', '{"wednesday": "8-4", "thursday": "8-4"}', true, 'approved', 3.8, 12),
+(2, 'Segundo González', 'segundo@example.com', 'password13', 'Blanes, Espanya', '{"monday": "10-7", "friday": "10-7"}', true, 'approved', 3.7, 13),
+(2, 'Marc Aribau', 'marc@example.com', 'password14', 'Igualada, Espanya', '{"tuesday": "9-5", "wednesday": "9-5"}', true, 'approved', 3.6, 14),
+(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', 'Cerdanyola del Vallès, Espanya', '{"thursday": "10-6", "friday": "10-6"}', true, 'approved', 3.5, 15),
+(2, 'Juan Delgado', 'juan@example.com', 'password16', 'Sant Cugat del Vallès, Espanya', '{"monday": "8-4", "wednesday": "8-4"}', true, 'approved', 3.4, 16),
+(2, 'Pol Prats', 'pol@example.com', 'password17', 'Mollet del Vallès, Espanya', '{"tuesday": "9-6", "thursday": "9-6"}', true, 'approved', 3.3, 17),
+(2, 'Gerard Torrent', 'gerard@example.com', 'password18', 'Vilanova i la Geltrú, Espanya', '{"monday": "9-5", "friday": "9-5"}', true, 'approved', 3.2, 18),
+(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', 'Figueres, Espanya', '{"tuesday": "10-7", "wednesday": "10-7"}', true, 'approved', 3.1, 19),
+(2, 'David Sierra', 'david@example.com', 'password20', 'El Prat de Llobregat, Espanya', '{"thursday": "8-3", "friday": "8-3"}', true, 'approved', 3.0, 20),
+(2, 'Laura Carrillo', 'laura@example.com', 'password21', 'Cornellà de Llobregat, Espanya', '{"monday": "10-6", "tuesday": "10-6"}', true, 'approved', 2.9, 21),
+(2, 'Oriol Pelino', 'oriol@example.com', 'password22', 'Roses, Espanya', '{"wednesday": "9-4", "friday": "9-4"}', true, 'approved', 2.8, 22),
+(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', 'Vilafranca del Penedès, Espanya', '{"monday": "8-3", "thursday": "8-3"}', true, 'approved', 2.7, 23);
+
 
 -- Inserciones para users (estudiantes)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
-(1, 'Laura Puig', 'laura@example.com', 'password24', true, 'approved', 4.2, 1),
-(1, 'Martí Vila', 'marti@example.com', 'password25', true, 'approved', 3.9, 2),
-(1, 'Gemma Riera', 'gemma@example.com', 'password26', true, 'approved', 4.3, 3),
-(1, 'Oriol Serra', 'oriol@example.com', 'password27', true, 'approved', 4.1, 4),
-(1, 'Anna Martí', 'anna@example.com', 'password28', true, 'approved', 4.4, 5);
+INSERT INTO users (typesUsers_id, name, email, password, city, verified, status, review, class_id) VALUES 
+(1, 'Laura Puig', 'laura@example.com', 'password24', 'Barcelona, Espanya', true, 'approved', 4.2, 1),
+(1, 'Martí Vila', 'marti@example.com', 'password25', 'Girona, Espanya', true, 'approved', 3.9, 2),
+(1, 'Gemma Riera', 'gemma@example.com', 'password26', 'Tarragona, Espanya', true, 'approved', 4.3, 3),
+(1, 'Oriol Serra', 'oriol@example.com', 'password27', 'Lleida, Espanya', true, 'approved', 4.1, 4),
+(1, 'Anna Martí', 'anna@example.com', 'password28', 'Barcelona, Espanya', true, 'approved', 4.4, 5);
+
 
 -- Inserciones para users (administradores)
 INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 

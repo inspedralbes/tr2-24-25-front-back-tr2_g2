@@ -1,7 +1,9 @@
 <template>
     <Header class="fixed top-0 left-0 right-0 z-10"></Header>
-    <section class="relative pt-40 pb-24 min-h-screen flex flex-col justify-between">
-        <img :src="`${banner}`" alt="cover-image"
+
+    <div v-if="user.value">
+        <section class="relative pt-40 pb-24 min-h-screen flex flex-col justify-between">
+        <img :src="`${user.value.banner}`" alt="cover-image"
             class="w-full absolute top-0 left-0 z-0 h-60 object-cover shadow-lg shadow-black/30">
 
         <div class="absolute right-4 md:right-5 top-60 transform -translate-y-8 md:-translate-y-8">
@@ -17,14 +19,14 @@
 
         <div class="w-full max-w-7xl mx-auto px-6 md:px-8 flex-grow">
             <div class="flex items-center justify-center sm:justify-start relative mb-5">
-                <img :src="`${profile}`" alt="user-avatar-image"
+                <img :src="`${user.value.profile}`" alt="user-avatar-image"
                     class="border-4 border-solid border-white rounded-full object-cover w-40 h-40">
             </div>
 
             <div class="flex flex-col sm:flex-row max-sm:gap-5 items-center justify-between mb-5">
                 <div class="block">
                     <h3 class="font-manrope font-bold text-2xl text-gray-900 mb-1">{{ user.value.name }}</h3>
-                    <p class="font-normal text-base leading-7 text-gray-500">Barcelona, España</p>
+                    <p class="font-normal text-base leading-7 text-gray-500">{{ user.value.city ? user.value.city : `Lloc on vius...`}}</p>
                 </div>
                 <button
                     class="rounded-full py-3.5 px-5 bg-gray-100 flex items-center group transition-all duration-500 hover:bg-indigo-100">
@@ -42,9 +44,6 @@
             </div>
 
             <div class="flex flex-col lg:flex-row max-lg:gap-5 items-center justify-between py-0.5">
-                <div class="flex items-center gap-4">
-
-                </div>
                 <div class="flex flex-col md:flex-row items-center sm:justify-end gap-6">
                     <ul class="flex items-center max-sm:justify-center max-sm:flex-wrap gap-2.5">
                         <li
@@ -68,9 +67,9 @@
         </div>
 
         <div
-            class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex justify-center sm:justify-end gap-4 md:mt-4 relative z-20 -translate-y-6 lg:-translate-y-60">
+            class="w-full max-w-7xl mx-auto px-6 md:px-8 mb-8 flex justify-center sm:justify-end gap-4 md:mt-4 relative  lg:-translate-y-60">
             <!-- Botón de Discord -->
-            <a href="https://discord.com/invite/tu-invite" target="_blank" rel="noopener noreferrer"
+            <a :href="`${user.value.discord_link}`" target="_blank" rel="noopener noreferrer"
                 class="flex items-center py-3 px-6 bg-indigo-600 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" viewBox="0 0 512 512">
                     <path fill="currentColor"
@@ -81,7 +80,7 @@
                 Discord
             </a>
 
-            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer"
+            <a :href="`${user.value.github_link}`" target="_blank" rel="noopener noreferrer"
                 class="flex items-center py-3 px-6 bg-gray-800 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-gray-900">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"
                     stroke="none">
@@ -97,6 +96,12 @@
         <calendario />
     </div>
 
+    </div>
+
+    <div v-else>
+        <Loading />
+    </div>
+
     <NavBar></NavBar>
 </template>
 
@@ -106,6 +111,7 @@ import { useAppStore } from '@/stores/index';
 import calendario from '@/components/calendario.vue';
 import NavBar from '@/components/NavBar.vue';
 import Header from '@/components/Header.vue';
+import Loading from '@/components/Loading.vue';
 
 const appStore = useAppStore();
 
@@ -115,7 +121,7 @@ var banner = ref(null);
 
 onMounted(() => {
     user.value = appStore.getUser();
-    profile.value = user.value.profile;
-    banner.value = user.value.banner;
+    // profile.value = user.value.profile;
+    // banner.value = user.value.banner;
 });
 </script>
