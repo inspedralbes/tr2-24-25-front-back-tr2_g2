@@ -321,14 +321,14 @@ export const createReportPublication = async (publication_id, user_id, report, s
 };
 
 // Update a report publication by ID
-export const updateReportPublication = async (id, publication_id, user_id, report, status) => {
+export const updateReportPublication = async (id, status) => {
     try {
         const response = await fetch(`${COMMUNITY_URL}reports/publications/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ publication_id, user_id, report, status }),
+            body: JSON.stringify({ status }),
         });
 
         if (!response.ok) {

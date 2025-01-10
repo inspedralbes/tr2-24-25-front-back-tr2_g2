@@ -278,7 +278,26 @@ app.delete('/publications/:id', async (req, res) => {
 app.get('/reports/publications', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM reportsPublications');
+        const [rows] = await connection.execute(`
+            SELECT 
+                rp.id,
+                rp.user_id AS reporting_user_id,
+                rp.report,
+                rp.status,
+                rp.created_at,
+                u1.name AS reporting_user_name,
+                u1.email AS reporting_user_email,
+                p.title,
+                p.description,
+                p.image,
+                p.user_id AS publication_user_id,
+                u2.name AS publication_user_name,
+                u2.email AS publication_user_email
+            FROM reportsPublications rp
+            JOIN users u1 ON rp.user_id = u1.id
+            JOIN publications p ON rp.publication_id = p.id
+            JOIN users u2 ON p.user_id = u2.id
+        `);
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -320,13 +339,13 @@ app.post('/reports/publications', async (req, res) => {
 
 app.put('/reports/publications/:id', async (req, res) => {
     const { id } = req.params;
-    const { publication_id, user_id, report, status } = req.body;
+    const { status } = req.body;
 
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
-            'UPDATE reportsPublications SET publication_id = ?, user_id = ?, report = ?, status = ? WHERE id = ?',
-            [publication_id, user_id, report, status, id]
+            'UPDATE reportsPublications SET status = ? WHERE id = ?',
+            [ status, id]
         );
         connection.end();
 

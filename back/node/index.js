@@ -688,21 +688,26 @@ app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
 app.get('/reports/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute(`
+        const [rows] = await connection.execute(`
             SELECT 
-                reportsUsers.id,
-                reportsUsers.reported_user_id,
-                reportsUsers.user_id,
-                reportsUsers.report,
-                reportsUsers.status,
-                reportsUsers.created_at,
-                reportedUser.name AS reported_user_name,
-                reportedUser.email AS reported_user_email,
-                reportingUser.name AS reporting_user_name,
-                reportingUser.email AS reporting_user_email
-            FROM reportsUsers
-            JOIN users AS reportedUser ON reportsUsers.reported_user_id = reportedUser.id
-            JOIN users AS reportingUser ON reportsUsers.user_id = reportingUser.id
+                rp.id,
+                rp.user_id AS reporting_user_id,
+                rp.report,
+                rp.status,
+                rp.created_at,
+                rp.image,
+                u1.name AS reporting_user_name,
+                u1.email AS reporting_user_email,
+                p.title,
+                p.description,
+                p.image AS publication_image,
+                p.user_id AS publication_user_id,
+                u2.name AS publication_user_name,
+                u2.email AS publication_user_email
+            FROM reportsPublications rp
+            JOIN users u1 ON rp.user_id = u1.id
+            JOIN publications p ON rp.publication_id = p.id
+            JOIN users u2 ON p.user_id = u2.id
         `);
         connection.end();
 
