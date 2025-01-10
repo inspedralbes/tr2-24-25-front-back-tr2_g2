@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255),
     banner VARCHAR(255),
     profile VARCHAR(255),
+    city VARCHAR(255),
     verified BOOLEAN DEFAULT 0,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     review DECIMAL(2,1) DEFAULT 0,

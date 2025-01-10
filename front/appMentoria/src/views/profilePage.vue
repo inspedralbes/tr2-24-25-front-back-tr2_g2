@@ -17,14 +17,13 @@
 
         <div class="w-full max-w-7xl mx-auto px-6 md:px-8 flex-grow">
             <div class="flex items-center justify-center sm:justify-start relative mb-5">
-                <img :src="`${profile}`"
-                    alt="user-avatar-image"
+                <img :src="`${profile}`" alt="user-avatar-image"
                     class="border-4 border-solid border-white rounded-full object-cover w-40 h-40">
             </div>
 
             <div class="flex flex-col sm:flex-row max-sm:gap-5 items-center justify-between mb-5">
                 <div class="block">
-                    <h3 class="font-manrope font-bold text-4xl text-gray-900 mb-1">Sara Martinez</h3>
+                    <h3 class="font-manrope font-bold text-2xl text-gray-900 mb-1">{{ user.value.name }}</h3>
                     <p class="font-normal text-base leading-7 text-gray-500">Barcelona, España</p>
                 </div>
                 <button
@@ -36,8 +35,9 @@
                     </svg>
 
                     <span
-                        class="px-2 font-medium text-base leading-7 text-gray-700 transition-all duration-500 group-hover:text-indigo-600">2n
-                        DAM</span>
+                        class="px-2 font-medium text-base leading-7 text-gray-700 transition-all duration-500 group-hover:text-indigo-600">
+                        {{ user.value.class_id ? user.value.class_id : `Pendet d'asignar` }}
+                    </span>
                 </button>
             </div>
 

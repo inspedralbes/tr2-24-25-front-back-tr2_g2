@@ -49,7 +49,7 @@ INSERT INTO classes (name) VALUES
 ('CURS ESPECIALITZACIÓ');
 
 -- Inserciones para users (profesores)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
+INSERT INTO users (typesUsers_id, name, email, password, city, verified, status, review, class_id) VALUES 
 (2, 'Dídac Pérez', 'didac@example.com', 'password1', true, 'approved', 4.7, 1),
 (2, 'Ana María Sossa', 'ana@example.com', 'password2', true, 'approved', 4.8, 2),
 (2, 'Vanessa Llop', 'vanessa@example.com', 'password3', true, 'approved', 4.6, 3),
