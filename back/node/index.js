@@ -141,7 +141,7 @@ app.get('/logout', (req, res) => {
 });
 
 // CRUD operations for users
-app.get('/users', verifyToken, async (req, res) => {
+app.get('/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM users');
@@ -152,7 +152,7 @@ app.get('/users', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/users/:id', verifyToken, async (req, res) => {
+app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {

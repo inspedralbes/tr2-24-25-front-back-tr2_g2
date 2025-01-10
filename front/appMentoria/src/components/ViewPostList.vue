@@ -1,5 +1,5 @@
 <template>
-    <ViewPost :posts="posts" :users="users" />
+    <ViewPost :posts="posts" />
 </template>
 
 <script setup>
@@ -8,7 +8,6 @@ import ViewPost from '@/components/viewPost.vue';
 import { getCommunityPublication, getUsers } from '../services/communicationManager';
 
 const posts = ref([]);
-const users = ref([]);
 
 
 const fetchPosts = async () => {
@@ -20,17 +19,7 @@ const fetchPosts = async () => {
   }
 };
 
-const fetchUsers = async () => {
-  try {
-    users.value = getUsers();
-  } catch (err) {
-    console.error('Error al obtener los users'); 
-  }
-  console.log("users" + users.value);
-};
-
 onMounted(() => {
   fetchPosts();
-  fetchUsers();
 });
 </script>
