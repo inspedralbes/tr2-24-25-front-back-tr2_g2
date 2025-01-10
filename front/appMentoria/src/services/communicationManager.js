@@ -46,6 +46,7 @@ export const postCommunityPublication = async (publication) => {
     }
 };
 
+// Get Community Publications
 export const getCommunityPublication = async () => {
     try {
         const response = await fetch(`${COMMUNITY_URL}/publications`, {
@@ -62,6 +63,7 @@ export const getCommunityPublication = async () => {
     }
 };
 
+// Get User Data
 export const getUsers = async () => {
     try {
         const response = await fetch(`${BACK_URL}/users`, {
@@ -77,4 +79,22 @@ export const getUsers = async () => {
         console.error('Network error:', error);
         return { error: 'Network error. Please try again later.' };
     }
+};
+
+//Get Comments in Community Posts
+export const getCommunityComments = async () => {
+  try {
+      const response = await fetch(`${COMMUNITY_URL}/comments`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+      });
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      console.error('Network error:', error);
+      return { error: 'Network error. Please try again later.' };
+  }
 };
