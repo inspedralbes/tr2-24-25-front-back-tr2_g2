@@ -685,19 +685,35 @@ app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports users
-app.get('/reports/users', verifyToken, async (req, res) => {
+app.get('/reports/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsUsers');
+        const [results] = await connection.execute(`
+            SELECT 
+                reportsUsers.id,
+                reportsUsers.reported_user_id,
+                reportsUsers.user_id,
+                reportsUsers.report,
+                reportsUsers.status,
+                reportsUsers.created_at,
+                reportedUser.name AS reported_user_name,
+                reportedUser.email AS reported_user_email,
+                reportingUser.name AS reporting_user_name,
+                reportingUser.email AS reporting_user_email
+            FROM reportsUsers
+            JOIN users AS reportedUser ON reportsUsers.reported_user_id = reportedUser.id
+            JOIN users AS reportingUser ON reportsUsers.user_id = reportingUser.id
+        `);
         connection.end();
 
         res.status(200).send(results);
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
-app.get('/reports/users/:id', verifyToken, async (req, res) => {
+app.get('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -713,7 +729,7 @@ app.get('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/users', verifyToken, async (req, res) => {
+app.post('/reports/users',  async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
 
     try {
@@ -727,7 +743,7 @@ app.post('/reports/users', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/users/:id', verifyToken, async (req, res) => {
+app.put('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -744,7 +760,7 @@ app.put('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/users/:id', verifyToken, async (req, res) => {
+app.delete('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {

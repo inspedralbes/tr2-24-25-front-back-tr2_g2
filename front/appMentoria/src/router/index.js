@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import mainPage from '../views/mainPage.vue'
 import profilePage from '../views/profilePage.vue'
 import profilesPage from '@/views/profilesPage.vue'
-// import reportPage from '../views/reportPage.vue'
+import reportPage from '../views/reportPage.vue'
 // import validationPage from '../views/validationPage.vue'
 // import chatListPage from '../views/chatListPage.vue'
 // import chatPage from '../views/chatPage.vue'
@@ -48,12 +48,12 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: adminPanel,
+    },
+    {
+      path: '/report',
+      name: 'reportPage',
+      component: reportPage,
     }
-    // {
-    //   path: '/report',
-    //   name: 'reportPage',
-    //   component: reportPage,
-    // },
     // {
     //   path: '/validation',
     //   name: 'validationPage',

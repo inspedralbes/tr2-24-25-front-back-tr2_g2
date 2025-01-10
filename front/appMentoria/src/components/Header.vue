@@ -4,7 +4,7 @@
       <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
         <div class="flex-1 flex justify-center">
           <div class="flex items-center space-x-5 lg:space-x-40">
-            <tempate v-if="isAdminPage">
+            <template v-if="isAdminPage">
               <div class="flex space-x-10 lg:space-x-40">
                 <a @click="$router.push('/report')"
               class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
@@ -14,8 +14,12 @@
                 class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Validation
               </a>
+              <a @click="$router.push('/services')"
+                class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
+                Services
+              </a>
               </div>
-            </tempate>
+            </template>
             <template v-else>
               <a @click="$router.push('/')" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Comunitat
@@ -45,6 +49,6 @@ const route = useRoute();
 
 
 const isAdminPage = computed(() => {
-  return route.path.startsWith('/admin');
+  return route.path.startsWith('/admin') || route.path.startsWith('/report') || route.path.startsWith('/validation');
 });
 </script>
