@@ -6,6 +6,7 @@ const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
 const FormData = require('form-data');
+const { text } = require('stream/consumers');
 require('dotenv').config();
 
 const app = express();
@@ -128,6 +129,8 @@ app.get('/publications', async (req, res) => {
     }
 });
 
+
+
 app.post('/publications', async (req, res) => {
     const { title, description, user_id, expired_at } = req.body;
 
@@ -137,138 +140,172 @@ app.post('/publications', async (req, res) => {
         return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
     }
 
-    // Llamada a la IA para analizar título y descripción
-    const analyzeContent = async (content) => {
-        const serverIA = 'http://localhost:3004/classify-comment';
-        try {
-            const response = await fetch(serverIA, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ comment: content }),
-            });
-            if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
-            return await response.json();
-        } catch (error) {
-            throw new Error(`Error al analizar contenido: ${error.message}`);
-        }
-    };
-
-    let titleAnalysis, descriptionAnalysis;
-
-    try {
-        titleAnalysis = await analyzeContent(title);
-        descriptionAnalysis = await analyzeContent(description);
-    } catch (error) {
-        console.error("Error al llamar a la IA", error);
-        return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
-    }
-
-    // Manejo de imagen
     const imageFile = req.files.image;
     const imageName = `${Date.now()}-${imageFile.name}`;
     const imagePath = path.join(__dirname, 'upload', imageName);
 
     await imageFile.mv(imagePath);
 
-    // Llamada a la IA para analizar la imagen
+
     const formData = new FormData();
     formData.append('image', fs.createReadStream(imagePath));
 
-    const serverMjsUrl = 'http://localhost:3006/classify-image';
-
-    let imageAnalysis;
-    try {
-        const fetchPromise = await import('node-fetch');
-        const fetch = fetchPromise.default;
-        const response = await fetch(serverMjsUrl, {
-            method: 'POST',
-            body: formData,
-            headers: formData.getHeaders(),
-        });
-
-        if (!response.ok)
-            throw new Error(`Error IA imagen: ${response.statusText}`);
-
-        imageAnalysis = await response.json();
-
-    } catch (fetchError) {
-        console.error("Error al llamar a la IA:", fetchError);
-
-        fs.unlink(imagePath, (err) => {
-            if (err) console.error("Error al eliminar la imagen temporal:", err);
-        });
-        return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
-    }
-
-    const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category);
-
-    // Guardar en base de datos
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
-
-        const [result] = await connection.execute(
-            `INSERT INTO publications (typesPublications_id, title, description, user_id, image, expired_at)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [1, title, description, user_id, `/upload/${imageName}`, expired_at || null]
-        );
-        const publication_id = result.insertId;
-
-        let reasons = [];
-        if (isReportableComment(titleAnalysis)) {
-            reasons.push(`títul: ${titleAnalysis.reason}`);
-        }
-        if (isReportableComment(descriptionAnalysis)) {
-            reasons.push(`descripción: ${descriptionAnalysis.reason}`);
-        }
-        if (imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
-            reasons.push(`imagen: ${imageAnalysis.reason}`);
-        }
-
-        if (reasons.length > 0) {
-            const notificationDescription = `S'ha generat un report en aquesta publicació: ${publication_id}. Reasons: ${reasons.join(', ')}.`;
-
-            await connection.execute(
-                `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
-                [publication_id, user_id, report, 'pending']
-            );
-
-            // Hacer fetch a las notificaciones
-            const notificationPayload = {
-                user_id,
-                description: notificationDescription,
-                publication_id: publication_id,
-                report_id: publication_id,
-            };
-
+    var running = await checkIA();
+    console.log("running", running);
+    let textIA = 0, imageIA = 0;
+    if (running == true) {
+        // Llamada a la IA para analizar título y descripción
+        const analyzeContent = async (content) => {
+            const serverIA = 'http://localhost:3004/classify-comment';
             try {
-                const fetchPromise = await import('node-fetch');
-                const fetch = fetchPromise.default;
-
-                const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                const response = await fetch(serverIA, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(notificationPayload),
+                    body: JSON.stringify({ comment: content }),
                 });
-
-                if (!notificationResponse.ok) {
-                    console.error("Error al enviar la notificación:", await notificationResponse.text());
-                }
-            } catch (notificationError) {
-                console.error("Error al realizar el fetch de la notificación:", notificationError);
+                if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error al analizar contenido: ${error.message}`);
+                return null;
             }
+        };
+
+        let titleAnalysis = null, descriptionAnalysis = null;
+
+        try {
+            titleAnalysis = await analyzeContent(title);
+            descriptionAnalysis = await analyzeContent(description);
+            textIA = 1;
+        } catch (error) {
+            console.error("Error al llamar a la IA", error);
+            return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
         }
 
-        res.status(201).json({
-            publicationId: publication_id,
-            titleAnalysis,
-            descriptionAnalysis,
-            imageAnalysis,
-        });
-        connection.end();
-    } catch (error) {
-        fs.unlink(imagePath, () => { }); // Limpieza
-        res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
+        // Manejo de imagen
+        // Llamada a la IA para analizar la imagen
+        const serverMjsUrl = 'http://localhost:3006/classify-image';
+
+        let imageAnalysis = null;
+        try {
+            const fetchPromise = await import('node-fetch');
+            const fetch = fetchPromise.default;
+            const response = await fetch(serverMjsUrl, {
+                method: 'POST',
+                body: formData,
+                headers: formData.getHeaders(),
+            });
+
+            if (!response.ok)
+                throw new Error(`Error IA imagen: ${response.statusText}`);
+
+            imageAnalysis = await response.json();
+            imageIA = 1;
+        } catch (fetchError) {
+            console.error("Error al llamar a la IA:", fetchError);
+
+            fs.unlink(imagePath, (err) => {
+                if (err) console.error("Error al eliminar la imagen temporal:", err);
+            });
+            return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
+        }
+
+        const isReportableComment = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category);
+
+        // Guardar en base de datos
+        try {
+            const connection = await mysql.createConnection(dbConfig);
+            const report = `Análisis: título (${titleAnalysis.category} | ${titleAnalysis.reason}), Descripció (${descriptionAnalysis.category} | ${descriptionAnalysis.reason}), imagen (${imageAnalysis.category} | ${imageAnalysis.reason})`;
+
+            const [result] = await connection.execute(
+                `INSERT INTO publications (typesPublications_id, title, description, user_id, image, text_ia, image_ia, expired_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [1, title, description, user_id, `/upload/${imageName}`, 1, 1, expired_at || null]
+            );
+            const publication_id = result.insertId;
+
+            let reasons = [];
+            if (isReportableComment(titleAnalysis)) {
+                reasons.push(`títul: ${titleAnalysis.reason}`);
+            }
+            if (isReportableComment(descriptionAnalysis)) {
+                reasons.push(`descripción: ${descriptionAnalysis.reason}`);
+            }
+            if (imageAnalysis.category === 'OFENSIVA' || (imageAnalysis.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysis.subcategory === 'OFENSIVO')) {
+                reasons.push(`imagen: ${imageAnalysis.reason}`);
+            }
+
+            if (reasons.length > 0) {
+                const notificationDescription = `S'ha generat un report en aquesta publicació: ${publication_id}. Reasons: ${reasons.join(', ')}.`;
+
+                await connection.execute(
+                    `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                    [publication_id, user_id, report, 'pending']
+                );
+
+                // Hacer fetch a las notificaciones
+                const notificationPayload = {
+                    user_id,
+                    description: notificationDescription,
+                    publication_id: publication_id,
+                    report_id: publication_id,
+                };
+
+                await connection.execute(
+                    `UPDATE publications SET reports = reports + 1 WHERE id = ?`,
+                    [publication_id]
+                );
+
+                try {
+                    const fetchPromise = await import('node-fetch');
+                    const fetch = fetchPromise.default;
+
+                    const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(notificationPayload),
+                    });
+
+                    if (!notificationResponse.ok) {
+                        console.error("Error al enviar la notificación:", await notificationResponse.text());
+                    }
+                } catch (notificationError) {
+                    console.error("Error al realizar el fetch de la notificación:", notificationError);
+                }
+            }
+
+            res.status(201).json({
+                publicationId: publication_id,
+                titleAnalysis,
+                descriptionAnalysis,
+                imageAnalysis,
+                textIA,
+                imageIA,
+            });
+            connection.end();
+        } catch (error) {
+            fs.unlink(imagePath, () => { }); // Limpieza
+            res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
+        }
+    } else {
+        try {
+            const connection = await mysql.createConnection(dbConfig);
+            const [result] = await connection.execute(
+                `INSERT INTO publications (typesPublications_id, title, description, user_id, image, text_ia, image_ia, expired_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [1, title, description, user_id, `/upload/${imageName}`, textIA, imageIA, expired_at || null]
+            );
+            const publication_id = result.insertId;
+            res.status(201).json({
+                publicationId: publication_id,
+                text_ia: 0,
+                image_ia: 0,
+            });
+            connection.end();
+
+        } catch (error) {
+            res.status(500).json({ error: 'Error al analizar contenido', details: error.message });
+        }
     }
 });
 
@@ -420,6 +457,26 @@ app.delete('/reports/publications/:id', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+async function checkIA() {
+
+    var running = true;
+    const serverIAtext = 'http://localhost:3004/';
+    const serverIAimage = 'http://localhost:3006/';
+
+    try {
+        const responseText = await fetch(serverIAtext);
+        if (!responseText.ok) throw new Error(`Error IA: ${responseText.statusText}`);
+
+        const responseImage = await fetch(serverIAimage);
+        if (!responseImage.ok) throw new Error(`Error IA: ${responseImage.statusText}`);
+
+    } catch (error) {
+        running = false;
+        console.error(`Error al analizar contenido: ${error.message}`);
+    }
+    return running;
+}
 
 // Start the server
 app.listen(port, () => {

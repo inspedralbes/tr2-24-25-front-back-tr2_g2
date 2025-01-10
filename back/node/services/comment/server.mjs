@@ -21,6 +21,10 @@ function extractJsonContent(responseText) {
     return responseText.substring(jsonStart, jsonEnd);
 }
 let totalTokensAcumulados = 0;
+
+app.get("/", (req, res) => {
+    res.send("Hello World! I am a comment service");
+});
 app.post("/classify-comment", async (req, res) => {
     try {
         const { comment } = req.body;

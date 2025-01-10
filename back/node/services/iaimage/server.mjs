@@ -30,6 +30,9 @@ function extractJsonContent(responseText) {
 }
 
 let totalTokensAcumulados = 0;
+app.get("/", (req, res) => {
+    res.send("Hello World! I am an image service");
+});
 app.post("/classify-image", async (req, res) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {

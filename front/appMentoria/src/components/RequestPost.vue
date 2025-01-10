@@ -301,7 +301,7 @@ async function submitPostPeticio() {
 
   try {
     const response = await postEmploymentExchangePublication(formData);
-
+    console.log("response", response);
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Error al crear la publicación:", errorData);

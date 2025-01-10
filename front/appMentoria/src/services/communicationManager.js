@@ -57,7 +57,7 @@ export const postEmploymentExchangePublication = async (formData) => {
         });
 
         console.log(response);
-        return response.json();
+        return response;
     } catch (error) {
         console.error(error);
     }

@@ -87,6 +87,8 @@ CREATE TABLE IF NOT EXISTS publications (
     availability VARCHAR(255) NULL,
     user_id INT NOT NULL,
     reports INT DEFAULT 0,  
+    text_ia BOOLEAN DEFAULT 0,
+    image_ia BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expired_at DATE,
     FOREIGN KEY (typesPublications_id) REFERENCES typesPublications(id),
