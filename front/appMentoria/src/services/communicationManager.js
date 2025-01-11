@@ -98,3 +98,21 @@ export const getCommunityComments = async () => {
       return { error: 'Network error. Please try again later.' };
   }
 };
+
+//Post Comments in Community Posts
+export const postCommunityComments = async (comment) => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(comment),
+        });
+        console.log(response);
+        return response.json();
+    } catch (error) {
+        console.error(error);
+    }
+};
