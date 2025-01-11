@@ -11,6 +11,9 @@ const cors = require('cors');
 require('dotenv').config();
 
 const secretKey = process.env.SECRET_KEY;
+const refreshKey = process.env.REFRESH_KEY;
+
+const refreshTokensDB = new Set();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -66,7 +69,6 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // Login with api's google, github, discord
 app.post('/loginAPI', async (req, res) => {
-    console.log('req.body: ', req.body);
     const { email, name, token, profile } = req.body;
     const connection = await mysql.createConnection(dbConfig);
     let userLogin = {};
@@ -75,34 +77,29 @@ app.post('/loginAPI', async (req, res) => {
         const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
 
         if (users.length == 0) {
-            console.log('User not found, creating new user...');
             let tokenHash = await hashPassword(token);
             let banner = '/upload/banner_default.png';
             const [result] = await connection.execute('INSERT INTO users (name, email, password, banner, profile) VALUES (?, ?, ?, ?, ?)', [name, email, tokenHash, banner, profile]);
-            console.log('User created:', result.insertId);
-
             const [resultNewUser] = await connection.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
-            console.log('resultNewUser: ', resultNewUser);
             userLogin = resultNewUser[0];
         } else {
-            console.log('User found');
             let password = users[0].password;
             let match = await comparePassword(token, password);
-
             if (!match) {
-                console.log('Invalid password');
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
                 userLogin = users[0];
-                console.log('userLogin: ', userLogin);
             }
         }
 
-        // Generar token JWT 
-        // const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        // res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
-        console.log('secret key: ', secretKey);
-        res.status(200).json({ message: 'Login successful', userLogin });
+        const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' });
+
+        refreshTokensDB.add(refreshToken);
+
+        res.status(200).json({ message: 'Login successful', accessToken: tokenJW, refreshToken: refreshToken, userLogin });
+
+        // res.status(200).json({ message: 'Login successful', userLogin });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
@@ -113,31 +110,48 @@ app.post('/loginAPI', async (req, res) => {
 });
 
 // Login route
-app.post('/login', async (req, res) => {
+app.post('/login', async (req, res) => { 
     const { email, password } = req.body;
+    const connection = await mysql.createConnection(dbConfig);
+    let userLogin = {};
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        connection.end();
-
         if (rows.length == 0) return res.status(400).json({ error: 'User not found' });
 
-        const user = rows[0];
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(400).json({ error: 'Invalid password' });
+        let passwordDB = users[0].password;
+        let match = await comparePassword(password, passwordDB);
+        if (!match) {
+            return res.status(400).json({ error: 'Invalid password' });
+        } else {
+            userLogin = users[0];
+        }
 
-        // Generar token JWT
-        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
-        res.json({ message: 'Login successful', token });
+        const token = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' });
+
+        refreshTokensDB.add(refreshToken);
+
+        res.status(200).json({ message: 'Login successful', accessToken: token, refreshToken: refreshToken, userLogin });
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
+        console.log('Connection closed');
     }
 });
 
 // Logout route
-app.get('/logout', (req, res) => {
+app.get('/logout', verifyToken, async (req, res) => {
+    // eliminar el acces token y refresh token
+    const { accessToken, refreshToken } = req.body;
 
+    if (!accessToken) return res.status(401).send('Token is required');
+    if (!refreshToken) return res.status(401).send('Token is required');
+
+    refreshTokensDB.delete(refreshToken);
+    res.status(200).send('User logout successfully');
 });
 
 // CRUD operations for users
@@ -781,6 +795,23 @@ app.post('/reviews', async (req, res) => {
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Route for refresh access token
+app.post('/refresh', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) return res.status(401).send('Token is required');
+    if (!refreshTokensDB.has(refreshToken)) return res.status(403).send('Invalid token');
+
+    try {
+        const decoded = jwt.verify(refreshToken, refreshKey);
+        const newAccessToken = jwt.sign({ id: decoded.id, email: decoded.email }, secretKey, { expiresIn: '1h' });
+        res.json({ accessToken: newAccessToken });
+    } catch (err) {
+        refreshTokensDB.delete(refreshToken);
+        res.status(403).json({ error: 'Invalid token or expired' });
     }
 });
 
