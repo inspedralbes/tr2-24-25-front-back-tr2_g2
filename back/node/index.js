@@ -609,10 +609,25 @@ app.delete('/teachersClasses/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports comments
-app.get('/reports/comments', verifyToken, async (req, res) => {
+app.get('/reports/comments',  async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsComments');
+        const [results] = await connection.execute(`SELECT 
+            reportsComments.id, 
+            reportsComments.comment_id, 
+            reportsComments.user_id AS reporting_user_id, 
+            reportsComments.report, 
+            reportsComments.status, 
+            reportsComments.created_at, 
+            comments.comment, 
+            comments.user_id AS comment_user_id,
+            reporting_user.name AS reporting_user_name,
+            comment_user.name AS comment_user_name,
+            comment_user.email AS comment_user_email
+            FROM reportsComments 
+            JOIN comments ON reportsComments.comment_id = comments.id 
+            JOIN users AS reporting_user ON reportsComments.user_id = reporting_user.id
+            JOIN users AS comment_user ON comments.user_id = comment_user.id`);
         connection.end();
 
         res.status(200).send(results);
@@ -621,7 +636,7 @@ app.get('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/reports/comments/:id', verifyToken, async (req, res) => {
+app.get('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -637,7 +652,7 @@ app.get('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/comments', verifyToken, async (req, res) => {
+app.post('/reports/comments',  async (req, res) => {
     const { comment_id, user_id, report } = req.body;
 
     try {
@@ -651,7 +666,7 @@ app.post('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/comments/:id', verifyToken, async (req, res) => {
+app.put('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -668,7 +683,7 @@ app.put('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
+app.delete('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {

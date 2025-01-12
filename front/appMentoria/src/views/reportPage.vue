@@ -4,6 +4,7 @@
         <div class="flex-grow mt-20 mb-40">
         <!-- <ViewReportUser></ViewReportUser> -->
          <ViewReportPublicacio></ViewReportPublicacio>
+          <!-- <ViewReportComments></ViewReportComments> -->
     </div>
     </div>
     <NavBar></NavBar>
@@ -12,6 +13,7 @@
 <script setup>
 import Header from '@/components/Header.vue';
 import NavBar from '@/components/NavBar.vue';
+import ViewReportComments from '@/components/viewReportComments.vue';
 import ViewReportPublicacio from '@/components/viewReportPublicacio.vue';
 import ViewReportUser from '@/components/viewReportUser.vue';
 </script>
