@@ -19,9 +19,9 @@
               <p class="text-base font-semibold text-gray-900 dark:text-gray-300">Estat:</p>
               <select v-model="report.status" @change="updateReportStatus(report.id, report.status)" :class="{
                 'bg-yellow-200 dark:bg-yellow-600': report.status === 'pending',
-                'bg-blue-400 dark:bg-blue-500': report.status === 'revising',
+                'bg-blue-300 dark:bg-blue-400': report.status === 'revising',
                 'bg-green-200 dark:bg-green-600': report.status === 'revised',
-                'appearance-none bg-gray-100 dark:bg-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 p-2 w-full md:w-32 shadow-sm': true
+                'appearance-none bg-gray-100 dark:bg-gray-600 dark:text-gray-900 border border-gray-300 dark:border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 p-2 w-full md:w-32 shadow-sm': true
               }">
                 <option value="pending">Pendent</option>
                 <option value="revising">Revisant</option>
@@ -65,6 +65,9 @@
           <img v-if="report.selectedImage" :src="report.selectedImage" alt="Imatge Reportada"
             class="w-32 h-auto rounded-md shadow-sm mt-2">
         </div>
+        <div class="flex justify-end">
+          <button @click="deleteReport(report.id)" class="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600">Eliminar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -72,7 +75,7 @@
 
 
 <script>
-import { fetchAllReportsPublications, updateReportPublication } from "@/services/communicationManager";
+import { fetchAllReportsPublications, updateReportPublication, deleteReportPublication } from "@/services/communicationManager";
 
 export default {
   data() {
@@ -108,7 +111,20 @@ export default {
       } catch (error) {
         console.error("Error al actualitzar l'estat:", error);
       }
-    }
+    },
+    async deleteReport(id) {
+      try {
+        const response = await deleteReportPublication(id);
+        if (response.error) {
+          console.error(response.error);
+        } else {
+          this.reports = this.reports.filter(report => report.id !== id);
+          console.log("Informe eliminat correctament");
+        }
+      } catch (error) {
+        console.error("Error al eliminar l'informe:", error);
+      }
+    },
   }
 };
 </script>
