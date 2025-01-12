@@ -51,9 +51,15 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('a user connected');
 
+    socket.on('newComment', (comment) => {
+        console.log('newComment event received', comment);
+        io.emit('updateComments');
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
+
 });
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */

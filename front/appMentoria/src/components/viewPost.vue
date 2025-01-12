@@ -9,7 +9,7 @@
           <img :src="getAuthorProfile(selectedPost.user_id)" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
           <div>
             <h2 class="font-bold text-lg">{{ getAuthorName(selectedPost.user_id) }}</h2>
-            <p class="text-gray-500 text-sm dark:text-white">{{ getAuthorHandle(selectedPost.user_id) }} · fa {{ timeSince(selectedPost.created_at) }}</p>
+            <p class="text-gray-500 text-sm dark:text-white mb-6">{{ getAuthorHandle(selectedPost.user_id) }} · since {{ timeSince(selectedPost.created_at) }}</p>
           </div>
         </header>
 
@@ -34,13 +34,13 @@
               >
               <div class="absolute right-0 items-center inset-y-0 flex">
                   <button @click="sendCommentInMongo(null)" type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none mr-4">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#999999"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20.7639 12H10.0556M3 8.00003H5.5M4 12H5.5M4.5 16H5.5M9.96153 12.4896L9.07002 15.4486C8.73252 16.5688 8.56376 17.1289 8.70734 17.4633C8.83199 17.7537 9.08656 17.9681 9.39391 18.0415C9.74792 18.1261 10.2711 17.8645 11.3175 17.3413L19.1378 13.4311C20.059 12.9705 20.5197 12.7402 20.6675 12.4285C20.7961 12.1573 20.7961 11.8427 20.6675 11.5715C20.5197 11.2598 20.059 11.0295 19.1378 10.5689L11.3068 6.65342C10.2633 6.13168 9.74156 5.87081 9.38789 5.95502C9.0808 6.02815 8.82627 6.24198 8.70128 6.53184C8.55731 6.86569 8.72427 7.42461 9.05819 8.54246L9.96261 11.5701C10.0137 11.7411 10.0392 11.8266 10.0493 11.9137C10.0583 11.991 10.0582 12.069 10.049 12.1463C10.0387 12.2334 10.013 12.3188 9.96153 12.4896Z" stroke="#999999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    <svg viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M14.734 15.8974L19.22 12.1374C19.3971 11.9927 19.4998 11.7761 19.4998 11.5474C19.4998 11.3187 19.3971 11.1022 19.22 10.9574L14.734 7.19743C14.4947 6.9929 14.1598 6.94275 13.8711 7.06826C13.5824 7.19377 13.3906 7.47295 13.377 7.78743V9.27043C7.079 8.17943 5.5 13.8154 5.5 16.9974C6.961 14.5734 10.747 10.1794 13.377 13.8154V15.3024C13.3888 15.6178 13.5799 15.8987 13.8689 16.0254C14.158 16.1521 14.494 16.1024 14.734 15.8974Z" stroke="#999999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                 </button>
               </div>
             </div>
         </div>
         <ul>
-            <li v-for="comment in getCommentsWithPostId(selectedPost.id).filter(comment => !comment.commentReply_id)" :key="comment.id" class="border-b py-2 flex items-start space-x-4">
+            <li v-for="comment in getCommentsWithPostId(selectedPost.id).filter(comment => !comment.commentReply_id && comment.reported === 0)" :key="comment.id" class="border-b py-2 flex items-start space-x-4 m-4">
               <img :src="getAuthorProfile(comment.user_id)" alt="Avatar" class="w-8 h-8 rounded-full" />
               <div>
                 <div class="flex items-center space-x-2">
@@ -49,7 +49,7 @@
                 </div>
                 <p style="word-break: break-word;">{{ comment.comment }}</p>     
                 <div v-if="getCommentsInComments(comment.id).length" class="ml-8 mt-2 space-y-2">
-                  <div v-for="reply in getCommentsInComments(comment.id)" :key="reply.id" class="flex items-start space-x-4">
+                    <div v-for="reply in getCommentsInComments(comment.id).filter(reply => reply.reported === 0)" :key="reply.id" class="flex items-start space-x-4 mb-4 mr-10">
                     <img :src="getAuthorProfile(reply.user_id)" alt="Avatar" class="w-8 h-8 rounded-full" />
                       <div>
                           <div class="flex items-center space-x-2">
@@ -60,16 +60,17 @@
                       </div>
                     </div>
                 </div>
-                <div class="relative flex">
-                  <input 
+                <div class="relative flex mb-4 mr-5">
+                    <input 
                     type="text" 
-                    placeholder="Write your message!" 
+                    placeholder="Escriu un comentari!" 
                     v-model="replyInputs[comment.id]" 
-                    class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-5 pr-20 bg-gray-200 rounded-md py-3 dark:bg-gray-800 dark:text-white"
-                  />
+                    class="w-3/4 focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-3 pr-16 bg-gray-200 rounded-md py-2 dark:bg-gray-800 dark:text-white"
+                    style="width: 100%;"
+                    />
                   <div class="absolute right-0 items-center inset-y-0 flex">
                       <button @click="sendCommentInMongo(comment.id)" type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none mr-4">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#999999"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20.7639 12H10.0556M3 8.00003H5.5M4 12H5.5M4.5 16H5.5M9.96153 12.4896L9.07002 15.4486C8.73252 16.5688 8.56376 17.1289 8.70734 17.4633C8.83199 17.7537 9.08656 17.9681 9.39391 18.0415C9.74792 18.1261 10.2711 17.8645 11.3175 17.3413L19.1378 13.4311C20.059 12.9705 20.5197 12.7402 20.6675 12.4285C20.7961 12.1573 20.7961 11.8427 20.6675 11.5715C20.5197 11.2598 20.059 11.0295 19.1378 10.5689L11.3068 6.65342C10.2633 6.13168 9.74156 5.87081 9.38789 5.95502C9.0808 6.02815 8.82627 6.24198 8.70128 6.53184C8.55731 6.86569 8.72427 7.42461 9.05819 8.54246L9.96261 11.5701C10.0137 11.7411 10.0392 11.8266 10.0493 11.9137C10.0583 11.991 10.0582 12.069 10.049 12.1463C10.0387 12.2334 10.013 12.3188 9.96153 12.4896Z" stroke="#999999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    <svg viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M14.734 15.8974L19.22 12.1374C19.3971 11.9927 19.4998 11.7761 19.4998 11.5474C19.4998 11.3187 19.3971 11.1022 19.22 10.9574L14.734 7.19743C14.4947 6.9929 14.1598 6.94275 13.8711 7.06826C13.5824 7.19377 13.3906 7.47295 13.377 7.78743V9.27043C7.079 8.17943 5.5 13.8154 5.5 16.9974C6.961 14.5734 10.747 10.1794 13.377 13.8154V15.3024C13.3888 15.6178 13.5799 15.8987 13.8689 16.0254C14.158 16.1521 14.494 16.1024 14.734 15.8974Z" stroke="#999999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                     </button>
                   </div>
                 </div>          
@@ -120,7 +121,7 @@
 <script setup>
   import { ref, onMounted, defineProps } from 'vue';
   import { getUsers, getCommunityComments, postCommunityComments } from '../services/communicationManager';
-
+  import socket from '../services/sockets.js'; 
 
   const authorAvatar = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg/220px-RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg';
 
@@ -173,12 +174,11 @@
         created_at: new Date().toISOString()
       };
       await postCommunityComments(comment);
-      comments.value = await getCommunityComments();
+      socket.emit('newComment', comment);
       commentInput.value.value = '';
     } else {
       if (!replyInputs.value[ID]) return;
       const message = replyInputs.value[ID];
-      // Envía la respuesta al comentario
       const replyComment = {
         comment: message,
         user_id: 1,
@@ -187,11 +187,10 @@
         created_at: new Date().toISOString()
       };
       await postCommunityComments(replyComment);
-      comments.value = await getCommunityComments();
-      replyInputs.value[ID] = '';  // Limpia el campo de texto específico
+      socket.emit('newComment', replyComment);
+      replyInputs.value[ID] = '';
     }
   };
-
 
   function timeSince(date) {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -225,6 +224,9 @@
     users.value = await getUsers();
     comments.value = await getCommunityComments();
     console.log("comments", comments.value);
-    
+    socket.on('updateComments', async () => {
+      console.log("New comment received");
+      comments.value = await getCommunityComments();
+    });
   });
 </script>
