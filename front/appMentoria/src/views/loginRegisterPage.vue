@@ -231,22 +231,22 @@ async function validateAndLogin() {
     // useAppStore().setToken(response.token);
 
     let user = response.userLogin;
-    let profile = user.value.profile;
+    let profile = user.profile;
 
-    console.log('User: ', user.value.profile);
+    console.log('User: ', user.profile);
 
-    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.value.banner}`;
+    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
     if (profile.includes('/upload/', 0)) {
-      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.value.profile}`;
+      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
     } else {
-      profileURL.value = user.value.profile;
+      profileURL.value = user.profile;
     }
 
-    user.value.profile = profileURL.value;
-    user.value.banner = bannerURL.value;
+    user.profile = profileURL.value;
+    user.banner = bannerURL.value;
 
     // useAppStore().setUser(response.userLogin);
-    useAppStore().setUser(user.value);
+    useAppStore().setUser(user);
 
   } catch (error) {
     console.log(error.message);

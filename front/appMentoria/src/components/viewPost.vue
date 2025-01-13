@@ -9,7 +9,7 @@
           <img :src="getAuthorProfile(selectedPost.user_id)" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
           <div>
             <h2 class="font-bold text-lg">{{ getAuthorName(selectedPost.user_id) }}</h2>
-            <p class="text-gray-500 text-sm dark:text-white mb-6">{{ getAuthorHandle(selectedPost.user_id) }} · since {{ timeSince(selectedPost.created_at) }}</p>
+            <p class="text-gray-500 text-sm dark:text-white mb-6">{{ getAuthorHandle(selectedPost.user_id) }} · {{ timeSince(selectedPost.created_at) }}</p>
           </div>
         </header>
 
@@ -81,13 +81,13 @@
     </div>
 
     <div v-else>
-      <div v-for="post in posts" :key="post.id" class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 dark:bg-gray-900">
+      <div v-for="post in posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))" :key="post.id" class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 dark:bg-gray-900">
         <div v-if="post.reports === 0">
           <header class="flex items-center p-4 border-b">
             <img :src="getAuthorProfile(post.user_id)" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
             <div>
               <h2 class="font-bold text-lg">{{ getAuthorName(post.user_id) }}</h2>
-              <p class="text-gray-500 text-sm dark:text-white">{{ getAuthorHandle(post.user_id) }} · fa {{ timeSince(post.created_at) }}</p>
+              <p class="text-gray-500 text-sm dark:text-white">{{ getAuthorHandle(post.user_id) }} · {{ timeSince(post.created_at) }}</p>
             </div>
           </header>
 
@@ -122,9 +122,8 @@
   import { ref, onMounted, defineProps } from 'vue';
   import { getUsers, getCommunityComments, postCommunityComments } from '../services/communicationManager';
   import socket from '../services/sockets.js'; 
-
-  const authorAvatar = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg/220px-RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg';
-
+  import { useAppStore } from '@/stores/index';
+  
   const users = ref([]);
   const comments = ref([]);
   const selectedPost = ref(null);
@@ -132,23 +131,25 @@
   const commentInput = ref(null);
   const replyInputs = ref({});
 
+  var myUser = useAppStore().getUser();
+
   const props = defineProps({
     posts: Array
   });
 
   const getAuthorName = (userId) => {
     const user = users.value.find(user => user.id === userId);
-    return user ? user.name : 'Unknown';
+    return user.name;
   };  
 
   const getAuthorHandle = (userId) => {
     const user = users.value.find(user => user.id === userId);
-    return user ? user.email.split('@')[0] : 'Unknown';
+    return user.email.split('@')[0];
   };  
 
   const getAuthorProfile = (userId) => {
     const user = users.value.find(user => user.id === userId);
-    return user && user.profile ? user.profile : authorAvatar;
+    return user.profile;
   };
 
   const getCommentsWithPostId = (postId) => {
@@ -168,7 +169,7 @@
       // Envía el comentario principal
       const comment = {
         comment: message,
-        user_id: 1,
+        user_id: myUser.id,
         publication_id: selectedPost.value.id,
         commentReply_id: null,
         created_at: new Date().toISOString()
@@ -181,7 +182,7 @@
       const message = replyInputs.value[ID];
       const replyComment = {
         comment: message,
-        user_id: 1,
+        user_id: myUser.id,
         publication_id: selectedPost.value.id,
         commentReply_id: ID,
         created_at: new Date().toISOString()
@@ -227,6 +228,7 @@
     socket.on('updateComments', async () => {
       console.log("New comment received");
       comments.value = await getCommunityComments();
+      users.value = await getUsers();
     });
   });
 </script>
