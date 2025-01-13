@@ -119,7 +119,8 @@ app.post('/login', async (req, res) => {
         const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length == 0) return res.status(400).json({ error: 'User not found' });
 
-        let passwordDB = users[0].password;
+        let passwordDB = rows[0].password;
+
         let match = await comparePassword(password, passwordDB);
         if (!match) {
             return res.status(400).json({ error: 'Invalid password' });
@@ -128,7 +129,7 @@ app.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' });
+        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' })
 
         refreshTokensDB.add(refreshToken);
 

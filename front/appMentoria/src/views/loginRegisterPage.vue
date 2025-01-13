@@ -66,12 +66,10 @@
             <div class="mx-auto max-w-xs">
               <input
                 class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                type="email" placeholder="Correu electrònic" 
-                v-model="userLogin.email" />
+                type="email" placeholder="Correu electrònic" v-model="userLogin.email" />
               <input
                 class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password" placeholder="Contrasenya" 
-                v-model="userLogin.password" />
+                type="password" placeholder="Contrasenya" v-model="userLogin.password" />
               <button @click="signInWithApp"
                 class="mt-5 tracking-wide font-semibold bg-indigo-500 dark:bg-indigo-700 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                 <svg class="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -112,7 +110,7 @@ import { ref, reactive } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
-import { loginAPI } from '@/services/communicationManager';
+import { loginAPI, loginDB } from '@/services/communicationManager';
 import { useAppStore } from '@/stores/index';
 import router from '@/router';
 
@@ -159,6 +157,7 @@ const signInWithGoogle = async () => {
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
+
     validateAndLogin(userAPIs);
 
   } catch (error) {
@@ -180,6 +179,7 @@ const signInWithGithub = async () => {
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
+
     validateAndLogin(userAPIs);
 
   } catch (error) {
@@ -190,17 +190,56 @@ const signInWithGithub = async () => {
 };
 
 const signInWithApp = async () => {
+  let succes = false;
+  let profileURL = ref('');
+  let bannerURL = ref('');
+
   console.log('Sign in with app');
 
   try {
-
     console.log('userLogin: ', userLogin);
-    validateAndLogin(userLogin);
+
+    const response = await loginDB(userLogin);
+
+    if (response.error) {
+      return;
+    } else {
+      succes = true;
+    }
+
+    let user = response.userLogin;
+    let profile = user.profile;
+
+    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+    if (profile.includes('/upload/', 0)) {
+      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+    } else {
+      profileURL.value = user.profile;
+    }
+
+    user.profile = profileURL.value;
+    user.banner = bannerURL.value;
+
+    useAppStore().setAccessToken(response.accessToken);
+    useAppStore().setRefreshToken(response.refreshToken);
+    useAppStore().setUser(user);
+
+    localStorage.setItem('user', JSON.stringify(user.email));
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
 
   } catch (error) {
     console.log(error.message);
-    message.value = `Error al iniciar sessió`;
+    message.value = `Error al iniciar sessió, comprova les dades introduïdes`;
     messageType.value = 'error';
+  } finally {
+    if (succes) {
+      console.log('Redirecting to main page + info en pinia');
+      console.log('Access Token: ', useAppStore().getAccessToken());
+      console.log('Refresh Token: ', useAppStore().getRefreshToken());
+      console.log('User: ', useAppStore().getUser());
+      router.push({ name: 'main' });
+    }
   }
 };
 
@@ -213,51 +252,51 @@ async function validateAndLogin(user) {
 
   console.log('user-email: ' + user.email);
 
-  // if (!user.email.includes('@inspedralbes.cat')) {
-  //   message.value = `Error al iniciar sessió. Correu no vàlid`;
-  //   messageType.value = 'error';
-  // } else {
-  //   try {
-  //     const response = await loginAPI(userAPIs);
+  if (!user.email.includes('@inspedralbes.cat')) {
+    message.value = `Error al iniciar sessió. Correu no vàlid`;
+    messageType.value = 'error';
+  } else {
+    try {
+      const response = await loginAPI(userAPIs);
 
-  //     if (response.error) {
-  //       return;
-  //     } else {
-  //       succes = true;
-  //     }
+      if (response.error) {
+        return;
+      } else {
+        succes = true;
+      }
 
-  //     let user = response.userLogin;
-  //     let profile = user.profile;
+      let user = response.userLogin;
+      let profile = user.profile;
 
-  //     bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
-  //     if (profile.includes('/upload/', 0)) {
-  //       profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
-  //     } else {
-  //       profileURL.value = user.profile;
-  //     }
+      bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+      if (profile.includes('/upload/', 0)) {
+        profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+      } else {
+        profileURL.value = user.profile;
+      }
 
-  //     user.profile = profileURL.value;
-  //     user.banner = bannerURL.value;
+      user.profile = profileURL.value;
+      user.banner = bannerURL.value;
 
-  //     useAppStore().setAccessToken(response.accessToken);
-  //     useAppStore().setRefreshToken(response.refreshToken);
-  //     useAppStore().setUser(user);
+      useAppStore().setAccessToken(response.accessToken);
+      useAppStore().setRefreshToken(response.refreshToken);
+      useAppStore().setUser(user);
 
-  //     localStorage.setItem('user', JSON.stringify(user.email));    
-  //     localStorage.setItem('accessToken', response.accessToken);
-  //     localStorage.setItem('refreshToken', response.refreshToken);
+      localStorage.setItem('user', JSON.stringify(user.email));
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
 
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   } finally {
-  //     if (succes) {
-  //       console.log('Redirecting to main page + info en pinia');
-  //       console.log('Access Token: ', useAppStore().getAccessToken());
-  //       console.log('Refresh Token: ', useAppStore().getRefreshToken());
-  //       console.log('User: ', useAppStore().getUser());
-  //       router.push({ name: 'main' });
-  //     }
-  //   }
-  // }
-}
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      if (succes) {
+        console.log('Redirecting to main page + info en pinia');
+        console.log('Access Token: ', useAppStore().getAccessToken());
+        console.log('Refresh Token: ', useAppStore().getRefreshToken());
+        console.log('User: ', useAppStore().getUser());
+        router.push({ name: 'main' });
+      }
+    }
+  }
+};
 </script>

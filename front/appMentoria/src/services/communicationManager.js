@@ -29,6 +29,29 @@ export const loginAPI = async (user) => {
     }
 };
 
+// Login with my app
+export const loginDB = async (user) => {
+    console.log(user, `communicationManager.js`);
+    try {
+        const response = await fetch(`${BACK_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
 // Create publications
 export const postCommunityPublication = async (publication) => {
     try {
