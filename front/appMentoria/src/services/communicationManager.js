@@ -7,7 +7,7 @@ const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
 const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
 const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENT_EXCHANGE;
 const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
-
+const NOTIFICATIONS_URL = import.meta.env.VITE_URL_BACK_NOTIFICATIONS;
 const VITE_URL_BACK_CHAT = import.meta.env.VITE_CHATS_URL;
 
 // Login API firebase
@@ -60,6 +60,22 @@ export const postEmploymentExchangePublication = async (formData) => {
         return response;
     } catch (error) {
         console.error(error);
+    }
+};
+
+export const getNotifications = async (userID) => {
+    try {
+        const response = await fetch(`${NOTIFICATIONS_URL}notifications/${userID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
     }
 };
 

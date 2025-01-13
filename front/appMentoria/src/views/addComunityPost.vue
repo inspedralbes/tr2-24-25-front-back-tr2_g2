@@ -97,12 +97,14 @@ import Header from "@/components/Header.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { postCommunityPublication } from "@/services/communicationManager";
+import { useAppStore } from "@/stores/index";
 
 const router = useRouter();
 const title = ref("");
 const description = ref("");
 const imageFile = ref(null);
 const imagePreview = ref(null);
+const user_id = useAppStore().getUser()?.id;
 
 function goBack() {
   router.back();
@@ -117,7 +119,7 @@ function handleImageUpload(event) {
 }
 
 async function submitPost() {
-  if (!title.value || !description.value || !imageFile.value) {
+  if (!user_id || !title.value || !description.value || !imageFile.value) {
     alert("Por favor, completa todos los campos y sube una imagen.");
     return;
   }
@@ -126,7 +128,7 @@ async function submitPost() {
   formData.append("typesPublications_id", 1);
   formData.append("title", title.value);
   formData.append("description", description.value);
-  formData.append("user_id", 1);
+  formData.append("user_id", user_id);
   formData.append("image", imageFile.value);
 
   try {

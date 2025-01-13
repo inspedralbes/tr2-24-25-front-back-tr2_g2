@@ -22,9 +22,15 @@ function extractJsonContent(responseText) {
 }
 let totalTokensAcumulados = 0;
 
+function checkPublications() {
+
+}
+
 app.get("/", (req, res) => {
     res.send("Hello World! I am a comment service");
 });
+
+
 app.post("/classify-comment", async (req, res) => {
     try {
         const { comment } = req.body;
@@ -87,6 +93,8 @@ app.post("/classify-comment", async (req, res) => {
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 });
+
+
 
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);

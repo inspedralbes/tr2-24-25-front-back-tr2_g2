@@ -14,8 +14,13 @@ const port = process.env.PORT || 3008;
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin"],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+});
 // app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
@@ -32,10 +37,11 @@ app.get('/', (req, res) => {
     res.send('Hello World! XDDDDDDDDDDDDDDD I am a notifications service');
 });
 
-app.get('/notifications', async (req, res) => {
+app.get('/getNotifications', async (req, res) => {
+    const { user_id } = req.body;
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM notifications');
+        const [rows] = await connection.execute('SELECT * FROM notifications WHERE user_id = ?', [user_id]);
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -61,18 +67,22 @@ app.get('/notifications/:id', async (req, res) => {
 
 app.post('/notifications', async (req, res) => {
 
-    const { user_id, description, chat_id, report_id, publication_id, request_id, comment_id } = req.body;
-
+    const { user_id, description, chat_id, report_id, publicationId, request_id, comment_id } = req.body;
+    console.log("user_id notification", user_id);
     if (!user_id) {
         return res.status(400).json({ error: 'User id is required.' });
     }
+
+    console.log("body", req.body);
 
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
             'INSERT INTO notifications (user_id, description, chat_id, report_id, publication_id, request_id, comment_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [user_id, description || null, chat_id || null, report_id || null, publication_id || null, request_id || null, comment_id || null]
+            [user_id, description || null, chat_id || null, report_id || null, publicationId || null, request_id || null, comment_id || null]
         );
+
+        console.log("result", result);
 
         res.status(201).json({
             notificationId: result.insertId,
@@ -80,7 +90,7 @@ app.post('/notifications', async (req, res) => {
             description,
             chat_id,
             report_id,
-            publication_id,
+            publicationId,
             request_id,
             comment_id
         });
@@ -89,6 +99,7 @@ app.post('/notifications', async (req, res) => {
         console.log('Notification created:', result);
 
     } catch (error) {
+        console.log("error", error);
         res.status(500).json({ error: 'Database error' });
     }
 

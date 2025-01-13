@@ -6,7 +6,6 @@ const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
 const FormData = require('form-data');
-const { text } = require('stream/consumers');
 require('dotenv').config();
 
 const app = express();
@@ -15,10 +14,14 @@ const port = process.env.PORT || 3002;
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
 app.use(cors({
-    origin: `*`,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+});
 app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
@@ -133,9 +136,11 @@ app.get('/publications', async (req, res) => {
 
 app.post('/publications', async (req, res) => {
     const { title, description, user_id, expired_at } = req.body;
+    var notificationIAnoResponse;
 
-    console.log("fileeee", req.files);
+    console.log("file", req.files);
     console.log("body", req.body);
+
     if (!title || !description || !req.files || !req.files.image) {
         return res.status(400).json({ error: 'Faltan datos obligatorios (título, descripción, imagen).' });
     }
@@ -146,7 +151,6 @@ app.post('/publications', async (req, res) => {
 
     await imageFile.mv(imagePath);
 
-
     const formData = new FormData();
     formData.append('image', fs.createReadStream(imagePath));
 
@@ -156,6 +160,7 @@ app.post('/publications', async (req, res) => {
     if (running == true) {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
+            console.log("HOLA 1");
             const serverIA = 'http://localhost:3004/classify-comment';
             try {
                 const response = await fetch(serverIA, {
@@ -174,6 +179,7 @@ app.post('/publications', async (req, res) => {
         let titleAnalysis = null, descriptionAnalysis = null;
 
         try {
+            console.log("HOLA 2");
             titleAnalysis = await analyzeContent(title);
             descriptionAnalysis = await analyzeContent(description);
             textIA = 1;
@@ -219,7 +225,7 @@ app.post('/publications', async (req, res) => {
 
             const [result] = await connection.execute(
                 `INSERT INTO publications (typesPublications_id, title, description, user_id, image, text_ia, image_ia, expired_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [1, title, description, user_id, `/upload/${imageName}`, 1, 1, expired_at || null]
             );
             const publication_id = result.insertId;
@@ -235,20 +241,26 @@ app.post('/publications', async (req, res) => {
                 reasons.push(`imagen: ${imageAnalysis.reason}`);
             }
 
+            console.log("Hola 3");
+
             if (reasons.length > 0) {
                 const notificationDescription = `S'ha generat un report en aquesta publicació: ${publication_id}. Reasons: ${reasons.join(', ')}.`;
 
-                await connection.execute(
+                const [resultReport] = await connection.execute(
                     `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
                     [publication_id, user_id, report, 'pending']
                 );
+
+                console.log("Hola 4");
+
+                console.log("resultReport ID:", resultReport.insertId);
 
                 // Hacer fetch a las notificaciones
                 const notificationPayload = {
                     user_id,
                     description: notificationDescription,
                     publication_id: publication_id,
-                    report_id: publication_id,
+                    report_id: resultReport.insertId,
                 };
 
                 await connection.execute(
@@ -256,15 +268,17 @@ app.post('/publications', async (req, res) => {
                     [publication_id]
                 );
 
-                try {
-                    const fetchPromise = await import('node-fetch');
-                    const fetch = fetchPromise.default;
+                console.log("notification content", notificationPayload);
 
+                try {
+                    console.log("Hola 5");
                     const notificationResponse = await fetch('http://localhost:3008/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
                     });
+
+                    console.log("response notification", notificationResponse);
 
                     if (!notificationResponse.ok) {
                         console.error("Error al enviar la notificación:", await notificationResponse.text());
@@ -292,7 +306,7 @@ app.post('/publications', async (req, res) => {
             const connection = await mysql.createConnection(dbConfig);
             const [result] = await connection.execute(
                 `INSERT INTO publications (typesPublications_id, title, description, user_id, image, text_ia, image_ia, expired_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [1, title, description, user_id, `/upload/${imageName}`, textIA, imageIA, expired_at || null]
             );
             const publication_id = result.insertId;
@@ -301,11 +315,35 @@ app.post('/publications', async (req, res) => {
                 text_ia: 0,
                 image_ia: 0,
             });
+
+            const notificationReason = 'Tu publicació sera revisada més tard! Gràcies per la teva paciència.';
+
+            notificationIAnoResponse = {
+                user_id,
+                description: notificationReason,
+                publicationId: publication_id,
+            };
+            console.log("notification if no response ia", notificationIAnoResponse);
             connection.end();
 
         } catch (error) {
             res.status(500).json({ error: 'Error al analizar contenido', details: error.message });
         }
+
+        try {
+            const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(notificationIAnoResponse),
+            });
+
+            if (!notificationResponse.ok) {
+                console.error("Error al enviar la notificación:", await notificationResponse.text());
+            }
+        } catch (notificationError) {
+            console.error("Error al realizar el fetch de la notificación:", notificationError);
+        }
+
     }
 });
 

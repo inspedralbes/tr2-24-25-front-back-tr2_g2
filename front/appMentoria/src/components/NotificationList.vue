@@ -2,21 +2,21 @@
   <div class="flex flex-col p-6">
     <div class="relative w-full max-w-md mx-auto bg-white shadow-md rounded-lg">
       <div class="p-4 border-b flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-gray-700">Notificacions</h2>
+        <h2 class="text-lg font-semibold text-gray-700">Notificaciones</h2>
         <div class="flex space-x-2">
           <button
             class="px-3 py-1 text-sm bg-gray-200 rounded-md"
             :class="{ 'bg-gray-400': filter === 'all' }"
             @click="filter = 'all'"
           >
-            Totes
+            Todas
           </button>
           <button
             class="px-3 py-1 text-sm bg-blue-200 rounded-md"
             :class="{ 'bg-blue-400': filter === 'chat' }"
             @click="filter = 'chat'"
           >
-            Missatges
+            Mensajes
           </button>
           <button
             class="px-3 py-1 text-sm bg-red-200 rounded-md"
@@ -34,7 +34,6 @@
           :name="notification.type"
           :message="notification.description"
           :icon="notification.icon"
-          :type="notification.type"
           @remove="removeNotification(notification.id)"
           @markAsRead="markAsRead(notification.id)"
         />
@@ -46,17 +45,30 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import NotificationItem from "./NotificationItem.vue";
+import { getNotifications } from "@/services/communicationManager";
+import { useAppStore } from "@/stores/index";
+
+// Obtener datos del usuario desde Pinia
+const appStore = useAppStore();
+const user_id = appStore.getUser()?.id;
 
 const notifications = ref([]);
 const filter = ref("all");
 
-// Fetch notifications from the server
-const fetchNotifications = async () => {
+// Fetch notifications from the database
+async function fetchNotifications() {
   try {
-    const response = await fetch("/notifications.json");
+    if (!user_id) {
+      console.error("Error: user_id no está definido.");
+      return;
+    }
+
+    const response = await getNotifications(user_id);
+    console.log("user_id", user_id); // Envía user_id al backend
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const rawNotifications = await response.json();
 
     // Map data from the database to a more readable format
@@ -70,7 +82,7 @@ const fetchNotifications = async () => {
   } catch (error) {
     console.error("Error loading notifications:", error);
   }
-};
+}
 
 // Determine notification type based on database fields
 const getNotificationType = (notification) => {
@@ -105,20 +117,10 @@ const removeNotification = (id) => {
 };
 
 // Mark a notification as read
-const markAsRead = async (id) => {
-  try {
-    const response = await fetch(`/notifications/${id}/mark-as-read`, {
-      method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to mark as read");
-    }
-    const notification = notifications.value.find((n) => n.id === id);
-    if (notification) {
-      notification.revised = true;
-    }
-  } catch (error) {
-    console.error("Error marking notification as read:", error);
+const markAsRead = (id) => {
+  const notification = notifications.value.find((n) => n.id === id);
+  if (notification) {
+    notification.revised = true;
   }
 };
 
