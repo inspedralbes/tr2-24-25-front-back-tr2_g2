@@ -55,8 +55,8 @@ export const postEmploymentExchangePublication = async (formData) => {
             method: 'POST',
             body: formData,
         });
-
         console.log(response);
+        console.log('response', response);
         return response;
     } catch (error) {
         console.error(error);
