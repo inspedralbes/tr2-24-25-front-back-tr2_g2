@@ -28,12 +28,12 @@
                 class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                 role="menuitem">Mis Peticions</button>
                 <div v-if="userTypes == 2" class="py-1">
-                  <button @click="$router.push('/admin')" tabindex="3"
+                  <button @click="$router.push('/report')" tabindex="3"
                     class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                     role="menuitem">Admin</button>
                 </div>
                 <div v-if="userTypes == 3" class="py-1">
-                  <button @click="$router.push('/admin')" tabindex="3"
+                  <button @click="$router.push('/report')" tabindex="3"
                     class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                     role="menuitem">Admin</button>
                     <button tabindex="3"

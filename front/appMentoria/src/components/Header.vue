@@ -49,6 +49,6 @@ const route = useRoute();
 
 
 const isAdminPage = computed(() => {
-  return route.path.startsWith('/admin') || route.path.startsWith('/report') || route.path.startsWith('/validation');
+  return route.path.startsWith('/report') || route.path.startsWith('/validation');
 });
 </script>
