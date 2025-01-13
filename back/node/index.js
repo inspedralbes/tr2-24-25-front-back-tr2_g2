@@ -110,30 +110,48 @@ app.post('/loginAPI', async (req, res) => {
 });
 
 // Login route
-app.post('/login', async (req, res) => { 
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const connection = await mysql.createConnection(dbConfig);
     let userLogin = {};
 
     try {
+        console.log(email, password);
+
         const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length == 0) return res.status(400).json({ error: 'User not found' });
 
         let passwordDB = rows[0].password;
 
-        let match = await comparePassword(password, passwordDB);
-        if (!match) {
-            return res.status(400).json({ error: 'Invalid password' });
+        if (email.includes('@example.com')) {
+            console.log('Email de ejemplo');
+            if (password != passwordDB) {
+                console.log('Contraseña incorrecta');
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                userLogin = rows[0];
+            }
         } else {
-            userLogin = users[0];
+            let match = await comparePassword(password, passwordDB);
+            if (!match) {
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                userLogin = rows[0];
+            }
         }
 
-        const token = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' })
+        const aToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        const rToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' })
 
-        refreshTokensDB.add(refreshToken);
+        refreshTokensDB.add(rToken);
 
-        res.status(200).json({ message: 'Login successful', accessToken: token, refreshToken: refreshToken, userLogin });
+        console.log('Login successful');
+
+        console.log('User login:', userLogin);
+        console.log('Token:', aToken);
+        console.log('Refresh token:', rToken);
+
+        res.status(200).json({ message: 'Login successful', accessToken: aToken, refreshToken: rToken, userLogin });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
