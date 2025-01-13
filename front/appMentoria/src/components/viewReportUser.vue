@@ -18,9 +18,9 @@
               <p class="text-base font-semibold text-gray-900 dark:text-gray-300">Estat:</p>
               <select v-model="report.status" @change="updateReportStatus(report.id, report.status)" :class="{
                 'bg-yellow-200 dark:bg-yellow-600': report.status === 'pending',
-                'bg-blue-300 dark:bg-blue-400': report.status === 'revising',
+                'bg-blue-200 dark:bg-blue-300': report.status === 'revising',
                 'bg-green-200 dark:bg-green-600': report.status === 'revised',
-                'appearance-none bg-gray-100 dark:bg-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 p-2 w-full md:w-32 shadow-sm': true
+                'appearance-none bg-gray-100 dark:bg-gray-600 dark:text-gray-800 border border-gray-300 dark:border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 p-2 w-full md:w-32 shadow-sm': true
               }">
                 <option value="pending">Pendent</option>
                 <option value="revising">Revisant</option>
