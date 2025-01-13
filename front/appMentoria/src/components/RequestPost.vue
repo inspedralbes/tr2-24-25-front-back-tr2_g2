@@ -197,12 +197,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { postEmploymentExchangePublication } from "@/services/communicationManager";
+import { useAppStore } from "@/stores/index";
 
 const router = useRouter();
 const title = ref("");
 const description = ref("");
 const imageFile = ref(null);
 const availabilities = ref([]);
+const user_id = useAppStore().getUser()?.id;
 
 const hours = ref([
   "00:00",
@@ -286,18 +288,22 @@ const filteredHours = (index, type) => {
 };
 
 async function submitPostPeticio() {
-  if (!title.value || !description.value) {
+  if (!user_id || !title.value || !description.value) {
     alert("Por favor, completa todos los campos");
     return;
   }
 
+  console.log("userid", user_id);
+
   const formData = new FormData();
-  formData.append("typesPublications_id", 1);
+  formData.append("typesPublications_id", 2);
   formData.append("title", title.value);
   formData.append("description", description.value);
   formData.append("availability", JSON.stringify(availabilities.value));
-  formData.append("user_id", 1);
+  formData.append("user_id", user_id);
   formData.append("image", imageFile.value);
+
+  console.log("formdata", formData);
 
   try {
     const response = await postEmploymentExchangePublication(formData);

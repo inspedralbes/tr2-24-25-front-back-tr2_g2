@@ -69,6 +69,8 @@ app.post('/notifications', async (req, res) => {
 
     const { user_id, description, chat_id, report_id, publicationId, request_id, comment_id } = req.body;
     console.log("user_id notification", user_id);
+    console.log("desciption", description);
+    console.log("request_id", request_id);
     if (!user_id) {
         return res.status(400).json({ error: 'User id is required.' });
     }
