@@ -108,7 +108,10 @@ export const postCommunityPublication = async (publication) => {
 // Refresh acces token
 export const refreshToken = async () => {
     try {
-        const refreshToken = useAppStore().getRefreshToken();
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        console.log('Renovando token...');
+        console.log(refreshToken);
 
         const response = await fetch(`${BACK_URL}/refresh`, {
             method: 'POST',
@@ -123,6 +126,8 @@ export const refreshToken = async () => {
         }
 
         const data = await response.json();
+
+        console.log('Token renovado:', data);
 
         // Guardar el nuevo token
         useAppStore().setAccessToken(data.accessToken);

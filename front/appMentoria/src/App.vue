@@ -56,7 +56,7 @@ async function validateLogin() {
   }
 }
 
-onMounted(() => {
+onMounted( async () => {
   const darkModePreference = localStorage.getItem('darkMode');
   if (darkModePreference == 'enabled') {
     isDarkMode.value = true;
@@ -66,7 +66,7 @@ onMounted(() => {
     document.documentElement.classList.remove('dark');
   }
 
-  validateLogin();
+  await validateLogin();
 });
 </script>
 

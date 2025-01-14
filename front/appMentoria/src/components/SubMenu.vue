@@ -4,7 +4,7 @@
       <div class=" relative inline-block text-left dropdown">
         <span class="rounded-md shadow-sm">
           <button class="flex items-center focus:outline-none">
-            <img class="w-10 h-10 rounded-full" src="https://img.uefa.com/imgml/TP/players/3/2024/324x324/250024448.jpg"
+            <img class="w-10 h-10 rounded-full" :src="`${profile}`"
               alt="User Photo">
           </button>
         </span>
@@ -14,8 +14,8 @@
             class="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none"
             aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
             <div class="px-4 py-3">
-              <p class="text-sm leading-5">Hey,</p>
-              <p class="text-sm font-medium leading-5 text-gray-900 truncate">Carvajal</p>
+              <p class="text-sm leading-5">Hola,</p>
+              <p class="text-sm font-medium leading-5 text-gray-900 truncate">{{ user.value.name }}</p>
             </div>
             <div class="py-1">
               <button @click="$router.push('/myprofile')" tabindex="0"
@@ -54,8 +54,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import ToggleDarkMode from './ToggleDarkMode.vue';
+import { useAppStore } from '@/stores/index';
+
+const appStore = useAppStore();
+
+var user = reactive({});
+var profile = ref(null);
+var banner = ref(null);
+
+onMounted(() => {
+  console.log(appStore.getUser());
+  console.log(appStore.getUser().profile);
+    user.value = appStore.getUser();
+    profile.value = user.value.profile;
+    banner.value = user.value.banner;
+});
 
 </script>
 

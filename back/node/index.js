@@ -88,7 +88,10 @@ app.post('/loginAPI', async (req, res) => {
             if (!match) {
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
+                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                let className = resultClassName[0].name;
                 userLogin = users[0];
+                userLogin.class_name = className;
             }
         }
 
@@ -98,8 +101,6 @@ app.post('/loginAPI', async (req, res) => {
         refreshTokensDB.add(refreshToken);
 
         res.status(200).json({ message: 'Login successful', accessToken: tokenJW, refreshToken: refreshToken, userLogin });
-
-        // res.status(200).json({ message: 'Login successful', userLogin });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
@@ -118,10 +119,10 @@ app.post('/login', async (req, res) => {
     try {
         console.log(email, password);
 
-        const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        if (rows.length == 0) return res.status(400).json({ error: 'User not found' });
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length == 0) return res.status(400).json({ error: 'User not found' });
 
-        let passwordDB = rows[0].password;
+        let passwordDB = users[0].password;
 
         if (email.includes('@example.com')) {
             console.log('Email de ejemplo');
@@ -129,14 +130,20 @@ app.post('/login', async (req, res) => {
                 console.log('Contraseña incorrecta');
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
-                userLogin = rows[0];
+                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                let className = resultClassName[0].name;
+                userLogin = users[0];
+                userLogin.class_name = className;
             }
         } else {
             let match = await comparePassword(password, passwordDB);
             if (!match) {
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
-                userLogin = rows[0];
+                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                let className = resultClassName[0].name;
+                userLogin = users[0];
+                userLogin.class_name = className;
             }
         }
 
@@ -144,12 +151,6 @@ app.post('/login', async (req, res) => {
         const rToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' })
 
         refreshTokensDB.add(rToken);
-
-        console.log('Login successful');
-
-        console.log('User login:', userLogin);
-        console.log('Token:', aToken);
-        console.log('Refresh token:', rToken);
 
         res.status(200).json({ message: 'Login successful', accessToken: aToken, refreshToken: rToken, userLogin });
     } catch (error) {
@@ -174,13 +175,18 @@ app.get('/user', verifyToken, async (req, res) => {
     const connection = await mysql.createConnection(dbConfig);
 
     try {
-        const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
 
-        if (rows.length == 0) {
+        if (users.length == 0) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.status(200).json(rows[0]); 
+        const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+        let className = resultClassName[0].name;
+        userLogin = users[0];
+        userLogin.class_name = className;
+
+        res.status(200).json(userLogin);
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
@@ -847,33 +853,28 @@ app.post('/reviews', async (req, res) => {
 
 // Route for refresh access token
 app.post('/refresh', async (req, res) => {
+    console.log('Refresh token 0:', req.body);
     const { refreshToken } = req.body;
+
+    console.log('Refresh token 1:', refreshToken);
 
     if (!refreshToken) return res.status(401).send('Token is required');
     if (!refreshTokensDB.has(refreshToken)) return res.status(403).send('Invalid token');
 
     try {
+        console.log('Refresh token 2:', refreshToken);
         const decoded = jwt.verify(refreshToken, refreshKey);
+        console.log('Decoded:', decoded);
         const newAccessToken = jwt.sign({ id: decoded.id, email: decoded.email }, secretKey, { expiresIn: '1h' });
         res.json({ accessToken: newAccessToken });
     } catch (err) {
+        console.log('Error refresh:', err);
         refreshTokensDB.delete(refreshToken);
         res.status(403).json({ error: 'Invalid token or expired' });
     }
 });
 
 // Function to verify token
-// function verifyToken(req, res, next) {
-//     const token = req.headers['authorization'];
-//     if (!token) return res.status(403).send('Token es requerido');
-
-//     jwt.verify(token, secretKey, (err, decoded) => {
-//         if (err) return res.status(500).send('Fallo al autenticar el token');
-//         req.user = decoded;
-//         next();
-//     });
-// };
-
 function verifyToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {

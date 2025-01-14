@@ -74,15 +74,13 @@ INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, 
 (2, 'Oriol Pelino', 'oriol.pelino@example.com', 'oriolpelino', '/upload/banner_default.png', '/upload/profile_default.png', 'Roses, Espanya', '{"wednesday": "9-4", "friday": "9-4"}', true, 'approved', 2.8, 22),
 (2, 'Marc Esteve', 'marc.esteve@example.com', 'marcesteve', '/upload/banner_default.png', '/upload/profile_default.png', 'Vilafranca del Penedès, Espanya', '{"monday": "8-3", "thursday": "8-3"}', true, 'approved', 2.7, 23);
 
-
 -- Inserciones para users (estudiantes)
-INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, verified, status, review, class_id) VALUES 
-(1, 'Laura Puig', 'laura.puig@example.com', 'laurapuig', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 4.2, 1),
-(1, 'Martí Vila', 'marti.vila@example.com', 'martivila', '/upload/banner_default.png', '/upload/profile_default.png', 'Girona, Espanya', true, 'approved', 3.9, 2),
-(1, 'Gemma Riera', 'gemma.riera@example.com', 'gemmariera', '/upload/banner_default.png', '/upload/profile_default.png', 'Tarragona, Espanya', true, 'approved', 4.3, 3),
-(1, 'Oriol Serra', 'oriol.serra@example.com', 'oriolserra', '/upload/banner_default.png', '/upload/profile_default.png', 'Lleida, Espanya', true, 'approved', 4.1, 4),
-(1, 'Anna Martí', 'anna.marti@example.com', 'annamarti', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 4.4, 5);
-
+INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, tags, availibility, verified, status, review, class_id) VALUES 
+(1, 'Laura Puig', 'laura.puig@example.com', 'laurapuig', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', '["JavaScript", "Python", "React"]', '{"monday": "9-5", "tuesday": "9-5", "wednesday": "9-5", "thursday": "9-5", "friday": "9-5"}', true, 'approved', 4.2, 19),
+(1, 'Martí Vila', 'marti.vila@example.com', 'martivila', '/upload/banner_default.png', '/upload/profile_default.png', 'Girona, Espanya', '["Java", "C#", "SQL"]', '{"monday": "10-6", "wednesday": "10-6", "friday": "10-6"}', true, 'approved', 3.9, 17),
+(1, 'Gemma Riera', 'gemma.riera@example.com', 'gemmariera', '/upload/banner_default.png', '/upload/profile_default.png', 'Tarragona, Espanya', '["PHP", "MySQL", "Laravel"]', '{"monday": "8-4", "tuesday": "8-4", "thursday": "8-4", "friday": "8-4"}', true, 'approved', 4.3, 24),
+(1, 'Oriol Serra', 'oriol.serra@example.com', 'oriolserra', '/upload/banner_default.png', '/upload/profile_default.png', 'Lleida, Espanya', '["JavaScript", "Node.js", "Express"]', '{"monday": "9-5", "tuesday": "9-5", "wednesday": "9-5", "friday": "9-5"}', true, 'approved', 4.1, 15),
+(1, 'Anna Martí', 'anna.marti@example.com', 'annamarti', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', '["Ruby", "Rails", "JavaScript"]', '{"monday": "10-6", "tuesday": "10-6", "wednesday": "10-6", "thursday": "10-6"}', true, 'approved', 4.4, 23);
 
 -- Inserciones para users (administradores)
 INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, verified, status, review, class_id) VALUES 

@@ -48,9 +48,11 @@ CREATE TABLE IF NOT EXISTS users (
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     review DECIMAL(2,1) DEFAULT 0,
     class_id INT,
+    qualification_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (typesUsers_id) REFERENCES typesUsers(id),
-    FOREIGN KEY (class_id) REFERENCES classes(id)
+    FOREIGN KEY (class_id) REFERENCES classes(id),
+    FOREIGN KEY (qualification_id) REFERENCES qualifications(id)
 );
 
 -- Table 6: teachersClasses (depends on users and classes)
@@ -153,12 +155,18 @@ CREATE TABLE IF NOT EXISTS newDataUsers (
     name VARCHAR(255),
     email VARCHAR(255),
     password VARCHAR(255),
-    token VARCHAR(255),
     banner VARCHAR(255),
     profile VARCHAR(255),
+    city VARCHAR(255),
+    tags JSON DEFAULT NULL,
+    discord_link VARCHAR(255),
+    github_link VARCHAR(255),    
+    availibility JSON DEFAULT NULL,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     class_id INT,
+    qualification_id INT,
     FOREIGN KEY (typesUsers_id) REFERENCES typesUsers(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (class_id) REFERENCES classes(id)
+    FOREIGN KEY (class_id) REFERENCES classes(id),
+    FOREIGN KEY (qualification_id) REFERENCES qualifications(id)
 );
