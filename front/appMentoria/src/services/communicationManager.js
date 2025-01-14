@@ -75,7 +75,8 @@ export const getUsers = async () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    const data = await response.json();
+    const data = await response;
+    console.log(data);
     return data;
   } catch (error) {
     console.error("Network error:", error);

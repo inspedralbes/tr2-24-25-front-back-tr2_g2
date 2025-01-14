@@ -90,10 +90,6 @@
                 </svg>
                 GitHub
             </a>
-            <a @click="chatButton(userid1, userid2, router)" href="#" rel="noopener noreferrer"
-                class="flex items-center py-3 px-6 bg-gray-800 text-white rounded-full shadow-lg shadow-black/30 transition-all duration-500 hover:shadow-gray-100 hover:bg-gray-900">
-                Chat
-            </a>
         </div>
     </section>
 

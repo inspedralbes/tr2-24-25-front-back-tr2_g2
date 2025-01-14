@@ -80,7 +80,7 @@ const router = createRouter({
       path: '/chatList',
       name: 'chatListPage',
       component: chatListPage,
-    }
+    },
   ],
 })
 

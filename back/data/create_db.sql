@@ -43,9 +43,11 @@ CREATE TABLE IF NOT EXISTS users (
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     review DECIMAL(2,1) DEFAULT 0,
     class_id INT,
+    qualification_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (typesUsers_id) REFERENCES typesUsers(id),
-    FOREIGN KEY (class_id) REFERENCES classes(id)
+    FOREIGN KEY (class_id) REFERENCES classes(id),
+    FOREIGN KEY (qualification_id) REFERENCES qualifications(id)
 );
 
 -- Table 6: teachersClasses (depends on users and classes)

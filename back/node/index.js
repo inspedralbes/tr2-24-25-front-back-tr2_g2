@@ -152,10 +152,28 @@ app.get('/logout', (req, res) => {
 app.get('/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM users');
+        const [rows] = await connection.execute(`
+            SELECT 
+                users.id, 
+                users.name, 
+                users.email,
+                users.banner,
+                users.profile,
+                qualifications.name AS qualification
+            FROM 
+                users
+            LEFT JOIN 
+                qualifications
+            ON 
+                users.qualification_id = qualifications.id
+            WHERE 
+                users.typesUsers_id = 1
+        `);
         connection.end();
+        console.log('rows: ', rows);
         res.json(rows);
     } catch (error) {
+        console.error('Database error:', error.message);
         res.status(500).json({ error: 'Database error' });
     }
 });
