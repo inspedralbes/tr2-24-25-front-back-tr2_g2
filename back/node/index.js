@@ -88,10 +88,14 @@ app.post('/loginAPI', async (req, res) => {
             if (!match) {
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
-                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
-                let className = resultClassName[0].name;
-                userLogin = users[0];
-                userLogin.class_name = className;
+                if (users[0].class_id != null) {
+                    const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                    let className = resultClassName[0].name;
+                    userLogin = users[0];
+                    userLogin.class_name = className;
+                } else {
+                    userLogin = users[0];
+                }
             }
         }
 
@@ -179,12 +183,14 @@ app.get('/user', verifyToken, async (req, res) => {
 
         if (users.length == 0) {
             return res.status(404).json({ error: 'User not found' });
+        } else if (users[0].class_id != null) {
+            const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+            let className = resultClassName[0].name;
+            userLogin = users[0];
+            userLogin.class_name = className;
+        } else {
+            userLogin = users[0];
         }
-
-        const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
-        let className = resultClassName[0].name;
-        userLogin = users[0];
-        userLogin.class_name = className;
 
         res.status(200).json(userLogin);
     } catch (error) {

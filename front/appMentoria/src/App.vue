@@ -1,16 +1,18 @@
 <script setup>
-import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue';
+import { RouterView } from 'vue-router';
+import { ref, onMounted, reactive } from 'vue';
 import { useAppStore } from '@/stores/index';
 import router from '@/router';
 import { getUserForRefreshLogin } from './services/communicationManager';
+import Loading from './components/Loading.vue';
 
-
+const userAPP = reactive({}); // Objeto reactivo para el usuario
 const isDarkMode = ref(false);
+const isLoading = ref(true); // Bandera para controlar el estado de carga
 
 async function validateLogin() {
-  let profileURL = ref('');
-  let bannerURL = ref('');
+  const profileURL = ref('');
+  const bannerURL = ref('');
 
   console.log('hola token local:', localStorage.getItem('accessToken'));
   console.log('hola refresh token local:', localStorage.getItem('refreshToken'));
@@ -19,44 +21,47 @@ async function validateLogin() {
   if (!localStorage.getItem('accessToken') || !localStorage.getItem('user') || !localStorage.getItem('refreshToken')) {
     console.log('No hay token o user');
     router.push({ name: 'login' });
-  } else {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const response = await getUserForRefreshLogin({ email: user });
+    return null; // Retorna null si faltan datos
+  }
 
-      if (response.error) {
-        console.error('Error al verificar usuario:', response.error);
-        router.push({ name: 'login' });
-      } else {
-        let user = response;
-        let profile = user.profile;
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await getUserForRefreshLogin({ email: user });
 
-        bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
-        if (profile.includes('/upload/', 0)) {
-          profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
-        } else {
-          profileURL.value = user.profile;
-        }
-
-        user.profile = profileURL.value;
-        user.banner = bannerURL.value;
-
-        console.log('Usuario verificado:', user);
-
-        useAppStore().setUser(user);
-        useAppStore().setAccessToken(localStorage.getItem('accessToken'));
-        useAppStore().setRefreshToken(localStorage.getItem('refreshToken'));
-
-        console.log('User Pinia:', useAppStore().user);
-      }
-    } catch (error) {
-      console.error('Error inesperado:', error);
+    if (response.error) {
+      console.error('Error al verificar usuario:', response.error);
       router.push({ name: 'login' });
+      return null; // Retorna null si hay error
+    } else {
+      const user = response;
+      const profile = user.profile;
+
+      bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+      if (profile.includes('/upload/', 0)) {
+        profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+      } else {
+        profileURL.value = user.profile;
+      }
+
+      user.profile = profileURL.value;
+      user.banner = bannerURL.value;
+
+      console.log('Usuario verificado:', user);
+
+      useAppStore().setUser(user);
+      useAppStore().setAccessToken(localStorage.getItem('accessToken'));
+      useAppStore().setRefreshToken(localStorage.getItem('refreshToken'));
+
+      return user;
     }
+  } catch (error) {
+    console.error('Error inesperado:', error);
+    router.push({ name: 'login' });
+    return null; // Retorna null si ocurre un error inesperado
   }
 }
 
-onMounted( async () => {
+onMounted(async () => {
   const darkModePreference = localStorage.getItem('darkMode');
   if (darkModePreference == 'enabled') {
     isDarkMode.value = true;
@@ -66,13 +71,24 @@ onMounted( async () => {
     document.documentElement.classList.remove('dark');
   }
 
-  await validateLogin();
+  const user = await validateLogin();
+  if (user) {
+    Object.assign(userAPP, user); // Asigna las propiedades al objeto reactivo
+  } else {
+    console.log('Usuario no válido, redirigiendo a login');
+    router.push({ name: 'login' });
+  }
+
+  isLoading.value = false; // Desactiva el estado de carga
 });
 </script>
 
 <template>
-  <div id="app" :class="darkMode ? 'dark' : ''">
-    <RouterView class="bg-slate-200 dark:bg-neutral-800 text-gray-900 dark:text-white" />
+  <div id="app" :class="isDarkMode ? 'dark' : ''">
+    <!-- Muestra el contenido o el componente de carga -->
+    <RouterView v-if="!isLoading || userAPP.name"
+      class="bg-slate-200 dark:bg-neutral-800 text-gray-900 dark:text-white" />
+    <Loading v-else class="text-center" />
   </div>
 </template>
 

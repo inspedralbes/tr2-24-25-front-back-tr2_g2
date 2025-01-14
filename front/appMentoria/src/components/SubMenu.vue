@@ -15,7 +15,7 @@
             aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
             <div class="px-4 py-3">
               <p class="text-sm leading-5">Hola,</p>
-              <p class="text-sm font-medium leading-5 text-gray-900 truncate">{{ user.value.name }}</p>
+              <p class="text-sm font-medium leading-5 text-gray-900 truncate">{{ name }}</p>
             </div>
             <div class="py-1">
               <button @click="$router.push('/myprofile')" tabindex="0"
@@ -23,7 +23,7 @@
                 role="menuitem">Perfil</button>
               <button href="javascript:void(0)" tabindex="1"
                 class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
-                role="menuitem">Mis publicacions</button>
+                role="menuitem">Mis Publicacions</button>
               <button href="javascript:void(0)" tabindex="2"
                 class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                 role="menuitem">Mis Peticions</button>
@@ -62,14 +62,12 @@ const appStore = useAppStore();
 
 var user = reactive({});
 var profile = ref(null);
-var banner = ref(null);
+var name = ref(null);
 
 onMounted(() => {
-  console.log(appStore.getUser());
-  console.log(appStore.getUser().profile);
     user.value = appStore.getUser();
     profile.value = user.value.profile;
-    banner.value = user.value.banner;
+    name.value = user.value.name;
 });
 
 </script>
