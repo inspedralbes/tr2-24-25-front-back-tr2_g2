@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import socket from './sockets';
+import socketChat from './socketChat';
 import { useRouter } from 'vue-router';
 
 const BACK_URL = import.meta.env.VITE_URL_BACK;
@@ -163,7 +163,7 @@ export const fetchMessages = async (chatId) => {
       if (typeof messageInput === 'object' && messageInput !== null) {
         messageInput.value = ''; // Clear the input if it's an object
       }
-      socket.emit('sendMessage', {
+      socketChat.emit('sendMessage', {
         chatId: chatData._rawValue._id,
         userId: currentUser,
         message: newMessage.message

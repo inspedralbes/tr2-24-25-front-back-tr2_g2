@@ -16,7 +16,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import ViewChat from '@/components/viewInfoChat.vue';
-import socket from '../services/sockets.js';
+import socketChat from '../services/socketChat';
 import { useAppStore } from '@/stores/index';
 import { getUsers, fetchChats } from '../services/communicationManager';
 
@@ -42,7 +42,7 @@ const fetchChatsNow = async (userId) => {
 // Comportamiento al montar el componente
 onMounted(async () => {
   users.value = await getUsers();
-  socket.on('receiveMessage', async (newMessage) => {
+  socketChat.on('receiveMessage', async (newMessage) => {
     console.log("Nuevo mensaje recibido", newMessage);
       await fetchChatsNow(userId);
   });

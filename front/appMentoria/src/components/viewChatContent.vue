@@ -96,7 +96,7 @@
 <script setup>
 import { ref, onMounted, defineProps, watch, nextTick } from 'vue';
 import { fetchMessages, sendMessageInMongo } from '@/services/communicationManager';
-import socket from '../services/sockets.js';
+import socketChat from '../services/socketChat';
 
 
 const props = defineProps({
@@ -145,7 +145,7 @@ const sendMessageInMongoNow = () => {
 
 onMounted(async () => {
   scrollToBottom();
-    socket.on('receiveMessage', (newMessage) => {
+      socketChat.on('receiveMessage', (newMessage) => {
       console.log("itsworking")
       interactions.value.push(newMessage);
       scrollToBottom();
