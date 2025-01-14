@@ -49,30 +49,30 @@ INSERT INTO classes (name) VALUES
 ('CURS ESPECIALITZACIÓ');
 
 -- Inserciones para users (profesores)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
-(2, 'Dídac Pérez', 'didac@example.com', 'password1', true, 'approved', 4.7, 1),
-(2, 'Ana María Sossa', 'ana@example.com', 'password2', true, 'approved', 4.8, 2),
-(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', true, 'approved', 4.6, 3),
-(2, 'Raül Pons', 'raul@example.com', 'password4', true, 'approved', 4.9, 4),
-(2, 'Albert Casas', 'albert@example.com', 'password5', true, 'approved', 4.5, 5),
-(2, 'Joan Sánchez', 'joan@example.com', 'password6', true, 'approved', 4.4, 6),
-(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', true, 'approved', 4.3, 7),
-(2, 'Emma Morales', 'emma@example.com', 'password8', true, 'approved', 4.2, 8),
-(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', true, 'approved', 4.1, 9),
-(2, 'Noah Escartí', 'noah@example.com', 'password10', true, 'approved', 4.0, 10),
-(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', true, 'approved', 3.9, 11),
-(2, 'Rafa Monje', 'rafa@example.com', 'password12', true, 'approved', 3.8, 12),
-(2, 'Segundo González', 'segundo@example.com', 'password13', true, 'approved', 3.7, 13),
-(2, 'Marc Aribau', 'marc@example.com', 'password14', true, 'approved', 3.6, 14),
-(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', true, 'approved', 3.5, 15),
-(2, 'Juan Delgado', 'juan@example.com', 'password16', true, 'approved', 3.4, 16),
-(2, 'Pol Prats', 'pol@example.com', 'password17', true, 'approved', 3.3, 17),
-(2, 'Gerard Torrent', 'gerard@example.com', 'password18', true, 'approved', 3.2, 18),
-(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', true, 'approved', 3.1, 19),
-(2, 'David Sierra', 'david@example.com', 'password20', true, 'approved', 3.0, 20),
-(2, 'Laura Carrillo', 'laura@example.com', 'password21', true, 'approved', 2.9, 21),
-(2, 'Oriol Pelino', 'oriol@example.com', 'password22', true, 'approved', 2.8, 22),
-(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', true, 'approved', 2.7, 23);
+INSERT INTO users (typesUsers_id, name, email, password, profile, verified, status, review, class_id) VALUES 
+(2, 'Dídac Pérez', 'didac@example.com', 'password1', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/presidente_pedro_sanchez.png', true, 'approved', 4.7, 1),
+(2, 'Ana María Sossa', 'ana@example.com', 'password2', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_maria_jesus_montero.jpg', true, 'approved', 4.8, 2),
+(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_yolanda_diaz.jpg', true, 'approved', 4.6, 3),
+(2, 'Raül Pons', 'raul@example.com', 'password4', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_jose_manuel_albares.jpg', true, 'approved', 4.9, 4),
+(2, 'Albert Casas', 'albert@example.com', 'password5', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_felix_bolanos.jpg', true, 'approved', 4.5, 5),
+(2, 'Joan Sánchez', 'joan@example.com', 'password6', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_margarita_robles.jpg', true, 'approved', 4.4, 6),
+(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_fernando_marlaska.jpg', true, 'approved', 4.3, 7),
+(2, 'Emma Morales', 'emma@example.com', 'password8', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_oscar_puente.jpg', true, 'approved', 4.2, 8),
+(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_pilar_alegria.jpg', true, 'approved', 4.1, 9),
+(2, 'Noah Escartí', 'noah@example.com', 'password10', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_jordi_hereu.jpg', true, 'approved', 4.0, 10),
+(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_luis_planas.jpg', true, 'approved', 3.9, 11),
+(2, 'Rafa Monje', 'rafa@example.com', 'password12', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_angel_victor_torres.jpg', true, 'approved', 3.8, 12),
+(2, 'Segundo González', 'segundo@example.com', 'password13', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_ernest_urtasun.jpg', true, 'approved', 3.7, 13),
+(2, 'Marc Aribau', 'marc@example.com', 'password14', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_carlos_cuerpo.png', true, 'approved', 3.6, 14),
+(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_monica_garcia.jpg', true, 'approved', 3.5, 15),
+(2, 'Juan Delgado', 'juan@example.com', 'password16', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro_pablo_bustinduy.jpg', true, 'approved', 3.4, 16),
+(2, 'Pol Prats', 'pol@example.com', 'password17', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_diana_morant.jpg', true, 'approved', 3.3, 17),
+(2, 'Gerard Torrent', 'gerard@example.com', 'password18', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_ana_redondo.jpg', true, 'approved', 3.2, 18),
+(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministro-oscar-lopez.png', true, 'approved', 3.1, 19),
+(2, 'David Sierra', 'david@example.com', 'password20', 'https://www.lamoncloa.gob.es/gobierno/PublishingImages/xv-legislatura/biografias/ministra_sira_abed.jpg', true, 'approved', 3.0, 20),
+(2, 'Laura Carrillo', 'laura@example.com', 'password21', 'https://media.licdn.com/dms/image/v2/D4D35AQEOBuDgNnYONA/profile-framedphoto-shrink_200_200/profile-framedphoto-shrink_200_200/0/1719444320701?e=1737115200&v=beta&t=M42A7n7ih5bMzR18zl5-7uhJZ75JhS3UT4G8ofdIMKA', true, 'approved', 2.9, 21),
+(2, 'Oriol Pelino', 'oriol@example.com', 'password22', 'https://media.licdn.com/dms/image/v2/C4D03AQH7nuq4gWaNtw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1639676601748?e=1741824000&v=beta&t=exnw6fuPK0FIqS9keQqCZc1atewOj1qI0R8nLni0Dp4', true, 'approved', 2.8, 22),
+(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', 'https://media.licdn.com/dms/image/v2/D5603AQHV5g_kNdW_3g/profile-displayphoto-shrink_200_200/B56ZNuSdUcGcAY-/0/1732722153244?e=1741824000&v=beta&t=7BAY6SGt72Q7NeYcSkIUwvV7TgteX9jlydqHCVk_M_0', true, 'approved', 2.7, 23);
 
 -- Inserciones para users (estudiantes)
 INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
@@ -106,18 +106,18 @@ INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES
 -- Inserciones para publications
 INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES 
 (1, 'Introducció al SQL', 'Aprèn les bases del SQL.', 1, 0), 
-(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 1), 
-(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 2), 
-(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 3), 
-(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 4);
+(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 0), 
+(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 1), 
+(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 0), 
+(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 0);
 
 -- Inserciones para comments
 INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES 
 (1, 2, NULL, 'Molt informatiu!'), 
 (2, 3, 1, 'Gràcies pels detalls.'), 
-(3, 4, 2, 'Gran lectura!'), 
-(4, 5, 3, 'Article útil.'), 
-(5, 1, 4, 'Ben escrit.');
+(3, 4, NULL, 'Gran lectura!'), 
+(4, 5, NULL, 'Article útil.'), 
+(5, 1, NULL, 'Ben escrit.');
 
 -- Inserciones para reportsPublications
 INSERT INTO reportsPublications (publication_id, user_id, report) VALUES 

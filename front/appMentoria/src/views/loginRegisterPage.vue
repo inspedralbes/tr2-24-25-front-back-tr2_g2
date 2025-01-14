@@ -14,7 +14,7 @@
           <h1 class="text-2xl xl:text-3xl font-extrabold mb-5">
             CONEXUS
           </h1>
-          <h2 class="text-xl font-light xl:text-2xl">
+          <h2 class="text-xl font-light xl:text-2xl mb-3">
             Correu @inspedralbes.cat
           </h2>
           <div class="w-full flex-1 mt-3">
@@ -55,7 +55,7 @@
                 </span>
               </button>
 
-              <button @click="signInWithDiscord"
+              <!-- <button @click="signInWithDiscord"
                 class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
                 <div class="bg-white p-1 rounded-full">
                   <svg class="w-6" viewBox="0 0 32 32">
@@ -65,7 +65,7 @@
                   </svg>
                 </div>
                 <span class="ml-4">Accedeix amb Discord</span>
-              </button>
+              </button> -->
             </div>
 
             <div class="my-12 border-b text-center">
@@ -191,6 +191,7 @@ const signInWithGithub = async () => {
 
     console.log(userAPIs);
     validateAndLogin();
+
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;
@@ -198,13 +199,15 @@ const signInWithGithub = async () => {
   }
 };
 
-const signInWithDiscord = async () => {
-  message.value = 'Aquesta funcionalitat encara no està disponible';
-  messageType.value = 'error';
-};
+// const signInWithDiscord = async () => {
+//   message.value = 'Aquesta funcionalitat encara no està disponible';
+//   messageType.value = 'error';
+// };
 
 async function validateAndLogin() {
   let succes = false;
+  let profileURL = ref('');
+  let bannerURL = ref('');
 
   console.log('Validating and logging in');
 
@@ -224,8 +227,27 @@ async function validateAndLogin() {
       succes = true;
     }
 
-    //useAppStore().setToken(response.token);
-    useAppStore().setUser(response.userLogin);
+    
+    // useAppStore().setToken(response.token);
+
+    let user = response.userLogin;
+    let profile = user.profile;
+
+    console.log('User: ', user.profile);
+
+    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+    if (profile.includes('/upload/', 0)) {
+      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+    } else {
+      profileURL.value = user.profile;
+    }
+
+    user.profile = profileURL.value;
+    user.banner = bannerURL.value;
+
+    // useAppStore().setUser(response.userLogin);
+    useAppStore().setUser(user);
+
   } catch (error) {
     console.log(error.message);
   } finally {

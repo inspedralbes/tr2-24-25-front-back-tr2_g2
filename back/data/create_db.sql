@@ -83,6 +83,8 @@ CREATE TABLE IF NOT EXISTS publications (
     typesPublications_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
+    image VARCHAR(255) NULL,
+    availability VARCHAR(255) NULL,
     user_id INT NOT NULL,
     reports INT DEFAULT 0,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -98,6 +100,9 @@ CREATE TABLE IF NOT EXISTS comments (
     user_id INT NOT NULL,
     commentReply_id INT,
     comment TEXT NOT NULL,
+    category ENUM('OFFENSIVE', 'TOXIC', 'LITTLE_OFFENSIVE', 'FORBIDDEN', 'POSITIVE'),
+    reported BOOLEAN DEFAULT 0,
+    reason VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (publication_id) REFERENCES publications(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -156,4 +161,23 @@ CREATE TABLE IF NOT EXISTS newDataUsers (
     FOREIGN KEY (typesUsers_id) REFERENCES typesUsers(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (class_id) REFERENCES classes(id)
+);
+
+-- Table 15: notifications (depends on users)
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    description TEXT NULL,
+    chat_id VARCHAR(255) NULL,
+    report_id INT NULL,
+    publication_id INT NULL,
+    request_id INT NULL,
+    comment_id INT NULL,
+    revised BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (report_id) REFERENCES reportsPublications(id),
+    FOREIGN KEY (publication_id) REFERENCES publications(id),
+    FOREIGN KEY (comment_id) REFERENCES comments(id)
 );
