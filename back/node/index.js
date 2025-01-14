@@ -202,14 +202,15 @@ app.get('/user', verifyToken, async (req, res) => {
 });
 
 // Logout route
-app.get('/logout', verifyToken, async (req, res) => {
-    // eliminar el acces token y refresh token
+app.post('/logout', verifyToken, async (req, res) => {
+    console.log('Logout:', req.body);
     const { accessToken, refreshToken } = req.body;
 
     if (!accessToken) return res.status(401).send('Token is required');
     if (!refreshToken) return res.status(401).send('Token is required');
 
     refreshTokensDB.delete(refreshToken);
+    console.log('HOLAAAAAAAAAAAAAAAA');
     res.status(200).send('User logout successfully');
 });
 

@@ -87,6 +87,47 @@ export const getUserForRefreshLogin = async (user) => {
     }
 };
 
+// Logout for my app
+export const logout = async () => {
+
+    console.log('Cerrando sesión...');
+
+    try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        const accessToken = localStorage.getItem('accessToken');
+
+        console.log('Tokens:', refreshToken, accessToken);
+
+        const response = await fetch(`${BACK_URL}/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ accessToken, refreshToken }),
+        });
+
+        if (!response.ok) {
+            console.log('Error en la petición:', response);
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        // Clear Pinia store
+        const appStore = useAppStore();
+        appStore.$reset();
+
+        // Clear localStorage
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+
+        return { message: 'Logout successful' };
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
 // Create publications
 export const postCommunityPublication = async (publication) => {
     try {
