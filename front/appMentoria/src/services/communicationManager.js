@@ -14,7 +14,7 @@ const VITE_URL_BACK_CHAT = import.meta.env.VITE_CHATS_URL;
 export const loginAPI = async (user) => {
     console.log(user, `communicationManager.js`);
     try {
-        const response = await fetch(`${BACK_URL}loginAPI`, {
+        const response = await fetch(`${BACK_URL}/loginAPI`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export const loginAPI = async (user) => {
 // Create publications
 export const postCommunityPublication = async (formData) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}publications`, {
+        const response = await fetch(`${COMMUNITY_URL}/publications`, {
             method: 'POST',
             body: formData,
         });
@@ -51,13 +51,84 @@ export const postCommunityPublication = async (formData) => {
 
 export const postEmploymentExchangePublication = async (formData) => {
     try {
-        const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}publications`, {
+        const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}/publications`, {
             method: 'POST',
             body: formData,
         });
         console.log(response);
         console.log('response', response);
         return response;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Get Community Publications
+export const getCommunityPublication = async () => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/publications`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+// Get User Data
+export const getUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/users`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+//Get Comments in Community Posts
+export const getCommunityComments = async () => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/comments`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+//Post Comments in Community Posts
+export const postCommunityComments = async (comment) => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(comment),
+        });
+        console.log(response);
+        return response.json();
     } catch (error) {
         console.error(error);
     }
