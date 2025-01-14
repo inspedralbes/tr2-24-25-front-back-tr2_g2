@@ -161,6 +161,34 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Access User for email
+app.get('/user', verifyToken, async (req, res) => {
+    const email = req.query.email;
+
+    console.log('Email:', req.query.email);
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email es requerido' });
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+
+    try {
+        const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+        if (rows.length == 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(rows[0]); 
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
+    }
+});
+
 // Logout route
 app.get('/logout', verifyToken, async (req, res) => {
     // eliminar el acces token y refresh token
@@ -835,16 +863,42 @@ app.post('/refresh', async (req, res) => {
 });
 
 // Function to verify token
+// function verifyToken(req, res, next) {
+//     const token = req.headers['authorization'];
+//     if (!token) return res.status(403).send('Token es requerido');
+
+//     jwt.verify(token, secretKey, (err, decoded) => {
+//         if (err) return res.status(500).send('Fallo al autenticar el token');
+//         req.user = decoded;
+//         next();
+//     });
+// };
+
 function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).send('Token es requerido');
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+        return res.status(401).json({ error: 'Token es requerido' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ error: 'Formato de token inválido' });
+    }
+
+    console.log('Token:', token);
 
     jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) return res.status(500).send('Fallo al autenticar el token');
+        console.log('Decoded:', decoded);
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ error: 'Token expirado' });
+            }
+            return res.status(403).json({ error: 'Fallo al autenticar el token' });
+        }
         req.user = decoded;
         next();
     });
-};
+}
 
 // Function to hash password
 async function hashPassword(password) {
