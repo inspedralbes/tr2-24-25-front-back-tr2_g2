@@ -1,8 +1,14 @@
+import { ref } from 'vue';
+import socketChat from './socketChat';
+import { useRouter } from 'vue-router';
+
 const BACK_URL = import.meta.env.VITE_URL_BACK;
 const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
 const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
 const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENTEXCHANGE;
 const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
+
+const VITE_URL_BACK_CHAT = import.meta.env.VITE_CHATS_URL;
 
 // Login API firebase
 export const loginAPI = async (user) => {
@@ -16,15 +22,15 @@ export const loginAPI = async (user) => {
             body: JSON.stringify(user),
         });
 
-        if (!response.ok) {
-            return { error: `HTTP error! status: ${response.status}` };
-        }
+      if (!response.ok) {
+          return { error: `HTTP error! status: ${response.status}` };
+      }
 
-        return await response.json();
-    } catch (error) {
-        console.error('Network error:', error);
-        return { error: 'Network error. Please try again later.' };
-    }
+      return await response.json();
+  } catch (error) {
+      console.error('Network error:', error);
+      return { error: 'Network error. Please try again later.' };
+  }
 };
 
 
@@ -101,14 +107,11 @@ export const postCommunityComments = async (comment) => {
     try {
         const response = await fetch(`${COMMUNITY_URL}/comments`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(comment),
+            body: formData,
         });
+
         console.log(response);
-        return response.json();
+        return response;
     } catch (error) {
         console.error(error);
     }

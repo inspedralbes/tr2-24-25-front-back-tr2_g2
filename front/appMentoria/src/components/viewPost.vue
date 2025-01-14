@@ -121,7 +121,7 @@
 <script setup>
   import { ref, onMounted, defineProps } from 'vue';
   import { getUsers, getCommunityComments, postCommunityComments } from '../services/communicationManager';
-  import socket from '../services/sockets.js'; 
+  import socketBack from '../services/socketBack.js'; 
   import { useAppStore } from '@/stores/index';
   
   const users = ref([]);
@@ -136,99 +136,4 @@
   const props = defineProps({
     posts: Array
   });
-
-  const getAuthorName = (userId) => {
-    const user = users.value.find(user => user.id === userId);
-    return user.name;
-  };  
-
-  const getAuthorHandle = (userId) => {
-    const user = users.value.find(user => user.id === userId);
-    return user.email.split('@')[0];
-  };  
-
-  const getAuthorProfile = (userId) => {
-    const user = users.value.find(user => user.id === userId);
-    return user.profile;
-  };
-
-  const getCommentsWithPostId = (postId) => {
-    const list = comments.value.filter(comment => comment.publication_id === postId);
-    list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    return list;
-  };
-  
-  const getCommentsInComments = (commentid) => {
-    return comments.value.filter(comment => comment.commentReply_id === commentid);
-  };
-
-  const sendCommentInMongo = async (ID) => {
-    if (ID === null) {
-      if (commentInput.value.value === '') return;
-      const message = commentInput.value.value;
-      // Envía el comentario principal
-      const comment = {
-        comment: message,
-        user_id: myUser.id,
-        publication_id: selectedPost.value.id,
-        commentReply_id: null,
-        created_at: new Date().toISOString()
-      };
-      await postCommunityComments(comment);
-      socket.emit('newComment', comment);
-      commentInput.value.value = '';
-    } else {
-      if (!replyInputs.value[ID]) return;
-      const message = replyInputs.value[ID];
-      const replyComment = {
-        comment: message,
-        user_id: myUser.id,
-        publication_id: selectedPost.value.id,
-        commentReply_id: ID,
-        created_at: new Date().toISOString()
-      };
-      await postCommunityComments(replyComment);
-      socket.emit('newComment', replyComment);
-      replyInputs.value[ID] = '';
-    }
-  };
-
-  function timeSince(date) {
-    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    const intervals = [
-      { label: 'anys', seconds: 31536000 },
-      { label: 'mesos', seconds: 2592000 },
-      { label: 'dies', seconds: 86400 },
-      { label: 'hores', seconds: 3600 },
-      { label: 'minuts', seconds: 60 },
-      { label: 'segons', seconds: 1 }
-    ];
-
-    for (const interval of intervals) {
-      const count = Math.floor(seconds / interval.seconds);
-      if (count >= 1) {
-        return `${count} ${interval.label}`;
-      }
-    }
-    return 'ara mateix';
-  }
-
-  const showPostWithComments = (post) => {
-    selectedPost.value = post;
-  };
-
-  function goMain() {
-    selectedPost.value = null;
-  }
-
-  onMounted(async () => {
-    users.value = await getUsers();
-    comments.value = await getCommunityComments();
-    console.log("comments", comments.value);
-    socket.on('updateComments', async () => {
-      console.log("New comment received");
-      comments.value = await getCommunityComments();
-      users.value = await getUsers();
-    });
-  });
-</script>
+  </script>
