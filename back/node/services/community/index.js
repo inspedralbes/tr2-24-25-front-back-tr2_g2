@@ -16,7 +16,8 @@ app.use(express.json());
 app.use(cors({
     origin: `*`,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Access-Control-Allow-Origin"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(fileUpload());
 

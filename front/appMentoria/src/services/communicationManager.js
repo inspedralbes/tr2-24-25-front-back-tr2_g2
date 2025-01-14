@@ -8,7 +8,7 @@ const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
 export const loginAPI = async (user) => {
     console.log(user, `communicationManager.js`);
     try {
-        const response = await fetch(`${BACK_URL}loginAPI`, {
+        const response = await fetch(`${BACK_URL}/loginAPI`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -31,9 +31,9 @@ export const loginAPI = async (user) => {
 // Create publications
 export const postCommunityPublication = async (formData) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}publications`, {
+        const response = await fetch(`${COMMUNITY_URL}/publications`, {
             method: 'POST',
-           body: formData,
+            body: formData,
         });
 
         console.log(response);
@@ -43,10 +43,81 @@ export const postCommunityPublication = async (formData) => {
     }
 };
 
+// Get Community Publications
+export const getCommunityPublication = async () => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/publications`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+// Get User Data
+export const getUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/users`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+//Get Comments in Community Posts
+export const getCommunityComments = async () => {
+  try {
+      const response = await fetch(`${COMMUNITY_URL}/comments`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+      });
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      console.error('Network error:', error);
+      return { error: 'Network error. Please try again later.' };
+  }
+};
+
+//Post Comments in Community Posts
+export const postCommunityComments = async (comment) => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(comment),
+        });
+        console.log(response);
+        return response.json();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 // Get all publications
 export const fetchAllUserReports = async () => {
     try {
-        const response = await fetch(`${BACK_URL}reports/users`, {
+        const response = await fetch(`${BACK_URL}/reports/users`, {
             method: 'GET',
         });
 
@@ -65,7 +136,7 @@ export const fetchAllUserReports = async () => {
 // Fetch a single report user by ID
 export const fetchReportUserById = async (id) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/users/${id}`, {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -86,7 +157,7 @@ export const fetchReportUserById = async (id) => {
 // Create a new report user
 export const createReportUser = async (reported_user_id, user_id, report) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/users`, {
+        const response = await fetch(`${BACK_URL}/reports/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,7 +179,7 @@ export const createReportUser = async (reported_user_id, user_id, report) => {
 // Update a report user by ID
 export const updateReportUser = async (id, status) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/users/${id}`, {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +201,7 @@ export const updateReportUser = async (id, status) => {
 // Delete a report user by ID
 export const deleteReportUser = async (id) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/users/${id}`, {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +222,7 @@ export const deleteReportUser = async (id) => {
 // Fetch all reports comments
 export const fetchAllReportsComments = async () => {
     try {
-        const response = await fetch(`${BACK_URL}reports/comments`, {
+        const response = await fetch(`${BACK_URL}/reports/comments`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -172,7 +243,7 @@ export const fetchAllReportsComments = async () => {
 // Fetch a single report comment by ID
 export const fetchReportCommentById = async (id) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/comments/${id}`, {
+        const response = await fetch(`${BACK_URL}7reports/comments/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +264,7 @@ export const fetchReportCommentById = async (id) => {
 // Create a new report comment
 export const createReportComment = async (comment_id, user_id, report) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/comments`, {
+        const response = await fetch(`${BACK_URL}/reports/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -215,7 +286,7 @@ export const createReportComment = async (comment_id, user_id, report) => {
 // Update a report comment by ID
 export const updateReportComment = async (id, status) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/comments/${id}`, {
+        const response = await fetch(`${BACK_URL}/reports/comments/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -237,7 +308,7 @@ export const updateReportComment = async (id, status) => {
 // Delete a report comment by ID
 export const deleteReportComment = async (id) => {
     try {
-        const response = await fetch(`${BACK_URL}reports/comments/${id}`, {
+        const response = await fetch(`${BACK_URL}/reports/comments/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -259,7 +330,7 @@ export const deleteReportComment = async (id) => {
 // Fetch all reports publications
 export const fetchAllReportsPublications = async () => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}reports/publications`, {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -280,7 +351,7 @@ export const fetchAllReportsPublications = async () => {
 // Fetch a single report publication by ID
 export const fetchReportPublicationById = async (id) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}reports/publications/${id}`, {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -301,7 +372,7 @@ export const fetchReportPublicationById = async (id) => {
 // Create a new report publication
 export const createReportPublication = async (publication_id, user_id, report, status) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}reports/publications`, {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -323,7 +394,7 @@ export const createReportPublication = async (publication_id, user_id, report, s
 // Update a report publication by ID
 export const updateReportPublication = async (id, status) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}reports/publications/${id}`, {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -345,7 +416,7 @@ export const updateReportPublication = async (id, status) => {
 // Delete a report publication by ID
 export const deleteReportPublication = async (id) => {
     try {
-        const response = await fetch(`${COMMUNITY_URL}reports/publications/${id}`, {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
