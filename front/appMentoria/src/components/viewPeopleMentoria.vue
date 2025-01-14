@@ -35,6 +35,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { defineProps } from 'vue';
+import { chatButton } from '@/services/communicationManager';
 
 const props = defineProps({
   user: {

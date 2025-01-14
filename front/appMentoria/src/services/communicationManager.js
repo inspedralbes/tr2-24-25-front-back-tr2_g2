@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import socketChat from "./socketChat";
 import { useRouter } from "vue-router";
+import { useAppStore } from '@/stores/index';
 
 const BACK_URL = import.meta.env.VITE_URL_BACK;
 const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
@@ -201,7 +202,9 @@ export const fetchChats = async (userId) => {
 };
 
 // Create a new chat
-export const chatButton = async (userid1, userid2, router) => {
+export const chatButton = async (userid2, router) => {
+  const appStore = useAppStore();
+  const userid1 = appStore.getUser().id;
   const newMessage = {
     user_one_id: userid1,
     user_two_id: userid2,
