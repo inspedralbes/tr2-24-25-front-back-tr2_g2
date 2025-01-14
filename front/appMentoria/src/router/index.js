@@ -70,7 +70,7 @@ const router = createRouter({
       path: '/reportCommentsPage',
       name: 'reportCommentsPage',
       component: reportCommentsPage,
-    }
+    },
     // {
     //   path: '/validation',
     //   name: 'validationPage',
