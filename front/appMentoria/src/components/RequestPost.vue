@@ -196,7 +196,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { postEmploymentExchangePublication } from "@/services/communicationManager";
+// import { postEmploymentExchangePublication } from "@/services/communicationManager";
 import { useAppStore } from "@/stores/index";
 
 const router = useRouter();

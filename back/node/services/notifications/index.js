@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/getNotifications', async (req, res) => {
-    console.log(req.query.user_id);
+    console.log("user_id", req.query.user_id);
     const { user_id } = req.query;
     try {
         const connection = await mysql.createConnection(dbConfig);

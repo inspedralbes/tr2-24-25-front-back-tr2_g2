@@ -119,7 +119,7 @@ function handleImageUpload(event) {
 }
 
 async function submitPost() {
-  if (!user_id || !title.value || !description.value || !imageFile.value) {
+  if (!title.value || !description.value || !imageFile.value) {
     alert("Por favor, completa todos los campos y sube una imagen.");
     return;
   }

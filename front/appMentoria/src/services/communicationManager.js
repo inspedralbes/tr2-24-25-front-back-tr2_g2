@@ -34,18 +34,29 @@ export const loginAPI = async (user) => {
 };
 
 // Create publications
-export const postCommunityPublication = async (publication) => {
+export const postCommunityPublication = async (formdata) => {
     try {
         const response = await fetch(`${COMMUNITY_URL}/publications`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(publication),
+            body: formdata,
         });
 
         console.log(response);
-        return response.json();
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const postEmploymentExchangePublication = async (formData) => {
+    try {
+        const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}/publications`, {
+            method: 'POST',
+            body: formData,
+        });
+        console.log(response);
+        console.log('response', response);
+        return response;
     } catch (error) {
         console.error(error);
     }
@@ -211,5 +222,375 @@ export const postCommunityComments = async (comment) => {
         return response.json();
     } catch (error) {
         console.error(error);
+    }
+};
+
+export const fetchAllUserReports = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/users`, {
+            method: "GET",
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+        console.log(response.json());
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Fetch a single report user by ID
+export const fetchReportUserById = async (id) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Create a new report user
+export const createReportUser = async (reported_user_id, user_id, report) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/users`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reported_user_id, user_id, report }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Update a report user by ID
+export const updateReportUser = async (id, status) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Delete a report user by ID
+export const deleteReportUser = async (id) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/users/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "Report deleted successfully" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Fetch all reports comments
+export const fetchAllReportsComments = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/comments`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Fetch a single report comment by ID
+export const fetchReportCommentById = async (id) => {
+    try {
+        const response = await fetch(`${BACK_URL}7reports/comments/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Create a new report comment
+export const createReportComment = async (comment_id, user_id, report) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ comment_id, user_id, report }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Update a report comment by ID
+export const updateReportComment = async (id, status) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/comments/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Delete a report comment by ID
+export const deleteReportComment = async (id) => {
+    try {
+        const response = await fetch(`${BACK_URL}/reports/comments/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "Report deleted successfully" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Fetch all reports publications
+export const fetchAllReportsPublications = async () => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Fetch a single report publication by ID
+export const fetchReportPublicationById = async (id) => {
+    try {
+        const response = await fetch(
+            `${COMMUNITY_URL}/reports/publications/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Create a new report publication
+export const createReportPublication = async (
+    publication_id,
+    user_id,
+    report,
+    status
+) => {
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/reports/publications`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ publication_id, user_id, report, status }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Update a report publication by ID
+export const updateReportPublication = async (id, status) => {
+    try {
+        const response = await fetch(
+            `${COMMUNITY_URL}/reports/publications/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status }),
+            }
+        );
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Delete a report publication by ID
+export const deleteReportPublication = async (id) => {
+    try {
+        const response = await fetch(
+            `${COMMUNITY_URL}/reports/publications/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "ReportPublication deleted successfully" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+export const getNotifications = async (userID) => {
+    try {
+        const response = await fetch(`${NOTIFICATIONS_URL}/getNotifications?user_id=${userID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+    }
+};
+
+export const updateNotificationRevision = async (id) => {
+    console.log(NOTIFICATIONS_URL); // Asegúrate de que este valor sea correcto
+    console.log(id); // Debe imprimir el ID de la notificación esperada
+
+    try {
+        const response = await fetch(`${NOTIFICATIONS_URL}/notifications/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update notification');
+        }
+        return response;
+
+    } catch (error) {
+        console.error('Error updating notification:', error);
+        throw error;
     }
 };

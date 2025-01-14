@@ -1,10 +1,12 @@
 <template>
   <div>
-    <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between bg-blue-600 w-11/12 rounded-3xl">
+    <div
+      class="fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between bg-blue-600 w-11/12 rounded-3xl"
+    >
       <button
         aria-current="page"
         class="inline-flex flex-col items-center text-xs font-medium py-3 px-4 text-white flex-grow"
-         @click="$router.push('/')"
+        @click="$router.push('/')"
       >
         <svg
           class="w-7 h-7"
@@ -74,7 +76,7 @@
             d="M19.993 9.042C19.48 5.017 16.054 2 11.996 2s-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.958zM12 20c-1.306 0-2.417-.835-2.829-2h5.658c-.412 1.165-1.523 2-2.829 2zm-6.866-4l.847-6.698C6.364 6.272 8.941 4 11.996 4s5.627 2.268 6.013 5.295L18.864 16H5.134z"
           ></path>
         </svg>
-      </a>
+      </button>
       <router-link
         class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
         to="/chatList"
