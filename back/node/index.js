@@ -616,10 +616,25 @@ app.delete('/teachersClasses/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports comments
-app.get('/reports/comments', verifyToken, async (req, res) => {
+app.get('/reports/comments',  async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsComments');
+        const [results] = await connection.execute(`SELECT 
+            reportsComments.id, 
+            reportsComments.comment_id, 
+            reportsComments.user_id AS reporting_user_id, 
+            reportsComments.report, 
+            reportsComments.status, 
+            reportsComments.created_at, 
+            comments.comment, 
+            comments.user_id AS comment_user_id,
+            reporting_user.name AS reporting_user_name,
+            comment_user.name AS comment_user_name,
+            comment_user.email AS comment_user_email
+            FROM reportsComments 
+            JOIN comments ON reportsComments.comment_id = comments.id 
+            JOIN users AS reporting_user ON reportsComments.user_id = reporting_user.id
+            JOIN users AS comment_user ON comments.user_id = comment_user.id`);
         connection.end();
 
         res.status(200).send(results);
@@ -628,7 +643,7 @@ app.get('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/reports/comments/:id', verifyToken, async (req, res) => {
+app.get('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -644,7 +659,7 @@ app.get('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/comments', verifyToken, async (req, res) => {
+app.post('/reports/comments',  async (req, res) => {
     const { comment_id, user_id, report } = req.body;
 
     try {
@@ -658,7 +673,7 @@ app.post('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/comments/:id', verifyToken, async (req, res) => {
+app.put('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -675,7 +690,7 @@ app.put('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
+app.delete('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -692,19 +707,35 @@ app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports users
-app.get('/reports/users', verifyToken, async (req, res) => {
+app.get('/reports/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsUsers');
+        const [results] = await connection.execute(`
+            SELECT 
+                reportsUsers.id,
+                reportsUsers.reported_user_id,
+                reportsUsers.user_id,
+                reportsUsers.report,
+                reportsUsers.status,
+                reportsUsers.created_at,
+                reportedUser.name AS reported_user_name,
+                reportedUser.email AS reported_user_email,
+                reportingUser.name AS reporting_user_name,
+                reportingUser.email AS reporting_user_email
+            FROM reportsUsers
+            JOIN users AS reportedUser ON reportsUsers.reported_user_id = reportedUser.id
+            JOIN users AS reportingUser ON reportsUsers.user_id = reportingUser.id
+        `);
         connection.end();
 
         res.status(200).send(results);
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
-app.get('/reports/users/:id', verifyToken, async (req, res) => {
+app.get('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -720,7 +751,7 @@ app.get('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/users', verifyToken, async (req, res) => {
+app.post('/reports/users',  async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
 
     try {
@@ -734,7 +765,7 @@ app.post('/reports/users', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/users/:id', verifyToken, async (req, res) => {
+app.put('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -751,7 +782,7 @@ app.put('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/users/:id', verifyToken, async (req, res) => {
+app.delete('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {

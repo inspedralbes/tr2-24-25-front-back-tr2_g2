@@ -291,7 +291,7 @@ import {
   getCommunityComments,
   postCommunityComments,
 } from "../services/communicationManager";
-import socket from "../services/sockets.js";
+import socketBack from "../services/socketBack.js";
 import { useAppStore } from "@/stores/index";
 import Loading from "@/components/Loading.vue"; // Import the Loading component
 
@@ -341,11 +341,9 @@ const getCommentsInComments = (commentid) => {
 };
 
 const sendCommentInMongo = async (ID) => {
-  commentLoading.value = true; // Set comment loading state to true
   if (ID === null) {
     if (commentInput.value.value === "") return;
     const message = commentInput.value.value;
-    // Envía el comentario principal
     const comment = {
       comment: message,
       user_id: myUser.id,
@@ -354,7 +352,8 @@ const sendCommentInMongo = async (ID) => {
       created_at: new Date().toISOString(),
     };
     await postCommunityComments(comment);
-    socket.emit("newComment", comment);
+    console.log(comment);
+    socketBack.emit("newComment", comment);
     commentInput.value.value = "";
   } else {
     if (!replyInputs.value[ID]) return;
@@ -367,10 +366,9 @@ const sendCommentInMongo = async (ID) => {
       created_at: new Date().toISOString(),
     };
     await postCommunityComments(replyComment);
-    socket.emit("newComment", replyComment);
+    socketBack.emit("newComment", replyComment);
     replyInputs.value[ID] = "";
   }
-  commentLoading.value = false; // Set comment loading state to false
 };
 
 function timeSince(date) {
@@ -406,7 +404,7 @@ onMounted(async () => {
   comments.value = await getCommunityComments();
   loading.value = false;
   console.log("comments", comments.value);
-  socket.on("updateComments", async () => {
+  socketBack.on("updateComments", async () => {
     console.log("New comment received");
     comments.value = await getCommunityComments();
     users.value = await getUsers();

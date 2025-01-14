@@ -1,19 +1,19 @@
 <template>
-  <div class="flex flex-col h-screen dark:bg-black ">
+  <div class="flex flex-col h-screen dark:bg-neutral-900 ">
     <div class="flex sm:items-center justify-between py-2 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
           <img 
-            :src="'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
+            :src="users.find(user => user._id === userElla)?.profile || 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
             alt="" 
             class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
           >
         </div>
         <div class="flex flex-col leading-tight">
           <div class="text-2xl mt-1 flex items-center">
-            <span class="text-gray-700 mr-3 dark:text-white">{{ userName }}</span>
+            <span class="text-gray-700 mr-3 dark:text-white">{{ users.find(user => user._id === userElla)?.name }}</span>
           </div>
-          <span class="text-lg text-gray-600 dark:text-white">Junior Developer</span>
+          <span class="text-lg text-gray-600 dark:text-white">{{ users.find(user => user._id === userElla)?.email.split('@')[0] }}</span>
         </div>
       </div>
       <div class="flex items-center space-x-2 pr-4">
@@ -29,25 +29,25 @@
         :key="index" 
         class="chat-message"
       >
-        <div :class="interaction.userId === currentUser ? 'flex items-end justify-end' : 'flex items-end'">
+        <div :class="Number(interaction.userId) === currentUser ? 'flex items-end justify-end' : 'flex items-end'">
           <div 
-            :class="interaction.userId === currentUser ? 'flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end' : 'flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start'"
+            :class="Number(interaction.userId) === currentUser ? 'flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end' : 'flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start'"
           >
             <div>
               <span 
-                :class="interaction.userId === currentUser ? 'px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white' : 'px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600'"
+                :class="Number(interaction.userId) === currentUser ? 'px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white' : 'px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600'"
               >
               <p>{{ interaction.message }}</p>
               <p><small>{{ interaction.timestamp }}</small></p>
               </span>
             </div>
           </div>
-          <img 
-            :src="interaction.avatar || 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
+            <img 
+            :src="users.find(user => user.id === Number(interaction.userId))?.profile || 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
             alt="Profile" 
             class="w-6 h-6 rounded-full" 
-            :class="interaction.userId === currentUser ? 'order-2' : 'order-1'"
-          >
+            :class="Number(interaction.userId) === currentUser ? 'order-2' : 'order-1'"
+            >
         </div>
       </div>
     </div>
@@ -93,50 +93,69 @@
 }
 </style>
 
-<script>
-import { ref, onMounted, reactive, toRefs } from 'vue';
+<script setup>
+import { ref, onMounted, defineProps, watch, nextTick } from 'vue';
 import { fetchMessages, sendMessageInMongo } from '@/services/communicationManager';
-import socket from '../services/sockets.js';
+import socketChat from '../services/socketChat';
 
-let chatData = ref({});
 
-const userId = "111111";
+const props = defineProps({
+  chatId: {
+    type: String,
+    required: true
+  },
+  users: {
+    type: Array,
+    required: true
+  },
+  userMio: {
+    type: String,
+    required: true
+  },
+  userElla: {
+    type: String,
+    required: true
+  }
+});
 
-export default {
-  props: ['chatId'],
-  data() {
-    return {
-      socket: null,
-      userName: 'User',
-      interactions: [],
-      currentUser: userId
-    };
-  },
-  async mounted() {
-    this.socket = socket;
-    this.socket.on('receiveMessage', (newMessage) => {
-      this.interactions.push(newMessage);
-      this.scrollToBottom();
-    });
-    chatData = await fetchMessages(this.chatId);
-    this.interactions = chatData.value.interactions;
-  },
-  methods: {
-    scrollToBottom() {
-      const container = this.$refs.messageContainer;
-      container.scrollTop = container.scrollHeight;
-    },
-     sendMessageInMongoNow() {
-      const message = this.$refs.messageInput.value;
-      if (message) {
-        sendMessageInMongo(chatData.value, userId, message);
-        console.log(chatData)
-        this.$refs.messageInput.value = '';
-      }
-    }
-  },
-  updated() {
-    this.scrollToBottom();
+const currentUser = props.userMio;
+const userElla = props.userElla;
+const users = ref(props.users);
+
+const chatData = ref({});
+const interactions = ref([]);
+
+const messageContainer = ref(null);
+const messageInput = ref(null);
+
+const scrollToBottom = async () => {
+  await nextTick();
+  if (messageContainer.value) {
+    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
   }
 };
+
+const sendMessageInMongoNow = () => {
+  const message = messageInput.value.value;
+  if (message) {
+    sendMessageInMongo(chatData.value, currentUser, message);
+    messageInput.value.value = '';
+  }
+};
+
+onMounted(async () => {
+  scrollToBottom();
+      socketChat.on('receiveMessage', (newMessage) => {
+      console.log("itsworking")
+      interactions.value.push(newMessage);
+      scrollToBottom();
+  });
+  chatData.value = await fetchMessages(props.chatId);
+  interactions.value = chatData.value._rawValue.interactions;
+  console.log(interactions.value);
+  scrollToBottom();
+});
+watch(interactions, () => {
+  scrollToBottom();
+});
 </script>

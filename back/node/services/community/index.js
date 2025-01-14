@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors({
     credentials: true,
     allowedHeaders: ["Access-Control-Allow-Origin"],
-    allowedHeaders: 'Content-Type,Authorization'
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use((req, res, next) => {
