@@ -161,7 +161,7 @@ app.post('/publications', async (req, res) => {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://localhost:3004/classify-comment';
+            const serverIA = 'http://localhost:3005/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -500,7 +500,7 @@ app.delete('/reports/publications/:id', async (req, res) => {
 async function checkIA() {
 
     var running = true;
-    const serverIAtext = 'http://localhost:3004/';
+    const serverIAtext = 'http://localhost:3005/';
     const serverIAimage = 'http://localhost:3006/';
 
     try {

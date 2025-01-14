@@ -70,200 +70,6 @@ app.get('/publications/:id', async (req, res) => {
     }
 });
 
-// app.post('/publications', async (req, res) => {
-//     const { title, description, user_id, availability, expired_at } = req.body;
-//     var notificationIAnoResponse;
-
-//     console.log("bodyy", req.body);
-//     console.log("files", req.files);
-
-//     if (!title || !description) {
-//         return res.status(400).json({ error: 'Faltan dades' })
-//     }
-
-//     const imageFile = req.files.image;
-//     const imageName = `${Date.now()}-${imageFile.name}`;
-//     const imagePath = path.join(__dirname, 'upload', imageName);
-
-//     await imageFile.mv(imagePath);
-
-//     const formData = new FormData();
-//     formData.append('image', fs.createReadStream(imagePath));
-//     var running = await checkIA();
-//     let textIA = 0, imageIA = 0;
-//     if (running == true) {
-//         const analyzeContent = async (content) => {
-//             const serverIA = 'http://localhost:3004/classify-comment';
-//             try {
-//                 const response = await fetch(serverIA, {
-//                     method: 'POST',
-//                     headers: { 'Content-Type': 'application/json' },
-//                     body: JSON.stringify({ comment: content }),
-//                 });
-//                 if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
-//                 return await response.json();
-//             } catch (error) {
-//                 console.error(`Error al analizar contenido: ${error.message}`);
-//                 return null;
-//             }
-//         };
-
-//         let titleAnalysisPeticio = null, descriptionAnalysisPeticio = null;
-
-//         try {
-//             titleAnalysisPeticio = await analyzeContent(title);
-//             descriptionAnalysisPeticio = await analyzeContent(description);
-//             textIA = 1;
-//         } catch (error) {
-//             console.error("Error al llamar a la IA", error);
-//             return res.status(500).json({ error: 'Error al analizar título o descripción.', details: error.message });
-//         }
-
-
-//         const serverMjsUrl = 'http://localhost:3006/classify-image';
-
-//         let imageAnalysisPeticio = null;
-//         try {
-//             const fetchPromise = await import('node-fetch');
-//             const fetch = fetchPromise.default;
-//             const response = await fetch(serverMjsUrl, {
-//                 method: 'POST',
-//                 body: formData,
-//                 headers: formData.getHeaders(),
-//             });
-
-//             if (!response.ok)
-//                 throw new Error(`Error IA imagen: ${response.statusText}`);
-
-//             imageAnalysisPeticio = await response.json()
-//             imageIA = 1;
-//         } catch (fetchError) {
-//             console.error("Error al llamar a la IA:", fetchError);
-
-//             fs.unlink(imagePath, (err) => {
-//                 if (err) console.error("Error al eliminar la imagen temporal:", err);
-//             });
-//             return res.status(500).json({ error: 'Error al analizar la imagen con la IA.' });
-//         }
-
-//         const isReportableCommentPeticio = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category)
-
-//         try {
-//             const connection = await mysql.createConnection(dbConfig);
-//             const report = `Análisis: título (${titleAnalysisPeticio.category} | ${titleAnalysisPeticio.reason}), Descripció (${descriptionAnalysisPeticio.category} | ${descriptionAnalysisPeticio.reason}), imagen (${imageAnalysisPeticio.category} | ${imageAnalysisPeticio.reason})`;
-
-//             const [result] = await connection.execute(
-//                 'INSERT INTO publications (typesPublications_id, title, description, user_id, image, availability, text_ia, image_ia, expired_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-//                 [2, title, description, user_id, `/upload/${imageName}`, availability, 0, 1, 1, expired_at || null]
-//             );
-//             const publication_id = result.insertId;
-
-//             let reasons = [];
-
-//             if (isReportableCommentPeticio(titleAnalysisPeticio))
-//                 reasons.push(`titul: ${titleAnalysisPeticio.reason}`);
-
-//             if (isReportableCommentPeticio(descriptionAnalysisPeticio))
-//                 reasons.push(`descripció: ${descriptionAnalysisPeticio.reason}`);
-
-//             if (imageAnalysisPeticio.category === 'OFENSIVA' || (imageAnalysisPeticio.category === 'POTENCIALMENTE_SUGERENTE' && imageAnalysisPeticio.subcategory === 'OFENSIVO'))
-//                 reasons.push(`imatge: ${imageAnalysisPeticio.reason}`);
-
-//             if (reasons.length > 0) {
-//                 const notificationDescription = `S'ha generat un report en aquesta petició: ${publication_id}. Reasons: ${reasons.join(', ')}`;
-
-//                 const [resultReport] = await connection.execute(
-//                     `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
-//                     [publication_id, user_id, report, 'pending']
-//                 );
-
-//                 const notificationPayload = {
-//                     user_id,
-//                     description: notificationDescription,
-//                     request_id: publication_id,
-//                     report_id: resultReport.insertId,
-//                 };
-
-//                 await connection.execute(
-//                     `UPDATE publications SET reports = reports + 1 WHERE id = ?`,
-//                     [publication_id]
-//                 );
-
-//                 console.log("notification content", notificationPayload);
-
-//                 try {
-
-//                     const notificationResponse = await fetch('http://localhost:3008/notifications', {
-//                         method: 'POST',
-//                         headers: { 'Content-Type': 'application/json' },
-//                         body: JSON.stringify(notificationPayload),
-//                     });
-
-//                     if (!notificationResponse.ok) {
-//                         console.error("Error al enviar la notificación:", await notificationResponse.text());
-//                     }
-//                 } catch (notificationError) {
-//                     console.error("Error al realizar el fetch de la notificación:", notificationError);
-//                 }
-//             }
-
-//             res.status(201).json({
-//                 publicationId: publication_id,
-//                 titleAnalysisPeticio,
-//                 descriptionAnalysisPeticio,
-//                 imageAnalysisPeticio,
-//                 textIA,
-//                 imageIA,
-//             });
-//             connection.end();
-//         } catch (error) {
-//             fs.unlink(imagePath, () => { }); // Limpieza
-//             res.status(500).json({ error: 'Error al guardar la publicación en la base de datos.', details: error.message });
-//         }
-//     } else {
-//         try {
-//             const connection = await mysql.createConnection(dbConfig);
-//             const [result] = await connection.execute(
-//                 `INSERT INTO publications (typesPublications_id, title, description, user_id, image, availability, text_ia, image_ia, expired_at)
-//                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-//                 [2, title, description, user_id, `/upload/${imageName}`, availability, 0 ,textIA, imageIA, expired_at || null]
-//             );
-//             const publication_id = result.insertId;
-//             res.status(201).json({
-//                 publicationId: publication_id,
-//                 text_ia: 0,
-//                 image_ia: 0,
-//             });
-
-//             const notificationReason = 'Tu publicació sera revisada més tard! Gràcies per la teva paciència.';
-//             console.log("notification user_id", user_id);
-//             notificationIAnoResponse = {
-//                 user_id,
-//                 description: notificationReason,
-//                 request_id: publication_id,
-//             };
-//             console.log("notification if no response ia", notificationIAnoResponse);
-//             connection.end();
-
-//         } catch (error) {
-//             res.status(500).json({ error: 'Error al analizar contenido', details: error.message });
-//         }
-
-//         try {
-//             const notificationResponse = await fetch('http://localhost:3008/notifications', {
-//                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify(notificationIAnoResponse),
-//             });
-
-//             if (!notificationResponse.ok) {
-//                 console.error("Error al enviar la notificación:", await notificationResponse.text());
-//             }
-//         } catch (notificationError) {
-//             console.error("Error al realizar el fetch de la notificación:", notificationError);
-//         }
-//     }
-// });
 
 
 app.post('/publications', async (req, res) => {
@@ -293,7 +99,7 @@ app.post('/publications', async (req, res) => {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://localhost:3004/classify-comment';
+            const serverIA = 'http://localhost:3005/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -597,7 +403,7 @@ app.delete('/reports/publications/:id', async (req, res) => {
 async function checkIA() {
 
     var running = true;
-    const serverIAtext = 'http://localhost:3004/';
+    const serverIAtext = 'http://localhost:3005/';
     const serverIAimage = 'http://localhost:3006/';
 
     try {
