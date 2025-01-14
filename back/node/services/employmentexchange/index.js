@@ -267,7 +267,7 @@ app.get('/publications/:id', async (req, res) => {
 
 
 app.post('/publications', async (req, res) => {
-    const { title, description, user_id, availability ,expired_at } = req.body;
+    const { title, description, user_id, availability, expired_at } = req.body;
     var notificationIAnoResponse;
 
     console.log("file", req.files);
@@ -390,7 +390,7 @@ app.post('/publications', async (req, res) => {
                 const notificationPayload = {
                     user_id,
                     description: notificationDescription,
-                    publication_id: publication_id,
+                    request_id: publication_id,
                     report_id: resultReport.insertId,
                 };
 
@@ -442,7 +442,7 @@ app.post('/publications', async (req, res) => {
             );
             const publication_id = result.insertId;
             res.status(201).json({
-                publicationId: publication_id,
+                publication_id: publication_id,
                 text_ia: 0,
                 image_ia: 0,
             });
@@ -452,7 +452,7 @@ app.post('/publications', async (req, res) => {
             notificationIAnoResponse = {
                 user_id,
                 description: notificationReason,
-                publicationId: publication_id,
+                publication_id: publication_id,
             };
             console.log("notification if no response ia", notificationIAnoResponse);
             connection.end();

@@ -289,7 +289,7 @@ app.post('/publications', async (req, res) => {
             }
 
             res.status(201).json({
-                publicationId: publication_id,
+                publication_id: publication_id,
                 titleAnalysis,
                 descriptionAnalysis,
                 imageAnalysis,
@@ -311,7 +311,7 @@ app.post('/publications', async (req, res) => {
             );
             const publication_id = result.insertId;
             res.status(201).json({
-                publicationId: publication_id,
+                publication_id: publication_id,
                 text_ia: 0,
                 image_ia: 0,
             });
@@ -321,8 +321,9 @@ app.post('/publications', async (req, res) => {
             notificationIAnoResponse = {
                 user_id,
                 description: notificationReason,
-                publicationId: publication_id,
+                publication_id: publication_id,
             };
+
             console.log("notification if no response ia", notificationIAnoResponse);
             connection.end();
 
