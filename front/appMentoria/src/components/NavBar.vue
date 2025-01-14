@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between bg-blue-600 w-11/12 rounded-3xl">
-      <a
+      <button
         aria-current="page"
         class="inline-flex flex-col items-center text-xs font-medium py-3 px-4 text-white flex-grow"
-        href="#"
+         @click="$router.push('/')"
       >
         <svg
           class="w-7 h-7"
@@ -15,7 +15,7 @@
           <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
         </svg>
         <span class="sr-only">Home</span>
-      </a>
+      </button>
       <a
         class="inline-flex flex-col items-center text-xs font-medium text-blue-400 py-3 px-4 flex-grow"
         href="#"
