@@ -558,3 +558,73 @@ export const deleteReportPublication = async (id) => {
     return { error: "Network error. Please try again later." };
   }
 };
+
+// Get all users in status pending
+export const fetchUserValidation = async () => {
+  try {
+    const users = await getUsers();
+    const pendingUsers = users.filter(user => user.status === 'pending');
+    console.log(pendingUsers);
+    return pendingUsers;
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
+};
+
+// Get User Data
+export const getNewUsers = async () => {
+  try {
+    const response = await fetch(`${BACK_URL}/newDataUsers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
+};
+
+// Get User Data
+export const fetchAllClasses = async () => {
+  try {
+    const response = await fetch(`${BACK_URL}/classes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
+};
+
+// delete a user in the admin validation
+export const deleteUserInDb = async (id) => {
+  try {
+      const response = await fetch(`${BACK_URL}/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        return { error: `HTTP error! status: ${response.status}` };
+      }
+  
+      return { message: "Report deleted successfully" };
+    } catch (error) {
+      console.error("Network error:", error);
+      return { error: "Network error. Please try again later." };
+    }
+};

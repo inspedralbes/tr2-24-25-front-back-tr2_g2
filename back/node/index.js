@@ -197,7 +197,7 @@ app.put('/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/users/:id', verifyToken, async (req, res) => {
+app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -214,7 +214,7 @@ app.delete('/users/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for newDataUsers
-app.get('/newDataUsers', verifyToken, async (req, res) => {
+app.get('/newDataUsers', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM newDataUsers');
@@ -225,7 +225,7 @@ app.get('/newDataUsers', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.get('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -258,7 +258,7 @@ app.post('/newDataUsers', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.put('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
     const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -279,7 +279,7 @@ app.put('/newDataUsers/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.delete('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -456,7 +456,7 @@ app.delete('/users/qualifications/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for classes
-app.get('/classes', verifyToken, async (req, res) => {
+app.get('/classes', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM classes');
