@@ -27,7 +27,6 @@ const chatsInfo = ref(false);
 const myUser = useAppStore().getUser();
 const userId = myUser.id;
 
-// Función para obtener los chats y actualizarlos
 const fetchChatsNow = async (userId) => {
   try {
     const result = await fetchChats(userId);
@@ -39,7 +38,6 @@ const fetchChatsNow = async (userId) => {
   }
 };
 
-// Comportamiento al montar el componente
 onMounted(async () => {
   users.value = await getUsers();
   socketChat.on('receiveMessage', async (newMessage) => {

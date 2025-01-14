@@ -161,7 +161,7 @@ export const fetchMessages = async (chatId) => {
         body: JSON.stringify(chatData._rawValue)
       });
       if (typeof messageInput === 'object' && messageInput !== null) {
-        messageInput.value = ''; // Clear the input if it's an object
+        messageInput.value = '';
       }
       socketChat.emit('sendMessage', {
         chatId: chatData._rawValue._id,
