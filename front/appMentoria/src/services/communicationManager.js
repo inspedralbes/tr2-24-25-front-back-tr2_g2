@@ -80,20 +80,20 @@ export const getUsers = async () => {
 
 //Get Comments in Community Posts
 export const getCommunityComments = async () => {
-  try {
-      const response = await fetch(`${COMMUNITY_URL}/comments`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-      });
-      const data = await response.json();
-      return data;
-  } catch (error) {
-      console.error('Network error:', error);
-      return { error: 'Network error. Please try again later.' };
-  }
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/comments`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
 };
 
 //Post Comments in Community Posts
