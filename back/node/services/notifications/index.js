@@ -38,10 +38,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/getNotifications', async (req, res) => {
-    const { user_id } = req.body;
+    console.log(req.query.user_id);
+    const { user_id } = req.query;
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM notifications WHERE user_id = ?', [user_id]);
+        const [rows] = await connection.execute('SELECT * FROM notifications WHERE user_id = ? AND revised = 0', [user_id]);
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -65,6 +66,31 @@ app.get('/notifications/:id', async (req, res) => {
     }
 });
 
+app.put('/notifications/:id', async (req, res) => {
+    console.log("req.params", req.params);
+    const { id } = req.params;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+
+        // Actualizar el campo `revised` de la notificación a 1 (marcada como leída)
+        const [result] = await connection.execute(
+            'UPDATE notifications SET revised = 1 WHERE id = ?',
+            [id]
+        );
+
+        connection.end();
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
+
+        res.json({ message: 'Notification marked as read' });
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 app.post('/notifications', async (req, res) => {
 
     const { user_id, description, chat_id, report_id, publication_id, request_id, comment_id, revised } = req.body;
@@ -81,7 +107,7 @@ app.post('/notifications', async (req, res) => {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
             'INSERT INTO notifications (user_id, description, chat_id, report_id, publication_id, request_id, comment_id, revised) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [user_id, description || null, chat_id || null, report_id || null, publication_id || null, request_id || null, comment_id || null, revised || null]
+            [user_id, description || null, chat_id || null, report_id || null, publication_id || null, request_id || null, comment_id || null, 0]
         );
 
         console.log("result", result);
@@ -94,7 +120,8 @@ app.post('/notifications', async (req, res) => {
             report_id,
             publication_id,
             request_id,
-            comment_id
+            comment_id,
+            revised: 0
         });
 
         connection.end();

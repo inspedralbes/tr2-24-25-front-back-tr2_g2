@@ -134,21 +134,45 @@ export const postCommunityComments = async (comment) => {
 };
 
 export const getNotifications = async (userID) => {
+    console.log(NOTIFICATIONS_URL); // Asegúrate de que este valor sea correcto
+    console.log(userID); // Debe imprimir el ID del usuario esperado
+
     try {
-        const response = await fetch(`${NOTIFICATIONS_URL}notifications/${userID}`, {
+        const response = await fetch(`${NOTIFICATIONS_URL}/getNotifications?user_id=${userID}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-
         });
         const data = await response.json();
+        console.log(data);
         return data;
     } catch (error) {
         console.error('Error fetching notifications:', error);
     }
 };
 
+export const updateNotificationRevision = async (id) => {
+    console.log(NOTIFICATIONS_URL); // Asegúrate de que este valor sea correcto
+    console.log(id); // Debe imprimir el ID de la notificación esperada
+
+    try {
+        const response = await fetch(`${NOTIFICATIONS_URL}/notifications/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update notification');
+        }
+        return response;
+
+    } catch (error) {
+        console.error('Error updating notification:', error);
+        throw error;
+    }
+};
 
 
 export const fetchMessages = async (chatId) => {

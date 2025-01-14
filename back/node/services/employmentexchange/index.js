@@ -181,7 +181,7 @@ app.post('/publications', async (req, res) => {
             console.log("Hola 3");
 
             if (reasons.length > 0) {
-                const notificationDescription = `S'ha generat un report en aquesta publicació: ${publication_id}. Reasons: ${reasons.join(', ')}.`;
+                const notificationDescription = `S'ha generat un report al postejar una petició. Reason: ${reasons.join(', ')}.`;
 
                 const [resultReport] = await connection.execute(
                     `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
