@@ -4,14 +4,20 @@
 /services/chat/node_modules
 /services/chat/.env
 
-/services/notifications/node_modules
-/services/notifications/.env
-
 /services/community/node_modules
 /services/community/.env
 
 /services/employmentexchange/node_modules
 /services/employmentexchange/.env
+
+/services/comment/node_modules
+/services/comment/.env
+
+/services/notifications/node_modules
+/services/notifications/.env
+
+/services/iaimage/node_modules
+/services/iaimage/.env
 
 /services/stadistics/node_modules
 /services/stadistics/.env
