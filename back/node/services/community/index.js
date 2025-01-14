@@ -45,7 +45,7 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 app.get('/comments', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM comments');
+        const [rows] = await connection.execute('SELECT * FROM comments WHERE text_ia = 1');
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -71,17 +71,158 @@ app.get('/comments/:id', async (req, res) => {
 
 app.post('/comments', async (req, res) => {
     const { publication_id, user_id, commentReply_id, comment } = req.body;
+    var notificationIAnoResponse;
+    var report;
 
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        await connection.execute(
-            'INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES (?, ?, ?, ?)',
-            [publication_id, user_id, commentReply_id, comment]
-        );
-        connection.end();
-        res.status(201).json({ message: 'Comment created successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+    console.log("body", req.body);
+
+    var running = await checkIA();
+    console.log("running", running);
+    let textIA = 0;
+    if (running == true) {
+        const analyzeContent = async (content) => {
+            console.log("HOLA 1");
+            const serverIA = 'http://localhost:3005/classify-comment';
+            try {
+                const response = await fetch(serverIA, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ comment: content }),
+                });
+                if (!response.ok) throw new Error(`Error IA: ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error al analizar contenido: ${error.message}`);
+                return null;
+            }
+        }
+        let commentAnalysis = null;
+        try {
+            console.log("analisis comment");
+            commentAnalysis = await analyzeContent(comment);
+            textIA = 1;
+        } catch (error) {
+            console.error("Error al llamar a la ia", error);
+            return res.status(500).json({ error: 'Error al analizar el comment', details: error.message });
+        }
+
+        const isReportableComent = (analysis_comment) => ['TOXICO', 'OFENSIVO', 'PROHIBIDO'].includes(analysis_comment.category);
+
+        try {
+            const connection = await mysql.createConnection(dbConfig);
+            report = `Comment reason: ${commentAnalysis.reason}`;
+            const category = commentAnalysis.category;
+            console.log("category", category);
+
+            const [result] = await connection.execute(
+                'INSERT INTO comments (publication_id, user_id, commentReply_id, comment, category, text_ia) VALUES (?, ?, ?, ?, ?, ?)',
+                [publication_id, user_id, commentReply_id, comment, category, 1]
+            );
+            const comment_id = result.insertId;
+            let reasons = [];
+            if (isReportableComent(commentAnalysis)) {
+                reasons.push(`comentari: ${commentAnalysis.reason}`);
+            }
+
+            if (reasons.length > 0) {
+                const notificationDescription = `S'ha generat un report del comentari amb id ${comment_id} en aquesta publicació: ${publication_id}. Reason: ${commentAnalysis.reason}`;
+                const [resultReport] = await connection.execute(
+                    `INSERT INTO reportscomments (comment_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                    [comment_id, user_id, report, 'pending']
+                );
+
+                console.log("result report", resultReport);
+
+                const notificationPayload = {
+                    user_id: user_id,
+                    description: notificationDescription,
+                    comment_id: comment_id,
+                    publication_id: publication_id,
+                    report_id: resultReport.insertId,
+                    revised: 1
+                };
+
+                await connection.execute(
+                    `UPDATE comments SET reported = reported + 1 WHERE id = ?`,
+                    [comment_id]
+                );
+
+                console.log("notification content", notificationPayload);
+
+                try {
+                    console.log("notification fetch");
+                    const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(notificationPayload),
+                    });
+                    console.log("response notification", notificationResponse);
+
+                    if (!notificationResponse.ok)
+                        console.error(`Error al enviar notificacion: ${notificationResponse.statusText}`);
+                } catch (error) {
+                    console.error("Error al realizar notificacion", error);
+                }
+            }
+
+            res.status(201).json({
+                message: 'Comment created successfully',
+                comment_id,
+                publication_id,
+                commentAnalysis,
+                user_id,
+                textIA: 1
+            });
+            connection.end();
+
+        } catch (error) {
+            console.error("Error al enviar notificacion", error);
+            return res.status(500).json({ error: 'Error al enviar notificacion', details: error.message });
+        }
+    } else {
+        try {
+            const connection = await mysql.createConnection(dbConfig);
+            const [result] = await connection.execute(
+                'INSERT INTO comments (publication_id, user_id, commentReply_id, comment, text_ia) VALUES (?, ?, ?, ?, ?)',
+                [publication_id, user_id, commentReply_id, comment, 0]
+            );
+            const comment_id = result.insertId;
+            res.status(201).json({
+                message: 'Comment created successfully',
+                comment_id,
+                publication_id,
+                user_id,
+                textIA: 0
+            });
+
+            const notificacionReason = 'El teu comentari sera revisat més tard! Gràcies per la teva paciència';
+
+            notificationIAnoResponse = {
+                user_id: user_id,
+                description: notificacionReason,
+                comment_id: comment_id,
+                publication_id: publication_id,
+                revised: 0
+            };
+
+            console.log("notification if no response ia", notificationIAnoResponse);
+            connection.end();
+        } catch (error) {
+            res.status(500).json({ error: 'Error al analizar contenido', details: error.message });
+        }
+
+        try {
+            const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(notificationIAnoResponse),
+            });
+
+            if (!notificationResponse.ok)
+                console.error(`Error al enviar notificacion: ${notificationResponse.statusText}`);
+        } catch (error) {
+            res.status(500).json({ error: 'Error al enviar notificacion', details: error.message });
+        }
     }
 });
 
@@ -125,7 +266,7 @@ app.delete('/comments/:id', async (req, res) => {
 app.get('/publications', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM publications');
+        const [rows] = await connection.execute('SELECT * FROM publications WHERE text_ia = 1 AND image_ia = 1');
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -233,7 +374,7 @@ app.post('/publications', async (req, res) => {
 
             let reasons = [];
             if (isReportableComment(titleAnalysis)) {
-                reasons.push(`títul: ${titleAnalysis.reason}`);
+                reasons.push(`títol: ${titleAnalysis.reason}`);
             }
             if (isReportableComment(descriptionAnalysis)) {
                 reasons.push(`descripción: ${descriptionAnalysis.reason}`);
@@ -262,6 +403,7 @@ app.post('/publications', async (req, res) => {
                     description: notificationDescription,
                     publication_id: publication_id,
                     report_id: resultReport.insertId,
+                    revised: 1
                 };
 
                 await connection.execute(
@@ -323,6 +465,7 @@ app.post('/publications', async (req, res) => {
                 user_id,
                 description: notificationReason,
                 publication_id: publication_id,
+                revised: 0
             };
 
             console.log("notification if no response ia", notificationIAnoResponse);

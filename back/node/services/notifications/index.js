@@ -67,7 +67,7 @@ app.get('/notifications/:id', async (req, res) => {
 
 app.post('/notifications', async (req, res) => {
 
-    const { user_id, description, chat_id, report_id, publication_id, request_id, comment_id } = req.body;
+    const { user_id, description, chat_id, report_id, publication_id, request_id, comment_id, revised } = req.body;
     console.log("user_id notification", user_id);
     console.log("desciption", description);
     console.log("request_id", request_id);
@@ -80,8 +80,8 @@ app.post('/notifications', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
-            'INSERT INTO notifications (user_id, description, chat_id, report_id, publication_id, request_id, comment_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [user_id, description || null, chat_id || null, report_id || null, publication_id || null, request_id || null, comment_id || null]
+            'INSERT INTO notifications (user_id, description, chat_id, report_id, publication_id, request_id, comment_id, revised) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [user_id, description || null, chat_id || null, report_id || null, publication_id || null, request_id || null, comment_id || null, revised || null]
         );
 
         console.log("result", result);

@@ -46,7 +46,7 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 app.get('/publications', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM publications');
+        const [rows] = await connection.execute('SELECT * FROM publications WHERE text_ia = 1 AND image_ia = 1');
         connection.end();
         res.json(rows);
     } catch (error) {

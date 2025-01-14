@@ -102,9 +102,9 @@ CREATE TABLE IF NOT EXISTS comments (
     user_id INT NOT NULL,
     commentReply_id INT,
     comment TEXT NOT NULL,
-    category ENUM('OFFENSIVE', 'TOXIC', 'LITTLE_OFFENSIVE', 'FORBIDDEN', 'POSITIVE'),
+    category ENUM('OFENSIVO', 'TOXICO', 'POCO_OFENSIVO', 'PROHIBIDO', 'POSITIVO'),
     reported BOOLEAN DEFAULT 0,
-    reason VARCHAR(255),
+    text_ia BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (publication_id) REFERENCES publications(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -179,7 +179,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     revised BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (report_id) REFERENCES reportsPublications(id),
     FOREIGN KEY (publication_id) REFERENCES publications(id),
     FOREIGN KEY (comment_id) REFERENCES comments(id)
 );
