@@ -1,2 +1,17 @@
 .env
 /node_modules
+
+/services/chat/node_modules
+/services/chat/.env
+
+/services/notifications/node_modules
+/services/notifications/.env
+
+/services/community/node_modules
+/services/community/.env
+
+/services/employmentexchange/node_modules
+/services/employmentexchange/.env
+
+/services/stadistics/node_modules
+/services/stadistics/.env
