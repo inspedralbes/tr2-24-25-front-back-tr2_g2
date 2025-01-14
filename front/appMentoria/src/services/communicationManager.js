@@ -122,3 +122,98 @@ export const postCommunityComments = async (comment) => {
         console.error(error);
     }
 };
+
+export const fetchMessages = async (chatId) => {
+    try {
+      const response = await fetch(`${CHAT_URL}/getChat/${chatId}`);
+      console.log(`${CHAT_URL}/getChat/${chatId}`);
+      const data = await response.json();
+      const chatData = ref({});
+      chatData.value = data[0];
+      chatData.value.userName = chatData.value.user_one_name;
+      chatData.value.interactions = chatData.value.interactions.map((interaction) => ({
+        message: interaction.message,
+        userId: interaction.userId,
+        timestamp: interaction.timestamp
+      }));
+      console.log('chatData:', chatData.value);
+      return chatData;
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+  
+  export const sendMessageInMongo = async (chatData, currentUser, messageInput) => {
+    console.log('sendMessageInMongo:', chatData._rawValue, currentUser, messageInput);
+    const newMessage = {
+      message: messageInput,
+      userId: currentUser,
+      timestamp: new Date().toISOString()
+    };
+    console.log(chatData._rawValue)
+  
+    try {
+      await fetch(`${CHAT_URL}/addChat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(chatData._rawValue)
+      });
+      if (typeof messageInput === 'object' && messageInput !== null) {
+        messageInput.value = ''; // Clear the input if it's an object
+      }
+      socket.emit('sendMessage', {
+        chatId: chatData._rawValue._id,
+        userId: currentUser,
+        message: newMessage.message
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+  
+  
+  
+  export const fetchChats = async (userId) => {
+  
+    const chats = ref([]);
+    const chatsInfo = ref(false);
+    
+    try {
+      const response = await fetch(`${CHAT_URL}/getChats/${userId}`);
+      const data = await response.json();
+      chats.value = data;
+      chatsInfo.value = true;
+    } catch (err) {
+      console.error('Error al obtener los chats', err);
+      chatsInfo.value = false;
+    }
+    return { chats: chats.value, chatsInfo: chatsInfo.value };
+  };
+  
+  export const chatButton = async (userid1, userid2, router) => {
+    const newMessage = {
+        "user_one_id": userid1,
+        "user_two_id": userid2,
+        "interactions": [],
+        "__v": 0
+    };
+    console.log(newMessage);
+    try {
+        const response = await fetch(`${CHAT_URL}/newChat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newMessage)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+          router.push('/chatList');
+    } catch (error) {
+        console.error('Error sending message:', error);
+        router.push('/chatList');
+    }
+  };

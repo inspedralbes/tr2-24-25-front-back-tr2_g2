@@ -121,7 +121,7 @@
 <script setup>
   import { ref, onMounted, defineProps } from 'vue';
   import { getUsers, getCommunityComments, postCommunityComments } from '../services/communicationManager';
-  import socket from '../services/sockets.js'; 
+  import socketBack from '../services/socketBack.js'; 
   import { useAppStore } from '@/stores/index';
   
   const users = ref([]);
@@ -175,7 +175,7 @@
         created_at: new Date().toISOString()
       };
       await postCommunityComments(comment);
-      socket.emit('newComment', comment);
+      socketBack.emit('newComment', comment);
       commentInput.value.value = '';
     } else {
       if (!replyInputs.value[ID]) return;
@@ -188,7 +188,7 @@
         created_at: new Date().toISOString()
       };
       await postCommunityComments(replyComment);
-      socket.emit('newComment', replyComment);
+      socketBack.emit('newComment', replyComment);
       replyInputs.value[ID] = '';
     }
   };
@@ -225,7 +225,7 @@
     users.value = await getUsers();
     comments.value = await getCommunityComments();
     console.log("comments", comments.value);
-    socket.on('updateComments', async () => {
+    socketBack.on('updateComments', async () => {
       console.log("New comment received");
       comments.value = await getCommunityComments();
       users.value = await getUsers();

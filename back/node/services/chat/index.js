@@ -76,10 +76,13 @@ app.get('/getChats', async (req, res) => {
 });
 
 app.get('/getChats/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   try {
-    const messages = await Message.find({ $or: [{ user_one_id: id }, { user_two_id: id }] });
-    res.json(messages);
+    const messages = await Message.find();
+    const filteredMessages = messages.filter(message => message.user_one_id == id || message.user_two_id == id);
+    ('ID:', id);
+    console.log('Messages:', filteredMessages);
+    res.json(filteredMessages);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -98,6 +101,7 @@ app.get('/getChat/:id', async (req, res) => {
 app.post('/addChat', async (req, res) => {
   console.log('addChat')
   const { _id, user_one_id, user_two_id, interactions } = req.body;
+  console.log('req.body:', req.body);
   try {
     let message;
     if (_id) {
@@ -138,6 +142,7 @@ io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('sendMessage', async (data) => {
+    console.log('sendMessage:', data);
     const { chatId, userId, message } = data;
     const newMessage = {
       userId,
@@ -151,6 +156,7 @@ io.on('connection', (socket) => {
         chat.interactions.push(newMessage);
         await chat.save();
         io.emit('receiveMessage', newMessage);
+        console.log('Message saved:', newMessage);
       }
     } catch (err) {
       console.error('Error saving message:', err);

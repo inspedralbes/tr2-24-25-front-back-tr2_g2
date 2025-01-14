@@ -1,38 +1,73 @@
 <template>
   <div>
     <div v-if="selectedChatId === false" v-for="chat in chats" :key="chat.id" class="chat-item overflow-y-auto">
-      <div style="display: flex; align-items: center;">
-        <img 
-          :src="'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
+      <div style="display: flex; align-items: center;" @click="selectChat(chat._id), updateUserIdLaOtra(chat)">
+        <img
+          v-if="chat.user_one_id === userId"
+          :src="getAuthorProfile(chat.user_two_id)" 
           alt="" 
           class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
         >
-        <div style="margin-left: 1rem;" @click="selectChat(chat._id)">
-          <h3 v-if="chat.user_one_id === userid">{{ chat.user_two_id }}</h3>
-          <h3 v-if="chat.user_two_id === userid">{{ chat.user_one_id }}</h3>
+        <img
+          v-if="chat.user_two_id === userId"
+          :src="getAuthorProfile(chat.user_one_id)" 
+          alt="" 
+          class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
+        >
+        <div style="margin-left: 1rem;">
+          <h3 v-if="chat.user_one_id === userId">{{ getAuthorName(chat.user_two_id) }}</h3>
+          <h3 v-if="chat.user_two_id === userId">{{ getAuthorName(chat.user_one_id) }}</h3>
           <p v-if="chat.interactions && chat.interactions.length > 0 && chat.interactions[chat.interactions.length - 1].message !== null">
             {{ chat.interactions[chat.interactions.length - 1].message }}
           </p>
         </div>
       </div>
     </div>
-    <viewChatContent v-if="selectedChatId !== false" :chatId="selectedChatId" @closeChat="selectedChatId = false" class="overlay" />
+    <viewChatContent v-if="selectedChatId !== false" :chatId="selectedChatId" :users="users" :userMio="userId" :userOtro="userIdLaOtra" @closeChat="selectedChatId = false" class="overlay" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { defineProps } from 'vue';
 import viewChatContent from './viewChatContent.vue';
-
-const userid = ref(111111);
+import { useAppStore } from '@/stores/index';
 
 const props = defineProps({
   chats: {
     type: Array,
     required: true
+  },
+  users: {
+    type: Array,
+    required: true
   }
 });
+
+const appStore = useAppStore();
+const myUser = appStore.getUser();
+const userId = ref(myUser.id);
+
+const users = ref(props.users);
+const chats = ref(props.chats);
+
+watch(() => props.users, (newUsers) => {
+  users.value = newUsers;
+});
+
+watch(() => props.chats, (newChats) => {
+  chats.value = newChats;
+});
+
+const userIdLaOtra = ref(false);
+
+const updateUserIdLaOtra = (chat) => {
+  if (chat.user_one_id === userId.value) {
+    userIdLaOtra.value = chat.user_two_id;
+  } else {
+    userIdLaOtra.value = chat.user_one_id;
+  }
+};
 
 const selectedChatId = ref(false);
 
@@ -40,7 +75,24 @@ const selectChat = (chatId) => {
   selectedChatId.value = chatId;
 };
 
+
+const getAuthorName = (userId) => {
+    const user = users.value.find(user => user.id === userId);
+    return user.name;
+}; 
+
+
+const getAuthorProfile = (userId) => {
+  try {
+    const user = users.value.find(user => user.id === userId);
+    return user.profile;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 onMounted(() => {
+  console.log(users.value);
   selectedChatId.value = false;
 });
 </script>

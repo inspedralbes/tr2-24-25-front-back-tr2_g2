@@ -7,28 +7,27 @@
       <p class="text-gray-500">Error</p>
     </div>
     <div v-else class="overflow-auto">
-      <ViewChat :chats="chats" />
+      <ViewChat :chats="chats" :users="users" />
       <div class="h-20"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ViewChat from '@/components/viewInfoChat.vue';
 import socket from '../services/sockets.js';
-const userId = "111111";
+import { useAppStore } from '@/stores/index';
+import { getUsers, fetchChats } from '../services/communicationManager';
 
-import { fetchChats } from '@/services/communicationManager';
-
+const users = ref([]);
 const chats = ref([]);
 const chatsInfo = ref(false);
 
-onMounted(() => {
-  socket.on('receiveMessage', () => fetchChatsNow(userId));
-  fetchChatsNow(userId);
-});
+const myUser = useAppStore().getUser();
+const userId = myUser.id;
 
+// Función para obtener los chats y actualizarlos
 const fetchChatsNow = async (userId) => {
   try {
     const result = await fetchChats(userId);
@@ -39,4 +38,18 @@ const fetchChatsNow = async (userId) => {
     console.log(error);
   }
 };
+
+// Comportamiento al montar el componente
+onMounted(async () => {
+  users.value = await getUsers();
+  socket.on('receiveMessage', async (newMessage) => {
+    console.log("Nuevo mensaje recibido", newMessage);
+      await fetchChatsNow(userId);
+  });
+  await fetchChatsNow(userId);
+});
+
+watch(chats, (newChats) => {
+  console.log("Chats actualizados", newChats);
+});
 </script>
