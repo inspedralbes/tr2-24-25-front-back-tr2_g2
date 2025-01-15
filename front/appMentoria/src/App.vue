@@ -1,37 +1,95 @@
 <script setup>
-import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue';
+import { RouterView } from 'vue-router';
+import { ref, onMounted, reactive } from 'vue';
 import { useAppStore } from '@/stores/index';
 import router from '@/router';
+import { getUserForRefreshLogin } from './services/communicationManager';
+import Loading from './components/Loading.vue';
 
+const userAPP = reactive({}); // Objeto reactivo para el usuario
 const isDarkMode = ref(false);
+const isLoading = ref(true); // Bandera para controlar el estado de carga
 
-function validateLogin() {
-  console.log('hola token pinia:', useAppStore().getToken());
-  console.log('hola user pinia:', useAppStore().getUser());
-  if (!useAppStore().getToken() || !useAppStore().getUser()) {
-    console.log('no hay token o user');
+async function validateLogin() {
+  const profileURL = ref('');
+  const bannerURL = ref('');
+
+  console.log('hola token local:', localStorage.getItem('accessToken'));
+  console.log('hola refresh token local:', localStorage.getItem('refreshToken'));
+  console.log('hola user local:', localStorage.getItem('user'));
+
+  if (!localStorage.getItem('accessToken') || !localStorage.getItem('user') || !localStorage.getItem('refreshToken')) {
+    console.log('No hay token o user');
     router.push({ name: 'login' });
+    return null; // Retorna null si faltan datos
+  }
+
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await getUserForRefreshLogin({ email: user });
+
+    if (response.error) {
+      console.error('Error al verificar usuario:', response.error);
+      router.push({ name: 'login' });
+      return null; // Retorna null si hay error
+    } else {
+      const user = response;
+      const profile = user.profile;
+
+      bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+      if (profile.includes('/upload/', 0)) {
+        profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+      } else {
+        profileURL.value = user.profile;
+      }
+
+      user.profile = profileURL.value;
+      user.banner = bannerURL.value;
+
+      console.log('Usuario verificado:', user);
+
+      useAppStore().setUser(user);
+      useAppStore().setAccessToken(localStorage.getItem('accessToken'));
+      useAppStore().setRefreshToken(localStorage.getItem('refreshToken'));
+
+      return user;
+    }
+  } catch (error) {
+    console.error('Error inesperado:', error);
+    router.push({ name: 'login' });
+    return null; // Retorna null si ocurre un error inesperado
   }
 }
 
-onMounted(() => { 
-  const darkModePreference = localStorage.getItem('darkMode'); 
-  if (darkModePreference == 'enabled') { 
-    isDarkMode.value = true; 
-    document.documentElement.classList.add('dark'); 
-  } else { 
-    isDarkMode.value = false; 
-    document.documentElement.classList.remove('dark'); 
-  } 
+onMounted(async () => {
+  const darkModePreference = localStorage.getItem('darkMode');
+  if (darkModePreference == 'enabled') {
+    isDarkMode.value = true;
+    document.documentElement.classList.add('dark');
+  } else {
+    isDarkMode.value = false;
+    document.documentElement.classList.remove('dark');
+  }
 
-  validateLogin();
+  const user = await validateLogin();
+  if (user) {
+    Object.assign(userAPP, user); // Asigna las propiedades al objeto reactivo
+  } else {
+    console.log('Usuario no válido, redirigiendo a login');
+    router.push({ name: 'login' });
+  }
+
+  isLoading.value = false; // Desactiva el estado de carga
 });
 </script>
 
 <template>
-  <div id="app" :class="darkMode ? 'dark' : ''">
-    <RouterView class="bg-white dark:bg-neutral-800 text-gray-900 dark:text-white"/>
+  <div id="app" :class="isDarkMode ? 'dark' : ''">
+    <RouterView v-if="!isLoading || userAPP.name"
+      class="bg-slate-200 dark:bg-neutral-800 text-gray-900 dark:text-white" />
+    <div v-else class="flex items-center justify-center min-h-screen bg-white dark:bg-neutral-800">
+      <Loading />
+    </div>
   </div>
 </template>
 

@@ -8,9 +8,14 @@ const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
+const FormData = require('form-data');
+const fs = require('fs');
 require('dotenv').config();
 
 const secretKey = process.env.SECRET_KEY;
+const refreshKey = process.env.REFRESH_KEY;
+
+const refreshTokensDB = new Set();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -51,9 +56,15 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('a user connected');
 
+    socket.on('newComment', (comment) => {
+        console.log('newComment event received', comment);
+        io.emit('updateComments');
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
+
 });
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */
@@ -66,7 +77,6 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // Login with api's google, github, discord
 app.post('/loginAPI', async (req, res) => {
-    console.log('req.body: ', req.body);
     const { email, name, token, profile } = req.body;
     const connection = await mysql.createConnection(dbConfig);
     let userLogin = {};
@@ -75,33 +85,34 @@ app.post('/loginAPI', async (req, res) => {
         const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
 
         if (users.length == 0) {
-            console.log('User not found, creating new user...');
             let tokenHash = await hashPassword(token);
-            const [result] = await connection.execute('INSERT INTO users (name, email, password, profile) VALUES (?, ?, ?, ?)', [name, email, tokenHash, profile]);
-            console.log('User created:', result.insertId);
-
+            let banner = '/upload/banner_default.png';
+            const [result] = await connection.execute('INSERT INTO users (name, email, password, banner, profile) VALUES (?, ?, ?, ?, ?)', [name, email, tokenHash, banner, profile]);
             const [resultNewUser] = await connection.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
-            console.log('resultNewUser: ', resultNewUser);
             userLogin = resultNewUser[0];
         } else {
-            console.log('User found');
             let password = users[0].password;
             let match = await comparePassword(token, password);
-
             if (!match) {
-                console.log('Invalid password');
                 return res.status(400).json({ error: 'Invalid password' });
             } else {
-                userLogin = users[0];
-                console.log('userLogin: ', userLogin);
+                if (users[0].class_id != null) {
+                    const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                    let className = resultClassName[0].name;
+                    userLogin = users[0];
+                    userLogin.class_name = className;
+                } else {
+                    userLogin = users[0];
+                }
             }
         }
 
-        // Generar token JWT 
-        // const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
-        // res.status(200).json({ message: 'Login successful', token: tokenJW, userLogin });
-        console.log('secret key: ', secretKey);
-        res.status(200).json({ message: 'Login successful', userLogin });
+        const tokenJW = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        const refreshToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' });
+
+        refreshTokensDB.add(refreshToken);
+
+        res.status(200).json({ message: 'Login successful', accessToken: tokenJW, refreshToken: refreshToken, userLogin });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
@@ -114,33 +125,105 @@ app.post('/loginAPI', async (req, res) => {
 // Login route
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    const connection = await mysql.createConnection(dbConfig);
+    let userLogin = {};
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        connection.end();
+        console.log(email, password);
 
-        if (rows.length == 0) return res.status(400).json({ error: 'User not found' });
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length == 0) return res.status(400).json({ error: 'User not found' });
 
-        const user = rows[0];
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(400).json({ error: 'Invalid password' });
+        let passwordDB = users[0].password;
 
-        // Generar token JWT
-        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
-        res.json({ message: 'Login successful', token });
+        if (email.includes('@example.com')) {
+            console.log('Email de ejemplo');
+            if (password != passwordDB) {
+                console.log('Contraseña incorrecta');
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                let className = resultClassName[0].name;
+                userLogin = users[0];
+                userLogin.class_name = className;
+            }
+        } else {
+            let match = await comparePassword(password, passwordDB);
+            if (!match) {
+                return res.status(400).json({ error: 'Invalid password' });
+            } else {
+                const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+                let className = resultClassName[0].name;
+                userLogin = users[0];
+                userLogin.class_name = className;
+            }
+        }
+
+        const aToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, secretKey, { expiresIn: '1h' });
+        const rToken = jwt.sign({ id: userLogin.id, email: userLogin.email }, refreshKey, { expiresIn: '7d' })
+
+        refreshTokensDB.add(rToken);
+
+        res.status(200).json({ message: 'Login successful', accessToken: aToken, refreshToken: rToken, userLogin });
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
+        console.log('Connection closed');
+    }
+});
+
+// Access User for email
+app.get('/user', verifyToken, async (req, res) => {
+    const email = req.query.email;
+
+    console.log('Email:', req.query.email);
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email es requerido' });
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+
+    try {
+        const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+        if (users.length == 0) {
+            return res.status(404).json({ error: 'User not found' });
+        } else if (users[0].class_id != null) {
+            const [resultClassName] = await connection.execute('SELECT * FROM classes WHERE id = ?', [users[0].class_id]);
+            let className = resultClassName[0].name;
+            userLogin = users[0];
+            userLogin.class_name = className;
+        } else {
+            userLogin = users[0];
+        }
+
+        res.status(200).json(userLogin);
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Database error' });
+    } finally {
+        connection.end();
     }
 });
 
 // Logout route
-app.get('/logout', (req, res) => {
+app.post('/logout', verifyToken, async (req, res) => {
+    console.log('Logout:', req.body);
+    const { accessToken, refreshToken } = req.body;
 
+    if (!accessToken) return res.status(401).send('Token is required');
+    if (!refreshToken) return res.status(401).send('Token is required');
+
+    refreshTokensDB.delete(refreshToken);
+    console.log('HOLAAAAAAAAAAAAAAAA');
+    res.status(200).send('User logout successfully');
 });
 
 // CRUD operations for users
-app.get('/users', verifyToken, async (req, res) => {
+app.get('/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM users');
@@ -151,7 +234,7 @@ app.get('/users', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/users/:id', verifyToken, async (req, res) => {
+app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -233,19 +316,63 @@ app.get('/newDataUsers/:id', verifyToken, async (req, res) => {
 });
 
 app.post('/newDataUsers', verifyToken, async (req, res) => {
-    const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     try {
+        console.log('New data user:', req.body);
+        const { userPinia, userData } = req.body;
+
+        // Validar que ambos objetos existan
+        if (!userPinia || !userData) {
+            return res.status(400).json({ error: 'Datos incompletos: se necesitan userPinia y userData.' });
+        }
+
+        // Fusionar los datos: Actualizar userPinia con los valores de userData
+        const updatedUser = {
+            ...userPinia,
+            ...userData,
+            tags: userData.tags || userPinia.tags, // Manejar valores específicos
+            availibility: userData.availibility || userPinia.availibility,
+        };
+
+        console.log('Usuario actualizado:', updatedUser);
+
+        // Convertir `tags` y `availibility` a JSON string si no están vacíos
+        if (updatedUser.tags && typeof updatedUser.tags !== 'string') {
+            updatedUser.tags = JSON.stringify(updatedUser.tags);
+        }
+
+        if (updatedUser.availibility && typeof updatedUser.availibility !== 'string') {
+            updatedUser.availibility = JSON.stringify(updatedUser.availibility);
+        }
+
+        // Aquí va la lógica para guardar los datos en la base de datos
         const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'INSERT INTO newDataUsers (typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [typesUsers_id, user_id, name, email, hashedPassword, token, banner, profile, status, class_id]
-        );
+        const query = `
+            INSERT INTO newDataUsers (typesUsers_id, user_id, name, email, password, banner, profile, class_id, city, discord_link, github_link, tags, availibility)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const values = [
+            updatedUser.typesUsers_id,
+            updatedUser.user_id,
+            updatedUser.name,
+            updatedUser.email,
+            updatedUser.password,
+            updatedUser.banner,
+            updatedUser.profile,
+            updatedUser.class_id,
+            updatedUser.city,
+            updatedUser.discord_link,
+            updatedUser.github_link,
+            updatedUser.tags,
+            updatedUser.availibility,
+        ];
+        await connection.execute(query, values);
         connection.end();
-        res.status(201).json({ message: 'New data user created successfully' });
+
+        // Simulación de respuesta exitosa
+        res.status(201).json({ message: 'Datos del usuario actualizados correctamente', updatedUser });
     } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+        console.error('Error al procesar los datos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -607,10 +734,25 @@ app.delete('/teachersClasses/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports comments
-app.get('/reports/comments', verifyToken, async (req, res) => {
+app.get('/reports/comments',  async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsComments');
+        const [results] = await connection.execute(`SELECT 
+            reportsComments.id, 
+            reportsComments.comment_id, 
+            reportsComments.user_id AS reporting_user_id, 
+            reportsComments.report, 
+            reportsComments.status, 
+            reportsComments.created_at, 
+            comments.comment, 
+            comments.user_id AS comment_user_id,
+            reporting_user.name AS reporting_user_name,
+            comment_user.name AS comment_user_name,
+            comment_user.email AS comment_user_email
+            FROM reportsComments 
+            JOIN comments ON reportsComments.comment_id = comments.id 
+            JOIN users AS reporting_user ON reportsComments.user_id = reporting_user.id
+            JOIN users AS comment_user ON comments.user_id = comment_user.id`);
         connection.end();
 
         res.status(200).send(results);
@@ -619,7 +761,7 @@ app.get('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/reports/comments/:id', verifyToken, async (req, res) => {
+app.get('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -635,7 +777,7 @@ app.get('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/comments', verifyToken, async (req, res) => {
+app.post('/reports/comments',  async (req, res) => {
     const { comment_id, user_id, report } = req.body;
 
     try {
@@ -649,7 +791,7 @@ app.post('/reports/comments', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/comments/:id', verifyToken, async (req, res) => {
+app.put('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -666,7 +808,7 @@ app.put('/reports/comments/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
+app.delete('/reports/comments/:id',  async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -683,19 +825,35 @@ app.delete('/reports/comments/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports users
-app.get('/reports/users', verifyToken, async (req, res) => {
+app.get('/reports/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [results] = await connection.execute('SELECT * FROM reportsUsers');
+        const [results] = await connection.execute(`
+            SELECT 
+                reportsUsers.id,
+                reportsUsers.reported_user_id,
+                reportsUsers.user_id,
+                reportsUsers.report,
+                reportsUsers.status,
+                reportsUsers.created_at,
+                reportedUser.name AS reported_user_name,
+                reportedUser.email AS reported_user_email,
+                reportingUser.name AS reporting_user_name,
+                reportingUser.email AS reporting_user_email
+            FROM reportsUsers
+            JOIN users AS reportedUser ON reportsUsers.reported_user_id = reportedUser.id
+            JOIN users AS reportingUser ON reportsUsers.user_id = reportingUser.id
+        `);
         connection.end();
 
         res.status(200).send(results);
     } catch (error) {
+        console.error('Database error:', error);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
-app.get('/reports/users/:id', verifyToken, async (req, res) => {
+app.get('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -711,7 +869,7 @@ app.get('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.post('/reports/users', verifyToken, async (req, res) => {
+app.post('/reports/users',  async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
 
     try {
@@ -725,7 +883,7 @@ app.post('/reports/users', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/reports/users/:id', verifyToken, async (req, res) => {
+app.put('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -742,7 +900,7 @@ app.put('/reports/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/reports/users/:id', verifyToken, async (req, res) => {
+app.delete('/reports/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -783,17 +941,55 @@ app.post('/reviews', async (req, res) => {
     }
 });
 
+// Route for refresh access token
+app.post('/refresh', async (req, res) => {
+    console.log('Refresh token 0:', req.body);
+    const { refreshToken } = req.body;
+
+    console.log('Refresh token 1:', refreshToken);
+
+    if (!refreshToken) return res.status(401).send('Token is required');
+    if (!refreshTokensDB.has(refreshToken)) return res.status(403).send('Invalid token');
+
+    try {
+        console.log('Refresh token 2:', refreshToken);
+        const decoded = jwt.verify(refreshToken, refreshKey);
+        console.log('Decoded:', decoded);
+        const newAccessToken = jwt.sign({ id: decoded.id, email: decoded.email }, secretKey, { expiresIn: '1h' });
+        res.json({ accessToken: newAccessToken });
+    } catch (err) {
+        console.log('Error refresh:', err);
+        refreshTokensDB.delete(refreshToken);
+        res.status(403).json({ error: 'Invalid token or expired' });
+    }
+});
+
 // Function to verify token
 function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).send('Token es requerido');
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+        return res.status(401).json({ error: 'Token es requerido' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ error: 'Formato de token inválido' });
+    }
+
+    console.log('Token:', token);
 
     jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) return res.status(500).send('Fallo al autenticar el token');
+        console.log('Decoded:', decoded);
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ error: 'Token expirado' });
+            }
+            return res.status(403).json({ error: 'Fallo al autenticar el token' });
+        }
         req.user = decoded;
         next();
     });
-};
+}
 
 // Function to hash password
 async function hashPassword(password) {

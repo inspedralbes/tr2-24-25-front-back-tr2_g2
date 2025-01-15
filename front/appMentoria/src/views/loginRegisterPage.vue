@@ -14,7 +14,7 @@
           <h1 class="text-2xl xl:text-3xl font-extrabold mb-5">
             CONEXUS
           </h1>
-          <h2 class="text-xl font-light xl:text-2xl">
+          <h2 class="text-xl font-light xl:text-2xl mb-3">
             Correu @inspedralbes.cat
           </h2>
           <div class="w-full flex-1 mt-3">
@@ -54,18 +54,6 @@
                   Accedeix amb GitHub
                 </span>
               </button>
-
-              <button @click="signInWithDiscord"
-                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 dark:bg-indigo-400 text-gray-800 dark:text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
-                <div class="bg-white p-1 rounded-full">
-                  <svg class="w-6" viewBox="0 0 32 32">
-                    <path xmlns="http://www.w3.org/2000/svg"
-                      d="M23.6361 9.33998C22.212 8.71399 20.6892 8.25903 19.0973 8C18.9018 8.33209 18.6734 8.77875 18.5159 9.13408C16.8236 8.89498 15.1469 8.89498 13.4857 9.13408C13.3283 8.77875 13.0946 8.33209 12.8974 8C11.3037 8.25903 9.77927 8.71565 8.35518 9.3433C5.48276 13.4213 4.70409 17.3981 5.09342 21.3184C6.99856 22.6551 8.84487 23.467 10.66 23.9983C11.1082 23.4189 11.5079 22.8029 11.8523 22.1536C11.1964 21.9195 10.5683 21.6306 9.9748 21.2951C10.1323 21.1856 10.2863 21.071 10.4351 20.9531C14.0551 22.5438 17.9881 22.5438 21.5649 20.9531C21.7154 21.071 21.8694 21.1856 22.0251 21.2951C21.4299 21.6322 20.8 21.9211 20.1442 22.1553C20.4885 22.8029 20.8865 23.4205 21.3364 24C23.1533 23.4687 25.0013 22.6567 26.9065 21.3184C27.3633 16.7738 26.1261 12.8335 23.6361 9.33998ZM12.3454 18.9075C11.2587 18.9075 10.3676 17.9543 10.3676 16.7937C10.3676 15.6331 11.2397 14.6783 12.3454 14.6783C13.4511 14.6783 14.3422 15.6314 14.3232 16.7937C14.325 17.9543 13.4511 18.9075 12.3454 18.9075ZM19.6545 18.9075C18.5678 18.9075 17.6767 17.9543 17.6767 16.7937C17.6767 15.6331 18.5488 14.6783 19.6545 14.6783C20.7602 14.6783 21.6514 15.6314 21.6323 16.7937C21.6323 17.9543 20.7602 18.9075 19.6545 18.9075Z"
-                      fill="#5865F2" />
-                  </svg>
-                </div>
-                <span class="ml-4">Accedeix amb Discord</span>
-              </button>
             </div>
 
             <div class="my-12 border-b text-center">
@@ -78,11 +66,11 @@
             <div class="mx-auto max-w-xs">
               <input
                 class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                type="email" placeholder="Correu electrònic" />
+                type="email" placeholder="Correu electrònic" v-model="userLogin.email" />
               <input
                 class="w-full px-8 py-4 rounded-lg font-medium dark:bg-gray-900 dark:text-white border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password" placeholder="Contrasenya" />
-              <button
+                type="password" placeholder="Contrasenya" v-model="userLogin.password" />
+              <button @click="signInWithApp"
                 class="mt-5 tracking-wide font-semibold bg-indigo-500 dark:bg-indigo-700 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                 <svg class="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round">
@@ -122,7 +110,7 @@ import { ref, reactive } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import ToggleDarkMode from '@/components/ToggleDarkMode.vue';
-import { loginAPI } from '@/services/communicationManager';
+import { loginAPI, loginDB } from '@/services/communicationManager';
 import { useAppStore } from '@/stores/index';
 import router from '@/router';
 
@@ -169,7 +157,8 @@ const signInWithGoogle = async () => {
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
-    validateAndLogin();
+
+    validateAndLogin(userAPIs);
 
   } catch (error) {
     console.log(error.message);
@@ -190,7 +179,9 @@ const signInWithGithub = async () => {
     userAPIs.profile = result.user.photoURL;
 
     console.log(userAPIs);
-    validateAndLogin();
+
+    validateAndLogin(userAPIs);
+
   } catch (error) {
     console.log(error.message);
     message.value = `Error al iniciar sessió`;
@@ -198,25 +189,17 @@ const signInWithGithub = async () => {
   }
 };
 
-const signInWithDiscord = async () => {
-  message.value = 'Aquesta funcionalitat encara no està disponible';
-  messageType.value = 'error';
-};
-
-async function validateAndLogin() {
+const signInWithApp = async () => {
   let succes = false;
+  let profileURL = ref('');
+  let bannerURL = ref('');
 
-  console.log('Validating and logging in');
-
-  // if (!userAPIs.email.includes('@inspedralbes.cat')) {
-  //   message.value = `No tens permís per accedir a aquesta aplicació`;
-  //   messageType.value = 'error';
-  //   return;
-  // } else {
-  // console.log('Usuari vàlid');
+  console.log('Sign in with app');
 
   try {
-    const response = await loginAPI(userAPIs);
+    console.log('userLogin: ', userLogin);
+
+    const response = await loginDB(userLogin);
 
     if (response.error) {
       return;
@@ -224,18 +207,96 @@ async function validateAndLogin() {
       succes = true;
     }
 
-    //useAppStore().setToken(response.token);
-    useAppStore().setUser(response.userLogin);
+    let user = response.userLogin;
+    let profile = user.profile;
+
+    bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+    if (profile.includes('/upload/', 0)) {
+      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+    } else {
+      profileURL.value = user.profile;
+    }
+
+    user.profile = profileURL.value;
+    user.banner = bannerURL.value;
+
+    useAppStore().setAccessToken(response.accessToken);
+    useAppStore().setRefreshToken(response.refreshToken);
+    useAppStore().setUser(user);
+
+    localStorage.setItem('user', JSON.stringify(user.email));
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+
   } catch (error) {
     console.log(error.message);
+    message.value = `Error al iniciar sessió, comprova les dades introduïdes`;
+    messageType.value = 'error';
   } finally {
     if (succes) {
       console.log('Redirecting to main page + info en pinia');
-      //console.log('Token: ', useAppStore().getToken());
+      console.log('Access Token: ', useAppStore().getAccessToken());
+      console.log('Refresh Token: ', useAppStore().getRefreshToken());
       console.log('User: ', useAppStore().getUser());
       router.push({ name: 'main' });
     }
   }
-  // }
-}
+};
+
+async function validateAndLogin(user) {
+  let succes = false;
+  let profileURL = ref('');
+  let bannerURL = ref('');
+
+  console.log('Validating and logging in');
+
+  console.log('user-email: ' + user.email);
+
+  if (!user.email.includes('@inspedralbes.cat')) {
+    message.value = `Error al iniciar sessió. Correu no vàlid`;
+    messageType.value = 'error';
+  } else {
+    try {
+      const response = await loginAPI(userAPIs);
+
+      if (response.error) {
+        return;
+      } else {
+        succes = true;
+      }
+
+      let user = response.userLogin;
+      let profile = user.profile;
+
+      bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
+      if (profile.includes('/upload/', 0)) {
+        profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+      } else {
+        profileURL.value = user.profile;
+      }
+
+      user.profile = profileURL.value;
+      user.banner = bannerURL.value;
+
+      useAppStore().setAccessToken(response.accessToken);
+      useAppStore().setRefreshToken(response.refreshToken);
+      useAppStore().setUser(user);
+
+      localStorage.setItem('user', JSON.stringify(user.email));
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      if (succes) {
+        console.log('Redirecting to main page + info en pinia');
+        console.log('Access Token: ', useAppStore().getAccessToken());
+        console.log('Refresh Token: ', useAppStore().getRefreshToken());
+        console.log('User: ', useAppStore().getUser());
+        router.push({ name: 'main' });
+      }
+    }
+  }
+};
 </script>

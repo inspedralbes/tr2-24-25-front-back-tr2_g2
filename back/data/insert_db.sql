@@ -49,43 +49,43 @@ INSERT INTO classes (name) VALUES
 ('CURS ESPECIALITZACIÓ');
 
 -- Inserciones para users (profesores)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
-(2, 'Dídac Pérez', 'didac@example.com', 'password1', true, 'approved', 4.7, 1),
-(2, 'Ana María Sossa', 'ana@example.com', 'password2', true, 'approved', 4.8, 2),
-(2, 'Vanessa Llop', 'vanessa@example.com', 'password3', true, 'approved', 4.6, 3),
-(2, 'Raül Pons', 'raul@example.com', 'password4', true, 'approved', 4.9, 4),
-(2, 'Albert Casas', 'albert@example.com', 'password5', true, 'approved', 4.5, 5),
-(2, 'Joan Sánchez', 'joan@example.com', 'password6', true, 'approved', 4.4, 6),
-(2, 'Ceferino Yuste', 'ceferino@example.com', 'password7', true, 'approved', 4.3, 7),
-(2, 'Emma Morales', 'emma@example.com', 'password8', true, 'approved', 4.2, 8),
-(2, 'Juanjo Carrasco', 'juanjo@example.com', 'password9', true, 'approved', 4.1, 9),
-(2, 'Noah Escartí', 'noah@example.com', 'password10', true, 'approved', 4.0, 10),
-(2, 'Ernesto Meiras', 'ernesto@example.com', 'password11', true, 'approved', 3.9, 11),
-(2, 'Rafa Monje', 'rafa@example.com', 'password12', true, 'approved', 3.8, 12),
-(2, 'Segundo González', 'segundo@example.com', 'password13', true, 'approved', 3.7, 13),
-(2, 'Marc Aribau', 'marc@example.com', 'password14', true, 'approved', 3.6, 14),
-(2, 'Héctor Alonso de la Rosa', 'hector@example.com', 'password15', true, 'approved', 3.5, 15),
-(2, 'Juan Delgado', 'juan@example.com', 'password16', true, 'approved', 3.4, 16),
-(2, 'Pol Prats', 'pol@example.com', 'password17', true, 'approved', 3.3, 17),
-(2, 'Gerard Torrent', 'gerard@example.com', 'password18', true, 'approved', 3.2, 18),
-(2, 'Álvaro Pérez', 'alvaro@example.com', 'password19', true, 'approved', 3.1, 19),
-(2, 'David Sierra', 'david@example.com', 'password20', true, 'approved', 3.0, 20),
-(2, 'Laura Carrillo', 'laura@example.com', 'password21', true, 'approved', 2.9, 21),
-(2, 'Oriol Pelino', 'oriol@example.com', 'password22', true, 'approved', 2.8, 22),
-(2, 'Marc Esteve', 'marc.esteve@example.com', 'password23', true, 'approved', 2.7, 23);
+INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, availibility, verified, status, review, class_id) VALUES
+(2, 'Dídac Pérez', 'didac.perez@example.com', 'didacperez', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', '{"monday": "9-5", "tuesday": "9-5"}', true, 'approved', 4.7, 1),
+(2, 'Ana María Sossa', 'ana.maria@example.com', 'anamaria', '/upload/banner_default.png', '/upload/profile_default.png', 'Girona, Espanya', '{"monday": "10-6", "wednesday": "10-6"}', true, 'approved', 4.8, 2),
+(2, 'Vanessa Llop', 'vanessa.llop@example.com', 'vanessallop', '/upload/banner_default.png', '/upload/profile_default.png', 'Tarragona, Espanya', '{"thursday": "9-5", "friday": "9-5"}', true, 'approved', 4.6, 3),
+(2, 'Raül Pons', 'raul.pons@example.com', 'raulpons', '/upload/banner_default.png', '/upload/profile_default.png', 'Lleida, Espanya', '{"monday": "8-4", "tuesday": "8-4"}', true, 'approved', 4.9, 4),
+(2, 'Albert Casas', 'albert.casas@example.com', 'albertcasas', '/upload/banner_default.png', '/upload/profile_default.png', 'Manresa, Espanya', '{"wednesday": "10-6", "thursday": "10-6"}', true, 'approved', 4.5, 5),
+(2, 'Joan Sánchez', 'joan.sanchez@example.com', 'joansanchez', '/upload/banner_default.png', '/upload/profile_default.png', 'Reus, Espanya', '{"monday": "9-5", "friday": "9-5"}', true, 'approved', 4.4, 6),
+(2, 'Ceferino Yuste', 'ceferino.yuste@example.com', 'ceferinoyuste', '/upload/banner_default.png', '/upload/profile_default.png', 'Mataró, Espanya', '{"tuesday": "8-4", "thursday": "8-4"}', true, 'approved', 4.3, 7),
+(2, 'Emma Morales', 'emma.morales@example.com', 'emmamorales', '/upload/banner_default.png', '/upload/profile_default.png', 'Sabadell, Espanya', '{"monday": "9-6", "friday": "9-6"}', true, 'approved', 4.2, 8),
+(2, 'Juanjo Carrasco', 'juanjo.carrasco@example.com', 'juanjocarrasco', '/upload/banner_default.png', '/upload/profile_default.png', 'Terrassa, Espanya', '{"tuesday": "10-7", "wednesday": "10-7"}', true, 'approved', 4.1, 9),
+(2, 'Noah Escartí', 'noah@example.com', 'noahescarti', '/upload/banner_default.png', '/upload/profile_default.png', 'Badalona, Espanya', '{"thursday": "8-3", "friday": "8-3"}', true, 'approved', 4.0, 10),
+(2, 'Ernesto Meiras', 'ernesto.meiras@example.com', 'ernestomeiras', '/upload/banner_default.png', '/upload/profile_default.png', 'Granollers, Espanya', '{"monday": "9-6", "tuesday": "9-6"}', true, 'approved', 3.9, 11),
+(2, 'Rafa Monje', 'rafa.monje@example.com', 'rafa.monje', '/upload/banner_default.png', '/upload/profile_default.png', 'Vic, Espanya', '{"wednesday": "8-4", "thursday": "8-4"}', true, 'approved', 3.8, 12),
+(2, 'Segundo González', 'segundo.gonzalez@example.com', 'segundogonzalez', '/upload/banner_default.png', '/upload/profile_default.png', 'Blanes, Espanya', '{"monday": "10-7", "friday": "10-7"}', true, 'approved', 3.7, 13),
+(2, 'Marc Aribau', 'marc.aribau@example.com', 'marcaribau', '/upload/banner_default.png', '/upload/profile_default.png', 'Igualada, Espanya', '{"tuesday": "9-5", "wednesday": "9-5"}', true, 'approved', 3.6, 14),
+(2, 'Héctor Alonso de la Rosa', 'hector.alonso@example.com', 'hectoralonso', '/upload/banner_default.png', '/upload/profile_default.png', 'Cerdanyola del Vallès, Espanya', '{"thursday": "10-6", "friday": "10-6"}', true, 'approved', 3.5, 15),
+(2, 'Juan Delgado', 'juan.delgado@example.com', 'juandelgado', '/upload/banner_default.png', '/upload/profile_default.png', 'Sant Cugat del Vallès, Espanya', '{"monday": "8-4", "wednesday": "8-4"}', true, 'approved', 3.4, 16),
+(2, 'Pol Prats', 'pol.prats@example.com', 'polprats', '/upload/banner_default.png', '/upload/profile_default.png', 'Mollet del Vallès, Espanya', '{"tuesday": "9-6", "thursday": "9-6"}', true, 'approved', 3.3, 17),
+(2, 'Gerard Torrent', 'gerard.torrent@example.com', 'gerardtorrent', '/upload/banner_default.png', '/upload/profile_default.png', 'Vilanova i la Geltrú, Espanya', '{"monday": "9-5", "friday": "9-5"}', true, 'approved', 3.2, 18),
+(2, 'Álvaro Pérez', 'alvaro.perez@example.com', 'alvaroperez', '/upload/banner_default.png', '/upload/profile_default.png', 'Figueres, Espanya', '{"tuesday": "10-7", "wednesday": "10-7"}', true, 'approved', 3.1, 19),
+(2, 'David Sierra', 'david.sierra@example.com', 'davidsierra', '/upload/banner_default.png', '/upload/profile_default.png', 'El Prat de Llobregat, Espanya', '{"thursday": "8-3", "friday": "8-3"}', true, 'approved', 3.0, 20),
+(2, 'Laura Carrillo', 'laura.carrillo@example.com', 'lauracarrillo', '/upload/banner_default.png', '/upload/profile_default.png', 'Cornellà de Llobregat, Espanya', '{"monday": "10-6", "tuesday": "10-6"}', true, 'approved', 2.9, 21),
+(2, 'Oriol Pelino', 'oriol.pelino@example.com', 'oriolpelino', '/upload/banner_default.png', '/upload/profile_default.png', 'Roses, Espanya', '{"wednesday": "9-4", "friday": "9-4"}', true, 'approved', 2.8, 22),
+(2, 'Marc Esteve', 'marc.esteve@example.com', 'marcesteve', '/upload/banner_default.png', '/upload/profile_default.png', 'Vilafranca del Penedès, Espanya', '{"monday": "8-3", "thursday": "8-3"}', true, 'approved', 2.7, 23);
 
 -- Inserciones para users (estudiantes)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
-(1, 'Laura Puig', 'laura@example.com', 'password24', true, 'approved', 4.2, 1),
-(1, 'Martí Vila', 'marti@example.com', 'password25', true, 'approved', 3.9, 2),
-(1, 'Gemma Riera', 'gemma@example.com', 'password26', true, 'approved', 4.3, 3),
-(1, 'Oriol Serra', 'oriol@example.com', 'password27', true, 'approved', 4.1, 4),
-(1, 'Anna Martí', 'anna@example.com', 'password28', true, 'approved', 4.4, 5);
+INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, tags, availibility, verified, status, review, class_id) VALUES 
+(1, 'Laura Puig', 'laura.puig@example.com', 'laurapuig', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', '["JavaScript", "Python", "React"]', '{"monday": "9-5", "tuesday": "9-5", "wednesday": "9-5", "thursday": "9-5", "friday": "9-5"}', true, 'approved', 4.2, 19),
+(1, 'Martí Vila', 'marti.vila@example.com', 'martivila', '/upload/banner_default.png', '/upload/profile_default.png', 'Girona, Espanya', '["Java", "C#", "SQL"]', '{"monday": "10-6", "wednesday": "10-6", "friday": "10-6"}', true, 'approved', 3.9, 17),
+(1, 'Gemma Riera', 'gemma.riera@example.com', 'gemmariera', '/upload/banner_default.png', '/upload/profile_default.png', 'Tarragona, Espanya', '["PHP", "MySQL", "Laravel"]', '{"monday": "8-4", "tuesday": "8-4", "thursday": "8-4", "friday": "8-4"}', true, 'approved', 4.3, 24),
+(1, 'Oriol Serra', 'oriol.serra@example.com', 'oriolserra', '/upload/banner_default.png', '/upload/profile_default.png', 'Lleida, Espanya', '["JavaScript", "Node.js", "Express"]', '{"monday": "9-5", "tuesday": "9-5", "wednesday": "9-5", "friday": "9-5"}', true, 'approved', 4.1, 15),
+(1, 'Anna Martí', 'anna.marti@example.com', 'annamarti', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', '["Ruby", "Rails", "JavaScript"]', '{"monday": "10-6", "tuesday": "10-6", "wednesday": "10-6", "thursday": "10-6"}', true, 'approved', 4.4, 23);
 
 -- Inserciones para users (administradores)
-INSERT INTO users (typesUsers_id, name, email, password, verified, status, review, class_id) VALUES 
-(3, 'Administradora A', 'adminA@example.com', 'password29', true, 'approved', 0.0, NULL),
-(3, 'Administrador B', 'adminB@example.com', 'password30', true, 'approved', 0.0, NULL);
+INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, verified, status, review, class_id) VALUES 
+(3, 'Administradora A', 'adminA@example.com', 'admina', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, NULL),
+(3, 'Administrador B', 'adminB@example.com', 'adminb', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, NULL);
 
 -- Inserciones para usersQualifications
 INSERT INTO usersQualifications (user_id, qualification_id) VALUES 
@@ -106,18 +106,18 @@ INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES
 -- Inserciones para publications
 INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES 
 (1, 'Introducció al SQL', 'Aprèn les bases del SQL.', 1, 0), 
-(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 1), 
-(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 2), 
-(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 3), 
-(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 4);
+(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 0), 
+(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 1), 
+(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 0), 
+(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 0);
 
 -- Inserciones para comments
 INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES 
 (1, 2, NULL, 'Molt informatiu!'), 
 (2, 3, 1, 'Gràcies pels detalls.'), 
-(3, 4, 2, 'Gran lectura!'), 
-(4, 5, 3, 'Article útil.'), 
-(5, 1, 4, 'Ben escrit.');
+(3, 4, NULL, 'Gran lectura!'), 
+(4, 5, NULL, 'Article útil.'), 
+(5, 1, NULL, 'Ben escrit.');
 
 -- Inserciones para reportsPublications
 INSERT INTO reportsPublications (publication_id, user_id, report) VALUES 
@@ -169,3 +169,21 @@ INSERT INTO teachersClasses (user_id, class_id) VALUES
 (22, 22), 
 (23, 23), 
 (24, 23);
+
+-- Inserts for reportsPublications
+INSERT INTO reportsPublications (publicationId, userId, reportReason, reportDate) VALUES
+(1, 1, 'Inappropriate content', '2023-01-01'),
+(2, 2, 'Spam', '2023-01-02'),
+(3, 3, 'Harassment', '2023-01-03');
+
+-- Inserts for reportsComments
+INSERT INTO reportsComments (commentId, userId, reportReason, reportDate) VALUES
+(1, 1, 'Offensive language', '2023-01-01'),
+(2, 2, 'Spam', '2023-01-02'),
+(3, 3, 'Harassment', '2023-01-03');
+
+-- Inserts for reportsUsers
+INSERT INTO reportsUsers (userId, reportReason, reportDate) VALUES
+(1, 'Multiple account abuse', '2023-01-01'),
+(2, 'Inappropriate behavior', '2023-01-02'),
+(3, 'Spam', '2023-01-03');
