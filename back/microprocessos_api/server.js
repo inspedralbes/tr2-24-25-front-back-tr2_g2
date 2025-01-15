@@ -79,7 +79,9 @@ app.get('/startService/:id', (req, res) => {
         const messageFilePath = path.join(logDir, 'messages.log');
 
         //SPAWN
-        const processData = spawn('node', [path.join(route, 'services', service.name)]);
+        const processData = spawn('node', [path.join(__dirname, 'services') + `/${service.name}/index.js`], {
+            cwd: path.join(__dirname, 'services') + `/${service.name}`,
+        });
         service.process = processData;
         service.status = 'running';
         service.enabled = 'enabled';
