@@ -23,15 +23,17 @@
       </svg>
     </button>
     <Header class="fixed top-0 left-0 right-0 z-10"></Header>
-    <main class="flex-grow">
+    <main class="flex-grow min-h-screen">
       <RequestPost></RequestPost>
     </main>
+    <NavBar></NavBar>
   </div>
 </template>
 
   <script setup>
 import RequestPost from "@/components/RequestPost.vue";
 import Header from "@/components/Header.vue";
+import NavBar from "@/components/NavBar.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();

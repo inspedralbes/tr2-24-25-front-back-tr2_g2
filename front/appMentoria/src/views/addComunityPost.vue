@@ -20,7 +20,7 @@
 
     <Header class="fixed top-0 left-0 right-0 z-10"></Header>
 
-    <main class="flex-grow flex items-center justify-center">
+    <main class="flex-grow flex items-center justify-center min-h-screen mx-24">
       <div
         class="max-w-xl w-full bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-md"
       >
@@ -94,7 +94,7 @@
       </div>
     </main>
   </div>
-  <NavBar></NavBar>
+  <!-- <NavBar></NavBar> -->
 </template>
 
 

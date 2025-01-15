@@ -169,7 +169,6 @@
       </form>
     </div>
   </div>
-  <NavBar></NavBar>
 </template>
 
 
