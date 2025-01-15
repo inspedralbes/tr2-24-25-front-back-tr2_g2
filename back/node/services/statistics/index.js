@@ -10,8 +10,7 @@ const port = process.env.PORT;
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type", "Authorization"],
 }));
 
 app.get('/', (req, res) => {
@@ -27,38 +26,61 @@ app.get('/images', (req, res) => {
     const publicationsDir = path.join(__dirname, 'python/images/statistics/publications');
     const usersDir = path.join(__dirname, 'python/images/statistics/users');
 
-    console.log('Comments Directory:', commentsDir);
-    console.log('Publications Directory:', publicationsDir);
-    console.log('Users Directory:', usersDir);
-    const getImages = (dir) => {
+    const getImages = (dir, parentFolder = '') => {
         try {
             if (!fs.existsSync(dir)) {
                 console.error(`Directory ${dir} does not exist.`);
-                return [];
+                return {};
             }
-            const file = fs.readdirSync(dir)
 
-            const files = fs.readdirSync(dir).filter(file =>{
+            const files = fs.readdirSync(dir).filter(file => {
                 const fullPath = path.join(dir, file);
                 return fs.statSync(fullPath).isFile();
-            })
-            console.log(files);
-            
-            return file.map(file => path.join('/upload', path.basename(dir), file).replace(/\\/g, '/'));
+            });
+
+            return {
+                folder: path.basename(dir),
+                images: files.map(file => path.join('/upload', parentFolder, path.basename(dir), file).replace(/\\/g, '/'))
+            };
         } catch (error) {
             console.error(`Error reading directory ${dir}:`, error);
-            return [];
+            return {};
+        }
+    };
+
+    const getSubfoldersImages = (dir, parentFolder = '') => {
+        try {
+            if (!fs.existsSync(dir)) {
+                console.error(`Directory ${dir} does not exist.`);
+                return {};
+            }
+
+            const subfolders = fs.readdirSync(dir).filter(subfolder => {
+                const fullPath = path.join(dir, subfolder);
+                return fs.statSync(fullPath).isDirectory();
+            });
+
+            const result = {};
+            subfolders.forEach(subfolder => {
+                const subfolderPath = path.join(dir, subfolder);
+                result[subfolder] = getImages(subfolderPath, parentFolder);
+            });
+
+            return result;
+        } catch (error) {
+            console.error(`Error reading directory ${dir}:`, error);
+            return {};
         }
     };
 
     const images = {
-        comments: getImages(commentsDir),
-        publications: getImages(publicationsDir),
-        users: getImages(usersDir)
+        comments: getSubfoldersImages(commentsDir, 'comments'),
+        publications: getSubfoldersImages(publicationsDir, 'publications'),
+        users: getSubfoldersImages(usersDir, 'users')
     };
 
-    console.log("aaaaaaaaaaa",images);
-    
+    console.log('Images:', images);
+
     res.json(images);
 });
 

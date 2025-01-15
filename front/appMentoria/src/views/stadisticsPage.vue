@@ -14,12 +14,14 @@
                     Gràfics d'Usuaris
                 </h2>
                 <div class="space-y-4">
-                    <img v-for="(image, index) in images.users" 
-                         :key="index" 
-                         :src="image" 
-                         alt="Gràfic d'usuaris"
-                         class="w-full rounded-md object-contain cursor-pointer"
-                         @click="openImage(image)" />
+                    <div v-for="(folder, folderName) in images.users" :key="folderName">
+                        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">{{ folderName }}</h3>
+                        <div v-for="(image, index) in folder.images" :key="index">
+                            <img :src="URLSTADISTICS + image" alt="Gràfic d'usuaris"
+                                 class="w-full rounded-md object-contain cursor-pointer"
+                                 @click="openImage(image)" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -29,12 +31,14 @@
                     Gràfics de Comentaris
                 </h2>
                 <div class="space-y-4">
-                    <img v-for="(image, index) in images.comments" 
-                         :key="index" 
-                         :src="image" 
-                         alt="Gràfic de comentaris"
-                         class="w-full rounded-md object-contain cursor-pointer"
-                         @click="openImage(image)" />
+                    <div v-for="(folder, folderName) in images.comments" :key="folderName">
+                        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">{{ folderName }}</h3>
+                        <div v-for="(image, index) in folder.images" :key="index">
+                            <img :src="URLSTADISTICS + image" alt="Gràfic de comentaris"
+                                 class="w-full rounded-md object-contain cursor-pointer"
+                                 @click="openImage(image)" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -44,12 +48,14 @@
                     Gràfics de Publicacions
                 </h2>
                 <div class="space-y-4">
-                    <img v-for="(image, index) in images.publications" 
-                         :key="index" 
-                         :src="image" 
-                         alt="Gràfic de publicacions"
-                         class="w-full rounded-md object-contain cursor-pointer"
-                         @click="openImage(image)" />
+                    <div v-for="(folder, folderName) in images.publications" :key="folderName">
+                        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">{{ folderName }}</h3>
+                        <div v-for="(image, index) in folder.images" :key="index">
+                            <img :src="URLSTADISTICS + image" alt="Gràfic de publicacions"
+                                 class="w-full rounded-md object-contain cursor-pointer"
+                                 @click="openImage(image)" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -66,7 +72,7 @@
     <!-- Modal para ampliar imágenes -->
     <div v-if="selectedImage" 
          class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <img :src="selectedImage" alt="Imagen ampliada" class="max-w-full max-h-full rounded-lg">
+        <img :src="URLSTADISTICS + selectedImage" alt="Imagen ampliada" class="max-w-full max-h-full rounded-lg">
         <button @click="closeImage" 
                 class="absolute top-4 right-4 text-white text-xl">&times;</button>
     </div>
@@ -83,9 +89,9 @@ let isLoading = ref(true);
 const selectedImage = ref(null);
 
 const images = ref({
-    comments: [],
-    publications: [],
-    users: [],
+    comments: {},
+    publications: {},
+    users: {}
 });
 
 // Función para cargar las imágenes desde el backend
@@ -95,9 +101,9 @@ const fetchImages = async () => {
         const data = await response.json();
 
         // Actualiza las imágenes con las rutas obtenidas
-        images.value.comments = data.comments.map(img => `${URLSTADISTICS}${img}`);
-        images.value.publications = data.publications.map(img => `${URLSTADISTICS}${img}`);
-        images.value.users = data.users.map(img => `${URLSTADISTICS}${img}`);
+        images.value.comments = data.comments;
+        images.value.publications = data.publications;
+        images.value.users = data.users;
     } catch (error) {
         console.error('Error cargando las imágenes:', error);
     } finally {
