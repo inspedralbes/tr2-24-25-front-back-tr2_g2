@@ -594,3 +594,35 @@ export const updateNotificationRevision = async (id) => {
         throw error;
     }
 };
+
+export const getMyPublications = async (userID) => {
+    console.log("userID", userID);
+    try {
+        const response = await fetch(`${COMMUNITY_URL}/getMyPublications?user_id=${userID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching my publications:', error);
+    }
+}
+
+export const getMyPeticions = async (userID) => {
+    console.log("userID", userID);
+    try {
+        const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}/getMyPublications?user_id=${userID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching my publications:', error);
+    }
+}

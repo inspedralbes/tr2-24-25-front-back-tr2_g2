@@ -13,6 +13,8 @@ import reportUserPage from '@/views/reportUserPage.vue'
 import reportPublicacioPage from '@/views/reportPublicacioPage.vue'
 import reportCommentsPage from '@/views/reportCommentsPage.vue'
 import notificationPage from '../views/notifiationPage.vue'
+import myPublications from '../views/myPublications.vue'
+import myRequests from '../views/myRequests.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,17 @@ const router = createRouter({
       name: 'myprofile',
       component: profilePage,
     },
+    {
+      path: '/mypublications',
+      name: 'mypublications',
+      component: myPublications,
+    },
+    {
+      path: '/myrequests',
+      name: 'myrequests',
+      component: myRequests,
+    },
+
     {
       path: '/addComunityPost',
       name: 'addComunityPost',

@@ -509,6 +509,23 @@ app.get('/publications/:id', async (req, res) => {
     }
 });
 
+app.get('/getMyPublications', async (req, res) => {
+    console.log("user_id recibido:", req.query.user_id); // Confirma el valor
+    const { user_id } = req.query;
+
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM publications WHERE user_id = ? AND typesPublications_id = 1', [user_id]);
+        console.log("Datos obtenidos:", rows); // Muestra los datos obtenidos
+        connection.end();
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 app.post('/publications', async (req, res) => {
     const { title, description, user_id } = req.body;
 
