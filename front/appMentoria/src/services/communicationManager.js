@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import socketChat from "./socketChat";
 import { useRouter } from "vue-router";
+import { useAppStore } from '@/stores/index';
 
 const BACK_URL = import.meta.env.VITE_URL_BACK;
 const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
@@ -66,7 +67,7 @@ export const getCommunityPublication = async () => {
 };
 
 // Get User Data
-export const getUsers = async () => {
+export const getUsersForOther = async () => {
     try {
         const response = await fetch(`${BACK_URL}/users`, {
             method: "GET",
@@ -75,7 +76,27 @@ export const getUsers = async () => {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
         });
+        const data = await response;
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Get User Data in JSON
+export const getUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/usersAll`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
         const data = await response.json();
+        console.log("PUTA", data);
         return data;
     } catch (error) {
         console.error("Network error:", error);
@@ -200,7 +221,9 @@ export const fetchChats = async (userId) => {
 };
 
 // Create a new chat
-export const chatButton = async (userid1, userid2, router) => {
+export const chatButton = async (userid2, router) => {
+    const appStore = useAppStore();
+    const userid1 = appStore.getUser().id;
     const newMessage = {
         user_one_id: userid1,
         user_two_id: userid2,
