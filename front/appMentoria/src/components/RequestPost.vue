@@ -1,39 +1,39 @@
 <template>
   <div
-    class="bg-gray-100 h-screen flex items-center justify-center p-8 dark:bg-neutral-900 dark:text-white"
+    class="bg-gray-100 min-h-screen flex items-center justify-center p-6 sm:p-8 dark:bg-neutral-900 dark:text-white"
   >
     <div
-      class="max-w-md w-full bg-white dark:bg-neutral-800 p-8 rounded-lg shadow-md"
+      class="max-w-md w-full bg-white dark:bg-neutral-800 p-6 sm:p-8 rounded-lg shadow-md my-20 mb-20"
     >
       <form>
+        <!-- Título y descripción -->
         <div class="mb-6">
           <label
             class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-300"
-            >Afegeix una Petició:</label
+            for="title"
           >
-          <div class="pb-4">
-            <textarea
-              id="title"
-              name="postContent"
-              rows="1"
-              v-model="title"
-              class="w-full border rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
-              placeholder="Títol"
-            ></textarea>
-          </div>
-          <div>
-            <textarea
-              id="des"
-              name="postContent"
-              rows="4"
-              v-model="description"
-              class="w-full border rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
-              placeholder="Que Busques?"
-            ></textarea>
-          </div>
+            Afegeix una Petició:
+          </label>
+          <textarea
+            id="title"
+            name="postContent"
+            rows="1"
+            v-model="title"
+            class="w-full border rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
+            placeholder="Títol"
+          ></textarea>
+          <textarea
+            id="des"
+            name="postContent"
+            rows="4"
+            v-model="description"
+            class="w-full mt-4 border rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
+            placeholder="Que Busques?"
+          ></textarea>
         </div>
 
-        <div class="mb-4">
+        <!-- Subida de imagen -->
+        <div class="mb-6">
           <label
             for="image-upload"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -49,127 +49,128 @@
           />
         </div>
 
+        <!-- Disponibilidad -->
         <div class="mb-6">
-          <div class="form-group p-4 rounded-md">
-            <label
-              for="hours"
-              class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-300"
+          <label
+            for="availability"
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-300"
+          >
+            Disponible:
+          </label>
+          <button
+            class="p-2 bg-blue-100 rounded-md mb-4 w-full sm:w-auto dark:bg-blue-700 dark:text-white dark:hover:bg-blue-800"
+            type="button"
+            @click="addAvailability"
+          >
+            + Afegir Disponibilitat
+          </button>
+          <div
+            v-for="(availability, index) in availabilities"
+            :key="index"
+            class="availability-group flex flex-wrap items-center gap-2 mb-4"
+          >
+            <select
+              v-model="availability.day"
+              class="border rounded-md p-2 text-sm w-full sm:w-auto dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
             >
-              Disponible:
-            </label>
+              <option disabled value="">Selecciona un dia</option>
+              <option v-for="day in week" :key="day" :value="day">
+                {{ day }}
+              </option>
+            </select>
+            <select
+              v-model="availability.startTime"
+              @change="validateTimes(index)"
+              class="border rounded-md p-2 text-sm w-full sm:w-auto dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
+            >
+              <option disabled value="">Hora d'inici</option>
+              <option
+                v-for="hour in filteredHours(index, 'start')"
+                :key="hour"
+                :value="hour"
+              >
+                {{ hour }}
+              </option>
+            </select>
+            <select
+              v-model="availability.endTime"
+              @change="validateTimes(index)"
+              class="border rounded-md p-2 text-sm w-full sm:w-auto dark:border-gray-700 dark:bg-neutral-900 dark:text-white justify-between"
+            >
+              <option disabled value="">Hora de final</option>
+              <option
+                v-for="hour in filteredHours(index, 'end')"
+                :key="hour"
+                :value="hour"
+              >
+                {{ hour }}
+              </option>
+            </select>
             <button
-              class="p-2 bg-blue-100 rounded-md mb-2 w-full md:w-auto dark:bg-blue-700 dark:text-white dark:hover:bg-blue-800"
               type="button"
-              @click="addAvailability"
+              @click="removeAvailability(index)"
+              class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md dark:bg-red-700 dark:hover:bg-red-800 mb-4 sm:w-auto w-full flex justify-center items-center"
             >
-              + Afegir Disponibilitat
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.1709 4C9.58273 2.83481 10.694 2 12.0002 2C13.3064 2 14.4177 2.83481 14.8295 4"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M20.5001 6H3.5"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M18.8332 8.5L18.3732 15.3991C18.1962 18.054 18.1077 19.3815 17.2427 20.1907C16.3777 21 15.0473 21 12.3865 21H11.6132C8.95235 21 7.62195 21 6.75694 20.1907C5.89194 19.3815 5.80344 18.054 5.62644 15.3991L5.1665 8.5"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M9.5 11L10 16"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M14.5 11L14 16"
+                  stroke="#ffffff"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
             </button>
-            <div
-              v-for="(availability, index) in availabilities"
-              :key="index"
-              class="availability-group flex flex-wrap items-center gap-2 mb-4"
-            >
-              <select
-                v-model="availability.day"
-                class="border rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
-              >
-                <option disabled value="">Selecciona un dia</option>
-                <option v-for="day in week" :key="day" :value="day">
-                  {{ day }}
-                </option>
-              </select>
-              <select
-                v-model="availability.startTime"
-                @change="validateTimes(index)"
-                class="border rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
-              >
-                <option disabled value="">Hora d'inici</option>
-                <option
-                  v-for="hour in filteredHours(index, 'start')"
-                  :key="hour"
-                  :value="hour"
-                >
-                  {{ hour }}
-                </option>
-              </select>
-              <select
-                v-model="availability.endTime"
-                @change="validateTimes(index)"
-                class="border rounded-md p-1 text-sm h-auto w-full md:w-auto flex-grow dark:border-gray-700 dark:bg-neutral-900 dark:text-white"
-              >
-                <option disabled value="">Hora de final</option>
-                <option
-                  v-for="hour in filteredHours(index, 'end')"
-                  :key="hour"
-                  :value="hour"
-                >
-                  {{ hour }}
-                </option>
-              </select>
-              <button
-                type="button"
-                @click="removeAvailability(index)"
-                class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md dark:bg-red-700 dark:hover:bg-red-800"
-              >
-                <svg
-                  width="19"
-                  height="19"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9.1709 4C9.58273 2.83481 10.694 2 12.0002 2C13.3064 2 14.4177 2.83481 14.8295 4"
-                    stroke="#ffffff"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M20.5001 6H3.5"
-                    stroke="#ffffff"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M18.8332 8.5L18.3732 15.3991C18.1962 18.054 18.1077 19.3815 17.2427 20.1907C16.3777 21 15.0473 21 12.3865 21H11.6132C8.95235 21 7.62195 21 6.75694 20.1907C5.89194 19.3815 5.80344 18.054 5.62644 15.3991L5.1665 8.5"
-                    stroke="#ffffff"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M9.5 11L10 16"
-                    stroke="#ffffff"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M14.5 11L14 16"
-                    stroke="#ffffff"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
 
+        <!-- Botón de envío -->
         <div class="flex items-center justify-between">
           <button
             type="button"
             @click="submitPostPeticio"
-            class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-white py-2 px-4 rounded-md transition duration-300 gap-2 dark:bg-blue-700 dark:hover:bg-blue-800"
+            class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-white py-2 px-10 rounded-md transition duration-300 gap-2 dark:bg-blue-700 dark:hover:bg-blue-800"
           >
             Post
           </button>
-          <span class="text-gray-500 text-sm dark:text-gray-300"
-            >Max 280 characters</span
-          >
+          <span class="text-gray-500 text-sm dark:text-gray-300">
+            Max 280 characters
+          </span>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 
 
 <script setup>

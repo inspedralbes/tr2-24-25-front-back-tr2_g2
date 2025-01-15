@@ -5,5 +5,5 @@
     <h1 class="text-4xl font-bold text-blue-900">Add Post</h1>
   </div>
 </template>
-<script scoped>
+<script setup>
 </script>
