@@ -13,6 +13,7 @@ import adminPanel from '../views/adminPanel.vue'
 import reportUserPage from '@/views/reportUserPage.vue'
 import reportPublicacioPage from '@/views/reportPublicacioPage.vue'
 import reportCommentsPage from '@/views/reportCommentsPage.vue'
+import stadisticsPage from '@/views/stadisticsPage.vue';
 
 const routes = [
   {
@@ -79,6 +80,11 @@ const routes = [
     path: '/chatList',
     name: 'chatListPage',
     component: chatListPage,
+  },
+  {
+    path: '/stadistics',
+    name: 'stadisticsPage',
+    component: stadisticsPage
   }
 ];
 

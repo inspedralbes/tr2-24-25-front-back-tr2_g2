@@ -26,6 +26,7 @@ services:
       - chat
       - community
       - employmentexchange
+      - stadistics
 
   chat:
     build: 
@@ -62,6 +63,17 @@ services:
     working_dir: /usr/src/app
     ports:
       - 3003:3003
+
+  stadistics:
+    build: 
+      context: ./back/node/services/stadistics
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/stadistics:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3010:3010
 
   # ia:
   #   build: 
