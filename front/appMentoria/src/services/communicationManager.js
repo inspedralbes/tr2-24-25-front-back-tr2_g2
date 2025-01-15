@@ -562,9 +562,18 @@ export const deleteReportPublication = async (id) => {
 // Get all users in status pending
 export const fetchUserValidation = async () => {
   try {
-    const users = await getUsers();
-    const pendingUsers = users.filter(user => user.status === 'pending');
-    console.log(pendingUsers);
+    const response = await fetch(`${BACK_URL}/pendingUsers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const pendingUsers = await response.json();
+    console.log("Pending users:", pendingUsers);
     return pendingUsers;
   } catch (error) {
     console.error("Network error:", error);
@@ -608,6 +617,7 @@ export const fetchAllClasses = async () => {
   }
 };
 
+
 // delete a user in the admin validation
 export const deleteUserInDb = async (id) => {
   try {
@@ -627,4 +637,25 @@ export const deleteUserInDb = async (id) => {
       console.error("Network error:", error);
       return { error: "Network error. Please try again later." };
     }
+};
+
+export const deleteUserValidation = async (id) => {
+  console.log("ID enviado a backend:", id); // Depuración
+  try {
+    const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return { error: `HTTP error! status: ${response.status}` };
+    }
+
+    return { message: "Usuari eliminat correctament" };
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
 };

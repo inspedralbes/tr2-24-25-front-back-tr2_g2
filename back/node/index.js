@@ -823,6 +823,42 @@ app.post('/reviews', async (req, res) => {
     }
 });
 
+
+app.get('/pendingUsers', async (req, res) => {
+    try {
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM users WHERE verified = 0');
+        connection.end();
+      
+      res.json(rows);
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({ error: 'Database error. Please try again later.' });
+    }
+  });
+
+app.delete('/verified/users/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log("ID recibido en backend:", id); // Depuración
+    if (!id) {
+      return res.status(400).send({ error: "ID no proporcionado" });
+    }
+    try {
+      const connection = await mysql.createConnection(dbConfig);
+      const [result] = await connection.execute('DELETE FROM users WHERE id = ?', [id]);
+      connection.end();
+  
+      if (result.affectedRows === 0) return res.status(404).send({ message: 'Usuario no encontrado' });
+  
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error en la base de datos:", error);
+      res.status(500).json({ error: "Error en la base de datos" });
+    }
+  });
+  
+
 // Function to verify token
 function verifyToken(req, res, next) {
     const token = req.headers['authorization'];

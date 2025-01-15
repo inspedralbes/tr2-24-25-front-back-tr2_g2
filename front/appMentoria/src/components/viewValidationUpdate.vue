@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { fetchAllUserValidation, deleteUserValidation, fetchAllClasses } from "@/services/communicationManager";
+import { fetchUserValidation, deleteUserValidation, fetchAllClasses } from "@/services/communicationManager";
 
 export default {
   data() {
@@ -71,7 +71,7 @@ export default {
     try {
       const BACK_URL = import.meta.env.VITE_URL_BACK;
 
-      const data = await fetchAllUserValidation();
+      const data = await fetchUserValidation();
       console.log("dadasda" + data);
       data.forEach(user => {
         if (user.banner.startsWith('/')) {
