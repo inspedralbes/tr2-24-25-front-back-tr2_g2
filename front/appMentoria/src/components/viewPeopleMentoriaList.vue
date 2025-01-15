@@ -9,13 +9,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import ViewPeopleMentoria from '@/components/viewPeopleMentoria.vue';
-import { getUsers } from '../services/communicationManager';
+import { getUsersForOther } from '../services/communicationManager';
 
 const users = ref([]);
 
 const fetchUsers = async () => {
   try {
-    const response = await getUsers();
+    const response = await getUsersForOther();
     if (!response.ok) {
       throw new Error('Error al obtener los usuarios');
     }

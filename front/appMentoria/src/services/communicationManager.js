@@ -67,7 +67,7 @@ export const getCommunityPublication = async () => {
 };
 
 // Get User Data
-export const getUsers = async () => {
+export const getUsersForOther = async () => {
   try {
     const response = await fetch(`${BACK_URL}/users`, {
       method: "GET",
@@ -78,6 +78,25 @@ export const getUsers = async () => {
     });
     const data = await response;
     console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
+};
+
+// Get User Data in JSON
+export const getUsers = async () => {
+  try {
+    const response = await fetch(`${BACK_URL}/users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const data = await response.json();
+    console.log("PUTA",data);
     return data;
   } catch (error) {
     console.error("Network error:", error);

@@ -4,16 +4,16 @@
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
           <img 
-            :src="users.find(user => user._id === userElla)?.profile || 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
+            :src="users.find(user => user.id === userOtro)?.profile || 'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT-fqsDjRDNUc9JjY89DKQNtvDO9XC6N2Mt1o3jVsINCrclE8GfaCVYVHlugZavO2EdyqoYp6sIZmBIAvDU2KYogQ'" 
             alt="" 
             class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
           >
         </div>
         <div class="flex flex-col leading-tight">
           <div class="text-2xl mt-1 flex items-center">
-            <span class="text-gray-700 mr-3 dark:text-white">{{ users.find(user => user._id === userElla)?.name }}</span>
+            <span class="text-gray-700 mr-3 dark:text-white">{{ users.find(user => user.id === userOtro)?.name }}</span>
           </div>
-          <span class="text-lg text-gray-600 dark:text-white">{{ users.find(user => user._id === userElla)?.email.split('@')[0] }}</span>
+          <span class="text-lg text-gray-600 dark:text-white">{{ users.find(user => user.id === userOtro)?.email.split('@')[0] }}</span>
         </div>
       </div>
       <div class="flex items-center space-x-2 pr-4">
@@ -112,14 +112,14 @@ const props = defineProps({
     type: String,
     required: true
   },
-  userElla: {
+  userOtro: {
     type: String,
     required: true
   }
 });
 
 const currentUser = props.userMio;
-const userElla = props.userElla;
+const userOtro = props.userOtro;
 const users = ref(props.users);
 
 const chatData = ref({});
