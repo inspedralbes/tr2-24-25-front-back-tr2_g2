@@ -53,13 +53,13 @@ const availibility = computed(() => {
 
 const formatDay = (day) => {
   const daysMap = {
-    monday: 'Lunes',
-    tuesday: 'Martes',
-    wednesday: 'Miércoles',
-    thursday: 'Jueves',
-    friday: 'Viernes',
-    saturday: 'Sábado',
-    sunday: 'Domingo',
+    monday: 'Dilluns',
+    tuesday: 'Dimarts',
+    wednesday: 'Dimecres',
+    thursday: 'Dijous',
+    friday: 'Divendres',
+    saturday: 'Dissabte',
+    sunday: 'Diumenge',
   };
   return daysMap[day] || day;
 };

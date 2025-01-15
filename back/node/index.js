@@ -308,19 +308,63 @@ app.get('/newDataUsers/:id', verifyToken, async (req, res) => {
 });
 
 app.post('/newDataUsers', verifyToken, async (req, res) => {
-    const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     try {
+        console.log('New data user:', req.body);
+        const { userPinia, userData } = req.body;
+
+        // Validar que ambos objetos existan
+        if (!userPinia || !userData) {
+            return res.status(400).json({ error: 'Datos incompletos: se necesitan userPinia y userData.' });
+        }
+
+        // Fusionar los datos: Actualizar userPinia con los valores de userData
+        const updatedUser = {
+            ...userPinia,
+            ...userData,
+            tags: userData.tags || userPinia.tags, // Manejar valores específicos
+            availibility: userData.availibility || userPinia.availibility,
+        };
+
+        console.log('Usuario actualizado:', updatedUser);
+
+        // Convertir `tags` y `availibility` a JSON string si no están vacíos
+        if (updatedUser.tags && typeof updatedUser.tags !== 'string') {
+            updatedUser.tags = JSON.stringify(updatedUser.tags);
+        }
+
+        if (updatedUser.availibility && typeof updatedUser.availibility !== 'string') {
+            updatedUser.availibility = JSON.stringify(updatedUser.availibility);
+        }
+
+        // Aquí va la lógica para guardar los datos en la base de datos
         const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'INSERT INTO newDataUsers (typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [typesUsers_id, user_id, name, email, hashedPassword, token, banner, profile, status, class_id]
-        );
+        const query = `
+            INSERT INTO newDataUsers (typesUsers_id, user_id, name, email, password, banner, profile, class_id, city, discord_link, github_link, tags, availibility)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const values = [
+            updatedUser.typesUsers_id,
+            updatedUser.user_id,
+            updatedUser.name,
+            updatedUser.email,
+            updatedUser.password,
+            updatedUser.banner,
+            updatedUser.profile,
+            updatedUser.class_id,
+            updatedUser.city,
+            updatedUser.discord_link,
+            updatedUser.github_link,
+            updatedUser.tags,
+            updatedUser.availibility,
+        ];
+        await connection.execute(query, values);
         connection.end();
-        res.status(201).json({ message: 'New data user created successfully' });
+
+        // Simulación de respuesta exitosa
+        res.status(201).json({ message: 'Datos del usuario actualizados correctamente', updatedUser });
     } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+        console.error('Error al procesar los datos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

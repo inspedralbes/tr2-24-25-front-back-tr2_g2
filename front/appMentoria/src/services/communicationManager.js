@@ -89,9 +89,7 @@ export const getUserForRefreshLogin = async (user) => {
 
 // Logout for my app
 export const logout = async () => {
-
     console.log('Cerrando sesión...');
-
     try {
         const refreshToken = localStorage.getItem('refreshToken');
         const accessToken = localStorage.getItem('accessToken');
@@ -106,6 +104,18 @@ export const logout = async () => {
             },
             body: JSON.stringify({ accessToken, refreshToken }),
         });
+
+        if (response.status === 401) {
+            console.log('Token expirado, intentando renovar...');
+            const refreshResult = await refreshToken();
+
+            if (refreshResult.error) {
+                return { error: 'No se pudo renovar el token. Inicia sesión nuevamente.' };
+            }
+
+            // Reintenta el logout después de renovar el token
+            return await logout();
+        }
 
         if (!response.ok) {
             console.log('Error en la petición:', response);
@@ -122,6 +132,50 @@ export const logout = async () => {
         localStorage.removeItem('user');
 
         return { message: 'Logout successful' };
+    } catch (error) {
+        console.error('Network error:', error);
+        return { error: 'Network error. Please try again later.' };
+    }
+};
+
+// Create new data user
+export const createNewDataUser = async (userData) => {
+    
+    console.log(userData, `communicationManager.js`);
+    console.log(`userPinia`, useAppStore().user);
+
+    let sendUserData = {
+        userPinia: useAppStore().user,
+        userData: userData,
+    };
+
+    try {
+        const response = await fetch(`${BACK_URL}/newDataUsers`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+            body: JSON.stringify(sendUserData),
+        });
+
+        if (response.status === 401) {
+            console.log('Token expirado, intentando renovar...');
+            const refreshResult = await refreshToken();
+
+            if (refreshResult.error) {
+                return { error: 'No se pudo renovar el token. Inicia sesión nuevamente.' };
+            }
+
+            // Reintenta la petición después de renovar el token
+            return await createNewDataUser(userData);
+        }
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return await response.json();
     } catch (error) {
         console.error('Network error:', error);
         return { error: 'Network error. Please try again later.' };

@@ -3,7 +3,8 @@
         <div class="max-w-7xl mx-auto px-6 md:px-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Formulari d'usuari</h2>
 
-            <button @click="toggleForm" class="bg-indigo-600 text-white py-2 px-4 rounded-full mb-6 hover:bg-indigo-700">
+            <button @click="toggleForm"
+                class="bg-indigo-600 text-white py-2 px-4 rounded-full mb-6 hover:bg-indigo-700">
                 Mostrar formulari
             </button>
 
@@ -18,20 +19,26 @@
                             required />
                     </div>
 
-                    <!-- Correu Electrònic -->
+                    <!-- Perfil foto -->
                     <div class="mb-4">
-                        <label for="email" class="block text-gray-700 dark:text-gray-300">Correu electrònic</label>
-                        <input type="email" id="email" v-model="form.email"
-                            class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                            required />
+                        <label for="profile_photo" class="block text-gray-700 dark:text-gray-300">Foto de perfil</label>
+                        <input 
+                            type="file" 
+                            id="profile_photo" 
+                            @change="onFileChange($event, 'profile_photo')"
+                            class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white" 
+                        />
                     </div>
 
-                    <!-- Contrasenya -->
+                    <!-- Banner foto -->
                     <div class="mb-4">
-                        <label for="password" class="block text-gray-700 dark:text-gray-300">Contrasenya</label>
-                        <input type="password" id="password" v-model="form.password"
-                            class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                            required />
+                        <label for="banner_photo" class="block text-gray-700 dark:text-gray-300">Foto de portada</label>
+                        <input 
+                            type="file" 
+                            id="banner_photo" 
+                            @change="onFileChange($event, 'banner_photo')"
+                            class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white" 
+                        />
                     </div>
 
                     <!-- Ciutat -->
@@ -44,24 +51,13 @@
                     <!-- Enllaços (Discord i GitHub) -->
                     <div class="mb-4">
                         <label for="discord_link" class="block text-gray-700 dark:text-gray-300">Enllaç Discord</label>
-                        <input type="url" id="discord_link" v-model="form.discord_link"
+                        <input id="discord_link" v-model="form.discord_link"
                             class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white" />
                     </div>
                     <div class="mb-4">
                         <label for="github_link" class="block text-gray-700 dark:text-gray-300">Enllaç GitHub</label>
-                        <input type="url" id="github_link" v-model="form.github_link"
+                        <input id="github_link" v-model="form.github_link"
                             class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white" />
-                    </div>
-
-                    <!-- Estat -->
-                    <div class="mb-4">
-                        <label for="status" class="block text-gray-700 dark:text-gray-300">Estat</label>
-                        <select id="status" v-model="form.status"
-                            class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">
-                            <option value="pending">Pendent</option>
-                            <option value="approved">Aprovat</option>
-                            <option value="rejected">Rebutjat</option>
-                        </select>
                     </div>
 
                     <!-- Etiquetes -->
@@ -69,15 +65,16 @@
                         <label for="tags" class="block text-gray-700 dark:text-gray-300">Etiquetes (JSON)</label>
                         <textarea id="tags" v-model="form.tags"
                             class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"></textarea>
-                        <small class="text-gray-500 dark:text-gray-400">Exemple de format: ["etiqueta1", "etiqueta2"]</small>
+                        <small class="text-gray-500 dark:text-gray-400">Exemple de format: ["JavaScript", "Python", "React"]</small>
                     </div>
 
                     <!-- Disponibilitat -->
                     <div class="mb-4">
-                        <label for="availibility" class="block text-gray-700 dark:text-gray-300">Disponibilitat (JSON)</label>
+                        <label for="availibility" class="block text-gray-700 dark:text-gray-300">Disponibilitat
+                            (JSON)</label>
                         <textarea id="availibility" v-model="form.availibility"
                             class="w-full p-3 mt-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"></textarea>
-                        <small class="text-gray-500 dark:text-gray-400">Exemple de format: {"dilluns": "9:00-12:00"}</small>
+                        <small class="text-gray-500 dark:text-gray-400">Exemple de format: {"monday":"9:00-12:00", "friday":"9:00-12:00"}</small>
                     </div>
 
                     <!-- Botó de Submit -->
@@ -95,21 +92,29 @@
 
 <script setup>
 import { ref } from 'vue';
+import { createNewDataUser } from '@/services/communicationManager';
 
 // Estado para el formulario
 const form = ref({
     name: '',
-    email: '',
-    password: '',
+    profile_photo: null,
+    banner_photo: null,
     city: '',
     discord_link: '',
     github_link: '',
-    status: 'pending',
     tags: '',
     availibility: ''
 });
 
 const formVisible = ref(false); // Para mostrar/ocultar el formulario
+
+// Función para manejar archivos
+const onFileChange = (event, fieldName) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.value[fieldName] = file;
+    }
+};
 
 // Función para mostrar/ocultar el formulario
 const toggleForm = () => {
@@ -118,28 +123,25 @@ const toggleForm = () => {
 
 // Función para manejar el envío del formulario
 const submitForm = async () => {
-    const userData = { ...form.value };
+    try {
+        const userData = { ...form.value };
+        // Validar y convertir JSON
+        if (userData.tags) userData.tags = JSON.parse(userData.tags);
+        if (userData.availibility) userData.availibility = JSON.parse(userData.availibility);
 
-    // Validación de JSON para tags y availability
-    if (userData.tags) {
-        try {
-            userData.tags = JSON.parse(userData.tags);
-        } catch (e) {
-            alert("El format de 'tags' no és vàlid. Assegura't que sigui JSON.");
-            return;
+        console.log('Datos enviados:', userData);
+
+        const response = await createNewDataUser(userData);
+
+        if (response.error) {
+            alert(`Error: ${response.error}`);
+        } else {
+            alert('Usuari creat correctament');
+            form.value = { name: '', profile_photo: null, banner_photo: null, city: '', discord_link: '', github_link: '', tags: '', availibility: '' };
+            formVisible.value = false;
         }
+    } catch (error) {
+        alert('Error en el format JSON.');
     }
-
-    if (userData.availibility) {
-        try {
-            userData.availibility = JSON.parse(userData.availibility);
-        } catch (e) {
-            alert("El format de 'availibility' no és vàlid. Assegura't que sigui JSON.");
-            return;
-        }
-    }
-
-    // Aquí va el código para enviar el formulario (por ejemplo, usando fetch)
-    // ...
 };
 </script>
