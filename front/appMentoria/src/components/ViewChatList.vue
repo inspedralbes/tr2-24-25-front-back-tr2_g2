@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="chats.length === 0 && chatsInfo" class="flex items-center justify-center h-full">
+    <div
+      v-if="chats.length === 0 && chatsInfo"
+      class="flex items-center justify-center h-full"
+    >
       <p class="text-gray-500">No hi tens chats</p>
     </div>
     <div v-if="!chatsInfo" class="flex items-center justify-center h-full">
@@ -14,11 +17,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import ViewChat from '@/components/viewInfoChat.vue';
-import socketChat from '../services/socketChat';
-import { useAppStore } from '@/stores/index';
-import { getUsers, fetchChats } from '../services/communicationManager';
+import { ref, onMounted, watch } from "vue";
+import ViewChat from "@/components/viewInfoChat.vue";
+import socketChat from "../services/socketChat";
+import { useAppStore } from "@/stores/index";
+import { getUsers, fetchChats } from "../services/communicationManager";
 
 const users = ref([]);
 const chats = ref([]);
@@ -40,9 +43,9 @@ const fetchChatsNow = async (userId) => {
 
 onMounted(async () => {
   users.value = await getUsers();
-  socketChat.on('receiveMessage', async (newMessage) => {
+  socketChat.on("receiveMessage", async (newMessage) => {
     console.log("Nuevo mensaje recibido", newMessage);
-      await fetchChatsNow(userId);
+    await fetchChatsNow(userId);
   });
   await fetchChatsNow(userId);
 });

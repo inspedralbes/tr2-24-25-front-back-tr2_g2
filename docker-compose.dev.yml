@@ -5,20 +5,20 @@ services:
     volumes:
       - ./front/appMentoria:/usr/src/app
     working_dir: /usr/src/app
-    ports: 
+    ports:
       - 5173:5173
     links:
       - tr2g2-back
 
   tr2g2-back:
-    build: 
+    build:
       dockerfile: ./back/node/dev.Dockerfile
       context: .
     command: sh -c "cp .env.DEV .env && npm install && npm run dev"
     volumes:
       - ./back/node:/usr/src/app
     working_dir: /usr/src/app
-    ports: 
+    ports:
       - 3000:3000
     links:
       - tr2g2-mysql
@@ -28,7 +28,7 @@ services:
       - employmentexchange
 
   chat:
-    build: 
+    build:
       context: ./back/node/services/chat
       dockerfile: ../../dev.Dockerfile
     command: sh -c "cp .env.DEV .env && npm install && node index.js"
@@ -39,10 +39,10 @@ services:
       - 3001:3001
     depends_on:
       - tr2g2-mongodb
-      # - tr2g2-back
+    #  - tr2g2-back
 
   community:
-    build: 
+    build:
       context: ./back/node/services/community
       dockerfile: ../../dev.Dockerfile
     command: sh -c "cp .env.DEV .env && npm install && npm run dev"
@@ -53,7 +53,7 @@ services:
       - 3002:3002
 
   employmentexchange:
-    build: 
+    build:
       context: ./back/node/services/employmentexchange
       dockerfile: ../../dev.Dockerfile
     command: sh -c "cp .env.DEV .env && npm install && npm run dev"
@@ -63,16 +63,16 @@ services:
     ports:
       - 3003:3003
 
-  # ia:
-  #   build: 
-  #     context: ./back/node/services/IA
-  #     dockerfile: ../../dev.Dockerfile
-  #   command: sh -c "cp .env.DEV .env && npm install && npm run dev"
-  #   volumes:
-  #     - ./back/node/services/IA:/usr/src/app
-  #   working_dir: /usr/src/app
-  #   ports:
-  #     - 3004:3004
+  iaimage:
+    build:
+      context: ./back/node/services/iaimage
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/iaimage:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3006:3006
 
   tr2g2-mongodb:
     image: mongo
@@ -102,7 +102,7 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mentories
     volumes:
       - mysql-db:/var/lib/mysql:rw

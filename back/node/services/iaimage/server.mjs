@@ -15,7 +15,15 @@ const port = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+});
 app.use(fileUpload());
 
 
@@ -30,6 +38,9 @@ function extractJsonContent(responseText) {
 }
 
 let totalTokensAcumulados = 0;
+app.get("/", (req, res) => {
+    res.send("Hello World! I am an image service");
+});
 app.post("/classify-image", async (req, res) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
@@ -93,13 +104,13 @@ app.post("/classify-image", async (req, res) => {
         
         
         Por mas ofensivo que sea una imagen devuelve por lo menos un mensaje de error.`;
-        
+
         const promptTokens = encode(prompt).length;
-        
+
         const result = await model.generateContent([prompt, imagePart]);
-          
+
         const responseText = result.response.text();
-        
+
         const responseTokens = encode(responseText).length;
 
         const totalTokens = promptTokens + responseTokens;

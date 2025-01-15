@@ -1,47 +1,74 @@
 <template>
   <div>
-    <div v-if="selectedChatId === false" v-for="chat in chats" :key="chat.id" class="chat-item overflow-y-auto">
-      <div style="display: flex; align-items: center;" @click="selectChat(chat._id), updateUserIdLaOtra(chat)">
+    <div
+      v-if="selectedChatId === false"
+      v-for="chat in chats"
+      :key="chat.id"
+      class="chat-item overflow-y-auto"
+    >
+      <div
+        style="display: flex; align-items: center"
+        @click="selectChat(chat._id), updateUserIdLaOtra(chat)"
+      >
         <img
           v-if="chat.user_one_id === userId"
-          :src="getAuthorProfile(chat.user_two_id)" 
-          alt="" 
+          :src="getAuthorProfile(chat.user_two_id)"
+          alt=""
           class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
-        >
+        />
         <img
           v-if="chat.user_two_id === userId"
-          :src="getAuthorProfile(chat.user_one_id)" 
-          alt="" 
+          :src="getAuthorProfile(chat.user_one_id)"
+          alt=""
           class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
-        >
-        <div style="margin-left: 1rem;">
-          <h3 v-if="chat.user_one_id === userId">{{ getAuthorName(chat.user_two_id) }}</h3>
-          <h3 v-if="chat.user_two_id === userId">{{ getAuthorName(chat.user_one_id) }}</h3>
-          <p v-if="chat.interactions && chat.interactions.length > 0 && chat.interactions[chat.interactions.length - 1].message !== null">
+        />
+        <div style="margin-left: 1rem">
+          <h3 v-if="chat.user_one_id === userId">
+            {{ getAuthorName(chat.user_two_id) }}
+          </h3>
+          <h3 v-if="chat.user_two_id === userId">
+            {{ getAuthorName(chat.user_one_id) }}
+          </h3>
+          <p
+            v-if="
+              chat.interactions &&
+              chat.interactions.length > 0 &&
+              chat.interactions[chat.interactions.length - 1].message !== null
+            "
+          >
             {{ chat.interactions[chat.interactions.length - 1].message }}
           </p>
         </div>
       </div>
     </div>
-    <viewChatContent v-if="selectedChatId !== false" :chatId="selectedChatId" :users="users" :userMio="userId" :userOtro="userIdLaOtra" @closeChat="selectedChatId = false" class="overlay" />
+    <viewChatContent
+      v-if="selectedChatId !== false"
+      :chatId="selectedChatId"
+      :users="users"
+      :userMio="userId"
+      :userOtro="userIdLaOtra"
+      :BACK_URL="BACK_URL"
+      @closeChat="selectedChatId = false"
+      class="overlay"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { defineProps } from 'vue';
-import viewChatContent from './viewChatContent.vue';
-import { useAppStore } from '@/stores/index';
+import { ref, onMounted, watch } from "vue";
+import { defineProps } from "vue";
+import viewChatContent from "./viewChatContent.vue";
+import { useAppStore } from "@/stores/index";
 
 const props = defineProps({
   chats: {
     type: Array,
-    required: true
+    required: true,
   },
   users: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const appStore = useAppStore();
@@ -51,13 +78,21 @@ const userId = ref(myUser.id);
 const users = ref(props.users);
 const chats = ref(props.chats);
 
-watch(() => props.users, (newUsers) => {
-  users.value = newUsers;
-});
+const BACK_URL = import.meta.env.VITE_URL_BACK;
 
-watch(() => props.chats, (newChats) => {
-  chats.value = newChats;
-});
+watch(
+  () => props.users,
+  (newUsers) => {
+    users.value = newUsers;
+  }
+);
+
+watch(
+  () => props.chats,
+  (newChats) => {
+    chats.value = newChats;
+  }
+);
 
 const userIdLaOtra = ref(false);
 
@@ -75,17 +110,16 @@ const selectChat = (chatId) => {
   selectedChatId.value = chatId;
 };
 
-
 const getAuthorName = (userId) => {
-    const user = users.value.find(user => user.id === userId);
-    return user.name;
-}; 
-
+  const user = users.value.find((user) => user.id === userId);
+  return user.name;
+};
 
 const getAuthorProfile = (userId) => {
   try {
-    const user = users.value.find(user => user.id === userId);
-    return user.profile;
+    const user = users.value.find((user) => user.id === userId);
+    const profileimage = `${BACK_URL}${user.profile}`;
+    return profileimage;
   } catch (error) {
     console.log(error);
   }
