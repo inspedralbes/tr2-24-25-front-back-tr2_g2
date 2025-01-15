@@ -24,7 +24,7 @@
               <a @click="$router.push('/')" class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Comunitat
               </a>
-              <a @click="$router.push('/profilesPage')"
+              <a @click="$router.push('/profiles')"
                 class="text-white hover:text-gray-200 font-medium text-sm lg:text-base">
                 Mentors
               </a>

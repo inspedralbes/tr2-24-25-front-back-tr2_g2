@@ -226,6 +226,35 @@ app.post('/logout', verifyToken, async (req, res) => {
 app.get('/users', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute(`
+            SELECT 
+                users.id, 
+                users.name, 
+                users.email,
+                users.banner,
+                users.profile,
+                qualifications.name AS qualification
+            FROM 
+                users
+            LEFT JOIN 
+                qualifications
+            ON 
+                users.qualification_id = qualifications.id
+            WHERE 
+                users.typesUsers_id = 1
+        `);
+        connection.end();
+        console.log('rows: ', rows);
+        res.json(rows);
+    } catch (error) {
+        console.error('Database error:', error.message);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/usersAll', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM users');
         connection.end();
         res.json(rows);
@@ -271,7 +300,7 @@ app.put('/users/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/users/:id', verifyToken, async (req, res) => {
+app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -288,7 +317,7 @@ app.delete('/users/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for newDataUsers
-app.get('/newDataUsers', verifyToken, async (req, res) => {
+app.get('/newDataUsers', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM newDataUsers');
@@ -299,7 +328,7 @@ app.get('/newDataUsers', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.get('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -376,7 +405,7 @@ app.post('/newDataUsers', verifyToken, async (req, res) => {
     }
 });
 
-app.put('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.put('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
     const { typesUsers_id, user_id, name, email, password, token, banner, profile, status, class_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -397,7 +426,7 @@ app.put('/newDataUsers/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/newDataUsers/:id', verifyToken, async (req, res) => {
+app.delete('/newDataUsers/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -574,7 +603,7 @@ app.delete('/users/qualifications/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for classes
-app.get('/classes', verifyToken, async (req, res) => {
+app.get('/classes', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM classes');
@@ -734,7 +763,7 @@ app.delete('/teachersClasses/:id', verifyToken, async (req, res) => {
 });
 
 // CRUD operations for reports comments
-app.get('/reports/comments',  async (req, res) => {
+app.get('/reports/comments', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [results] = await connection.execute(`SELECT 
@@ -761,7 +790,7 @@ app.get('/reports/comments',  async (req, res) => {
     }
 });
 
-app.get('/reports/comments/:id',  async (req, res) => {
+app.get('/reports/comments/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -777,7 +806,7 @@ app.get('/reports/comments/:id',  async (req, res) => {
     }
 });
 
-app.post('/reports/comments',  async (req, res) => {
+app.post('/reports/comments', async (req, res) => {
     const { comment_id, user_id, report } = req.body;
 
     try {
@@ -791,7 +820,7 @@ app.post('/reports/comments',  async (req, res) => {
     }
 });
 
-app.put('/reports/comments/:id',  async (req, res) => {
+app.put('/reports/comments/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
@@ -808,7 +837,7 @@ app.put('/reports/comments/:id',  async (req, res) => {
     }
 });
 
-app.delete('/reports/comments/:id',  async (req, res) => {
+app.delete('/reports/comments/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -869,7 +898,7 @@ app.get('/reports/users/:id', async (req, res) => {
     }
 });
 
-app.post('/reports/users',  async (req, res) => {
+app.post('/reports/users', async (req, res) => {
     const { reported_user_id, user_id, report } = req.body;
 
     try {
@@ -940,6 +969,63 @@ app.post('/reviews', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+
+app.get('/pendingUsers', async (req, res) => {
+    try {
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM users WHERE verified = 0');
+        connection.end();
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Database error. Please try again later.' });
+    }
+});
+
+app.delete('/verified/users/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log("ID recibido en backend:", id); // Depuración
+    if (!id) {
+        return res.status(400).send({ error: "ID no proporcionado" });
+    }
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('DELETE FROM users WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Usuario no encontrado' });
+
+        res.status(204).send();
+    } catch (error) {
+        console.error("Error en la base de datos:", error);
+        res.status(500).json({ error: "Error en la base de datos" });
+    }
+});
+
+
+app.put('/verified/users/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('UPDATE users SET verified = 1 WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Usuario no encontrado' });
+
+        res.status(200).send({ message: 'Usuario verificado exitosamente' });
+
+    } catch (error) {
+        console.error('Error en la base de datos:', error);
+        res.status(500).json({ error: 'Error en la base de datos' });
+    }
+});
+
 
 // Get type of users
 app.get('/typesUsers', async (req, res) => {
