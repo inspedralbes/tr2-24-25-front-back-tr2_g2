@@ -1,6 +1,6 @@
 <template>
     <Header></Header>
-    <div class="bg-gray-100 dark:bg-gray-900 min-h-screen py-12 px-6">
+    <div v-if="!isLoading || images.comments || images.publications || images.users" class="bg-gray-100 dark:bg-gray-900 min-h-screen py-12 px-6">
         <!-- Encabezado -->
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
             Estadístiques
@@ -45,15 +45,22 @@
             </div>
         </div>
     </div>
+
+    <div v-else class="flex items-center justify-center min-h-screen bg-white dark:bg-neutral-800">
+        <Loading />
+    </div>
+
     <NavBar />
 </template>
 
 <script setup>
 import Header from '@/components/Header.vue';
 import NavBar from '@/components/NavBar.vue';
+import Loading from '@/components/Loading.vue';
 import { ref, onMounted } from 'vue';
 
 const URLSTADISTICS = import.meta.env.VITE_URL_BACK_STADISTICS;
+let isLoading = ref(true);
 
 const images = ref({
     comments: [],
@@ -68,16 +75,19 @@ const fetchImages = async () => {
         const data = await response.json();
 
         // Actualiza las imágenes con las rutas obtenidas
-        images.value.comments = data.comments.map(img => `${URLSTADISTICS}/upload/comments/${img}`);
-        images.value.publications = data.publications.map(img => `${URLSTADISTICS}/upload/publications/${img}`);
-        images.value.users = data.users.map(img => `${URLSTADISTICS}/upload/users/${img}`);
+        images.value.comments = data.comments.map(img => `${URLSTADISTICS}${img}`);
+        images.value.publications = data.publications.map(img => `${URLSTADISTICS}${img}`);
+        images.value.users = data.users.map(img => `${URLSTADISTICS}${img}`);
     } catch (error) {
         console.error('Error cargando las imágenes:', error);
+    }  finally {
+        isLoading.value = false;
     }
 };
 
 // Cargar las imágenes cuando el componente se monta
-onMounted(() => {
+onMounted( async () => {
     fetchImages();
+    
 });
 </script>
