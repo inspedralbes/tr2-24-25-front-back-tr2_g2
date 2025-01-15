@@ -13,7 +13,7 @@ import adminPanel from '../views/adminPanel.vue'
 import reportUserPage from '@/views/reportUserPage.vue'
 import reportPublicacioPage from '@/views/reportPublicacioPage.vue'
 import reportCommentsPage from '@/views/reportCommentsPage.vue'
-
+import servicePage from '@/views/servicesListPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -86,6 +86,11 @@ const router = createRouter({
       path: '/chatList',
       name: 'chatListPage',
       component: chatListPage,
+    },
+    {
+      path: '/services',
+      name: 'servicePage',
+      component: servicePage,
     }
   ],
 })

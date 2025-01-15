@@ -10,12 +10,12 @@ const { spawn, exec } = require('child_process');
 const { log, error } = require('console');
 const { DateTime } = require('luxon');
 
+dotenv.config();
 // Inicialización del servidor y configuración
 const app = express();
 app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT;
-dotenv.config();
 
 // `__dirname` está disponible automáticamente en CommonJS
 const route = "../node"
@@ -47,7 +47,7 @@ fs.readdirSync(path.join(route, 'services')).forEach(file => {
         id: uuidv4(),
         name: file,
         status: 'stopped',
-        enabled: 'disabled',
+        enabled: 'enabled',
         message: [],
         log: [],
         logError: [],
@@ -165,6 +165,26 @@ app.get('/stopService/:id', (req, res) => {
 
     } else {
         res.status(404).send('Service not found');
+    }
+});
+
+app.put('/changeServiceViewUserFront/:id', (req, res) => {
+    const id = req.params.id;
+    const { enabled } = req.body;
+
+    const service = services.find(service => service.id === id);
+
+    if (service) {
+        service.enabled = enabled;
+        service.log.push({
+            message: `Service visibility changed to ${enabled}`,
+            timestamp: DateTime.now().setZone('Europe/Paris').toFormat('dd/MM/yyyy HH:mm:ss'),
+        });
+
+        io.emit('wsdata', JSON.stringify(services)); // Notificar cambios a través de WebSocket
+        res.status(200).send(service);
+    } else {
+        res.status(404).send({ error: 'Service not found' });
     }
 });
 
