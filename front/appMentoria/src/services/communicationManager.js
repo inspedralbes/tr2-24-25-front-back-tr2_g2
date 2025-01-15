@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import socketChat from "./socketChat";
+import { useRouter } from "vue-router";
 import { useAppStore } from '@/stores/index';
 
 const BACK_URL = import.meta.env.VITE_URL_BACK;
@@ -7,7 +8,9 @@ const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
 const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
 const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENT_EXCHANGE;
 const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
+const MICROOSERVICES_URL = import.meta.env.VITE_URL_BACK_MICROSERVICES;
 const NOTIFICATIONS_URL = import.meta.env.VITE_URL_BACK_NOTIFICATIONS;
+const VITE_URL_BACK_CHAT = import.meta.env.VITE_CHATS_URL;
 // Refresh acces token
 export const refreshToken = async () => {
     try {
@@ -267,7 +270,7 @@ export const getCommunityPublication = async () => {
 };
 
 // Get User Data
-export const getUsers = async () => {
+export const getUsersForOther = async () => {
     try {
         const response = await fetch(`${BACK_URL}/users`, {
             method: "GET",
@@ -276,7 +279,27 @@ export const getUsers = async () => {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
         });
+        const data = await response;
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Get User Data in JSON
+export const getUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/usersAll`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
         const data = await response.json();
+        console.log("PUTA", data);
         return data;
     } catch (error) {
         console.error("Network error:", error);
@@ -401,7 +424,9 @@ export const fetchChats = async (userId) => {
 };
 
 // Create a new chat
-export const chatButton = async (userid1, userid2, router) => {
+export const chatButton = async (userid2, router) => {
+    const appStore = useAppStore();
+    const userid1 = appStore.getUser().id;
     const newMessage = {
         user_one_id: userid1,
         user_two_id: userid2,
@@ -757,6 +782,164 @@ export const deleteReportPublication = async (id) => {
     } catch (error) {
         console.error("Network error:", error);
         return { error: "Network error. Please try again later." };
+    }
+};
+
+// Get all users in status pending
+export const fetchUserValidation = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/pendingUsers`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const pendingUsers = await response.json();
+        console.log("Pending users:", pendingUsers);
+        return pendingUsers;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Get User Data
+export const getNewUsers = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/newDataUsers`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+// Get User Data
+export const fetchAllClasses = async () => {
+    try {
+        const response = await fetch(`${BACK_URL}/classes`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+
+// delete a user in the admin validation
+export const deleteUserInDb = async (id) => {
+    try {
+        const response = await fetch(`${BACK_URL}/users/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "Report deleted successfully" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+export const deleteUserValidation = async (id) => {
+    console.log("ID enviado a backend:", id); // Depuración
+    try {
+        const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "Usuari eliminat correctament" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+
+export const updateUserValidation = async (id) => {
+    console.log("ID enviado a backend:", id); // Depuración
+    try {
+        const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        return { message: "Usuari verificat correctament" };
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+export const getServices = async () => {
+    console.log("hodaaaaaaaaaa");
+    try {
+        const response = await fetch(`${MICROOSERVICES_URL}/getProcess`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        console.log("data", data);
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        return { error: "Network error. Please try again later." };
+    }
+};
+
+export const changeServiceViewUsers = async (id, enabled) => {
+    try {
+        const response = await fetch(`${MICROOSERVICES_URL}/changeServiceViewUserFront/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ enabled }),
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Network error:", error);
+        throw new Error("Failed to update the service state.");
     }
 };
 

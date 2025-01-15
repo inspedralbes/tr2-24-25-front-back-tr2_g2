@@ -105,9 +105,8 @@
                       <path
                         d="M13.28 5.88c-0.12-0.080-0.28-0.12-0.44-0.12 0 0 0 0-0.040 0h-12c-0.44 0-0.84 0.36-0.84 0.84v15.080c0 0.44 0.36 0.84 0.84 0.84h2.4v2.92c0 0.28 0.12 0.52 0.36 0.68 0.12 0.080 0.28 0.12 0.44 0.12 0.12 0 0.24-0.040 0.32-0.080l8.84-3.76c0.32-0.12 0.52-0.44 0.52-0.76v-15.040c-0.040-0.28-0.16-0.56-0.4-0.72zM1.64 20.8v-13.4h7.16l-5.080 2.2c-0.32 0.12-0.52 0.44-0.52 0.76v10.44h-1.56zM12 21.12l-7.12 3.040v-13.28l7.12-3.040v13.28zM7.64 16.84c0 0.464-0.376 0.84-0.84 0.84s-0.84-0.376-0.84-0.84c0-0.464 0.376-0.84 0.84-0.84s0.84 0.376 0.84 0.84z"
                       ></path>
-                    </g>
-                  </svg>
-                </span>
+                    </g></svg
+                ></span>
               </div>
             </div>
           </div>
@@ -118,6 +117,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
+import ToggleDarkMode from "./ToggleDarkMode.vue";
+import { useAppStore } from "@/stores/index";
 import { ref, onMounted, reactive } from "vue";
 import ToggleDarkMode from "./ToggleDarkMode.vue";
 import { useAppStore } from "@/stores/index";
@@ -125,6 +127,7 @@ import { logout } from "@/services/communicationManager";
 import { useRouter } from "vue-router";
 
 const appStore = useAppStore();
+var userTypes = ref("");
 const router = useRouter();
 
 var user = reactive({});

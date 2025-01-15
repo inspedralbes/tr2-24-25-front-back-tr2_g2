@@ -4,7 +4,8 @@ import mainPage from '../views/mainPage.vue'
 import profilePage from '../views/profilePage.vue'
 import profilesPage from '@/views/profilesPage.vue'
 import reportPage from '../views/reportPage.vue'
-// import validationPage from '../views/validationPage.vue'
+import validationPage from '../views/validationPage.vue'
+import validationUpdatePage from '../views/validationUpdatePage.vue'
 import chatListPage from '../views/chatListPage.vue'
 import loginPage from '../views/loginRegisterPage.vue'
 import addComunityPost from '../views/addComunityPost.vue'
@@ -16,6 +17,7 @@ import reportCommentsPage from '@/views/reportCommentsPage.vue'
 import notificationPage from '../views/notifiationPage.vue'
 import myPublications from '../views/myPublications.vue'
 import myRequests from '../views/myRequests.vue'
+import servicePage from '../views/servicePage.vue'
 
 const routes = [
   {
@@ -94,15 +96,25 @@ const routes = [
     name: 'reportCommentsPage',
     component: reportCommentsPage,
   },
-  // {
-  //   path: '/validation',
-  //   name: 'validationPage',
-  //   component: validationPage,
-  // },
+  {
+    path: '/validation',
+    name: 'validationPage',
+    component: validationPage,
+  },
+  {
+    path: '/validationInfo',
+    name: 'validationUpdatePage',
+    component: validationUpdatePage,
+  },
   {
     path: '/chatList',
     name: 'chatListPage',
     component: chatListPage,
+  },
+  {
+    path: '/services',
+    name: 'servicePage',
+    component: servicePage,
   }
 ];
 

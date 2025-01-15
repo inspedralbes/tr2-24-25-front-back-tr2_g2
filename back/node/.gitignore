@@ -24,3 +24,6 @@
 
 /services/stadistics/node_modules
 /services/stadistics/.env
+
+/services/iatext/node_modules
+/services/iatext/.env
