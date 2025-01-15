@@ -1004,31 +1004,6 @@ async function comparePassword(password, hashedPassword) {
     return match
 }
 
-// Function to verify token
-function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).send('Token es requerido');
-
-    jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) return res.status(500).send('Fallo al autenticar el token');
-        req.user = decoded;
-        next();
-    });
-};
-
-// Function to hash password
-async function hashPassword(password) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return hashedPassword
-}
-
-// Function to compare password
-async function comparePassword(password, hashedPassword) {
-    const match = await bcrypt.compare(password, hashedPassword);
-    return match
-}
-
 // Start the server
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

@@ -78,9 +78,9 @@
             <Calendar :availibilityJson="JSON.stringify(user.value.availibility)" />
         </div>
 
-        <div class="pb-14">
+        <!-- <div class="pb-14">
             <FormNewDataUsers /> 
-        </div>
+        </div> -->
     </div>
 
     <div v-else>
@@ -97,7 +97,7 @@ import NavBar from '@/components/NavBar.vue';
 import Header from '@/components/Header.vue';
 import Loading from '@/components/Loading.vue';
 import Calendar from '@/components/Calendar.vue';
-import FormNewDataUsers from '@/components/FormNewDataUsers.vue';
+// import FormNewDataUsers from '@/components/FormNewDataUsers.vue';
 
 const appStore = useAppStore();
 

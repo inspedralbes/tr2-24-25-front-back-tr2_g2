@@ -209,19 +209,14 @@ const signInWithApp = async () => {
 
     let user = response.userLogin;
     let profile = user.profile;
-    let profile = user.profile;
 
     bannerURL.value = `${import.meta.env.VITE_URL_BACK}${user.banner}`;
     if (profile.includes('/upload/', 0)) {
       profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
-      profileURL.value = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
     } else {
-      profileURL.value = user.profile;
       profileURL.value = user.profile;
     }
 
-    user.profile = profileURL.value;
-    user.banner = bannerURL.value;
     user.profile = profileURL.value;
     user.banner = bannerURL.value;
 

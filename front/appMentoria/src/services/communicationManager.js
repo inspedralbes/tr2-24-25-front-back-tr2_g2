@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import socketChat from "./socketChat";
-import { useRouter } from "vue-router";
+import { useAppStore } from '@/stores/index';
 
 const BACK_URL = import.meta.env.VITE_URL_BACK;
 const CHAT_URL = import.meta.env.VITE_URL_BACK_CHAT;
@@ -8,9 +8,41 @@ const COMMUNITY_URL = import.meta.env.VITE_URL_BACK_COMMUNITY;
 const EMPLOYMENTEXCHANGE_URL = import.meta.env.VITE_URL_BACK_EMPLOYMENTEXCHANGE;
 const STADISTICS_URL = import.meta.env.VITE_URL_BACK_STADISTICS;
 
-import { useAppStore } from '@/stores/index';
+// Refresh acces token
+export const refreshToken = async () => {
+    try {
+        const refreshToken = localStorage.getItem('refreshToken');
 
-const VITE_URL_BACK_CHAT = import.meta.env.VITE_CHATS_URL;
+        console.log('Renovando token...');
+        console.log(refreshToken);
+
+        const response = await fetch(`${BACK_URL}/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!response.ok) {
+            return { error: `HTTP error! status: ${response.status}` };
+        }
+
+        const data = await response.json();
+
+        console.log('Token renovado:', data);
+
+        // Guardar el nuevo token
+        useAppStore().setAccessToken(data.accessToken);
+        localStorage.setItem('accessToken', data.accessToken);
+
+        return data;
+    } catch (error) {
+        console.error('Error al renovar el Access Token:', error);
+        window.location.href = '/login';
+        return { error: 'Error al renovar el Access Token.' };
+    }
+};
 
 // Login API firebase
 export const loginAPI = async (user) => {
@@ -273,43 +305,6 @@ export const postCommunityComments = async (comment) => {
         console.error(error);
     }
 };
-
-// Refresh acces token
-export const refreshToken = async () => {
-    try {
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        console.log('Renovando token...');
-        console.log(refreshToken);
-
-        const response = await fetch(`${BACK_URL}/refresh`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ refreshToken }),
-        });
-
-        if (!response.ok) {
-            return { error: `HTTP error! status: ${response.status}` };
-        }
-
-        const data = await response.json();
-
-        console.log('Token renovado:', data);
-
-        // Guardar el nuevo token
-        useAppStore().setAccessToken(data.accessToken);
-        localStorage.setItem('accessToken', data.accessToken);
-
-        return data;
-    } catch (error) {
-        console.error('Error al renovar el Access Token:', error);
-        window.location.href = '/login';
-        return { error: 'Error al renovar el Access Token.' };
-    }
-};
-
 
 // Get all messages
 export const fetchMessages = async (chatId) => {

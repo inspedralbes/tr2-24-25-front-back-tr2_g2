@@ -24,6 +24,9 @@ export const useAppStore = defineStore( 'appStore', {
     },
     getRefreshToken() {
       return this.refreshToken
+    },
+    getTypeUser() {
+      return this.user.typesUsers_id
     }
   }
 });
