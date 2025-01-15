@@ -169,21 +169,3 @@ INSERT INTO teachersClasses (user_id, class_id) VALUES
 (22, 22), 
 (23, 23), 
 (24, 23);
-
--- Inserts for reportsPublications
-INSERT INTO reportsPublications (publicationId, userId, reportReason, reportDate) VALUES
-(1, 1, 'Inappropriate content', '2023-01-01'),
-(2, 2, 'Spam', '2023-01-02'),
-(3, 3, 'Harassment', '2023-01-03');
-
--- Inserts for reportsComments
-INSERT INTO reportsComments (commentId, userId, reportReason, reportDate) VALUES
-(1, 1, 'Offensive language', '2023-01-01'),
-(2, 2, 'Spam', '2023-01-02'),
-(3, 3, 'Harassment', '2023-01-03');
-
--- Inserts for reportsUsers
-INSERT INTO reportsUsers (userId, reportReason, reportDate) VALUES
-(1, 'Multiple account abuse', '2023-01-01'),
-(2, 'Inappropriate behavior', '2023-01-02'),
-(3, 'Spam', '2023-01-03');

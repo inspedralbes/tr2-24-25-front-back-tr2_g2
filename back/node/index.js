@@ -965,6 +965,7 @@ app.get('/comments', async (req, res) => {
 });
 
 app.get('/publications', async (req, res) => {
+    console.log('Publications');
     try {
         const connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM publications');
