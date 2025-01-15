@@ -88,7 +88,7 @@ export const getUsersForOther = async () => {
 // Get User Data in JSON
 export const getUsers = async () => {
   try {
-    const response = await fetch(`${BACK_URL}/users`, {
+    const response = await fetch(`${BACK_URL}/usersAll`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

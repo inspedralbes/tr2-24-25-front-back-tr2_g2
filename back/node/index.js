@@ -178,6 +178,17 @@ app.get('/users', async (req, res) => {
     }
 });
 
+app.get('/usersAll', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM users');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
 
