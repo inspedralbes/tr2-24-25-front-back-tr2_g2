@@ -129,10 +129,10 @@
     </section>
 
     <!-- Calendar (marginal adjustment) -->
+     
     <div
       v-if="user.value.availibility"
-      :class="{ '-mt-24': !user.value.discord_link && !user.value.github_link }"
-      class="p-4"
+      :class="{ '-mt-24 pb-24': !user.value.discord_link && !user.value.github_link }"
     >
       <Calendar :availibilityJson="JSON.stringify(user.value.availibility)" />
     </div>
@@ -168,5 +168,21 @@ onMounted(() => {
   user.value = appStore.getUser();
   profile.value = user.value.profile;
   banner.value = user.value.banner;
+
+  if (typeof user.value.tags === "string") {
+    try {
+      user.value.tags = JSON.parse(user.value.tags);
+    } catch (error) {
+      console.error("Error al parsear tags:", error);
+    }
+  }
+
+  if (typeof user.value.availibility === "string") {
+    try {
+      user.value.availibility = JSON.parse(user.value.availibility);
+    } catch (error) {
+      console.error("Error al parsear availibility:", error);
+    }
+  }
 });
 </script>
