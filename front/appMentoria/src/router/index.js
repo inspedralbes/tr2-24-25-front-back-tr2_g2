@@ -19,7 +19,7 @@ import myPublications from '../views/myPublications.vue'
 import myRequests from '../views/myRequests.vue'
 import servicePage from '../views/servicesListPage.vue'
 import stadisticsPage from '@/views/stadisticsPage.vue';
-
+import requestsPage from '../views/mainRequests.vue'
 const routes = [
   {
     path: '/login',
@@ -30,6 +30,11 @@ const routes = [
     path: '/',
     name: 'main',
     component: mainPage,
+  },
+  {
+    path: '/requests',
+    name: 'requests',
+    component: requestsPage,
   },
   {
     path: '/myprofile',

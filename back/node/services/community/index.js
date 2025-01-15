@@ -166,7 +166,7 @@ app.post('/comments', async (req, res) => {
             }
 
             res.status(201).json({
-                message: 'Comment created successfully',
+                message: 'comment creat correctament!',
                 comment_id,
                 publication_id,
                 commentAnalysis,
@@ -188,7 +188,7 @@ app.post('/comments', async (req, res) => {
             );
             const comment_id = result.insertId;
             res.status(201).json({
-                message: 'Comment created successfully',
+                message: 'comment creat, pendent de revisió!',
                 comment_id,
                 publication_id,
                 user_id,
@@ -266,7 +266,7 @@ app.delete('/comments/:id', async (req, res) => {
 app.get('/publications', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM publications WHERE text_ia = 1 AND image_ia = 1');
+        const [rows] = await connection.execute('SELECT * FROM publications WHERE typesPublications_id = 1 AND text_ia = 1 AND image_ia = 1');
         connection.end();
         res.json(rows);
     } catch (error) {
@@ -623,31 +623,31 @@ app.post('/reports/publications', async (req, res) => {
 });
 
 app.put('/reports/publications/:id', async (req, res) => {
-    console.log('Body:', req.body); 
+    console.log('Body:', req.body);
     const { id } = req.params;
     const { publication_id, user_id, report, status } = req.body;
-  
+
     // Verifica que todos los parámetros estén definidos
     if (publication_id === undefined || user_id === undefined || report === undefined || status === undefined) {
-      return res.status(400).json({ error: 'Missing required parameters' });
+        return res.status(400).json({ error: 'Missing required parameters' });
     }
-  
+
     try {
-      const connection = await mysql.createConnection(dbConfig);
-      const [result] = await connection.execute(
-        'UPDATE reportsPublications SET publication_id = ?, user_id = ?, report = ?, status = ? WHERE id = ?',
-        [publication_id, user_id, report, status, id]
-      );
-      connection.end();
-  
-      if (result.affectedRows == 0) return res.status(404).json({ error: 'ReportPublication not found' });
-  
-      res.json({ message: 'ReportPublication updated successfully' });
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'UPDATE reportsPublications SET publication_id = ?, user_id = ?, report = ?, status = ? WHERE id = ?',
+            [publication_id, user_id, report, status, id]
+        );
+        connection.end();
+
+        if (result.affectedRows == 0) return res.status(404).json({ error: 'ReportPublication not found' });
+
+        res.json({ message: 'ReportPublication updated successfully' });
     } catch (error) {
-      console.error('Database error:', error);
-      res.status(500).json({ error: 'Database error' });
+        console.error('Database error:', error);
+        res.status(500).json({ error: 'Database error' });
     }
-  });
+});
 
 app.delete('/reports/publications/:id', async (req, res) => {
     const { id } = req.params;

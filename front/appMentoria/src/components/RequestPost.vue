@@ -297,7 +297,7 @@ async function submitPostPeticio() {
 
     const responseData = await response.json();
     console.log("Publicación creada con éxito:", responseData);
-    router.push("/");
+    router.push("/requests");
   } catch (error) {
     console.error("Error al enviar la publicación:", error);
     alert("Error al enviar la publicación.");

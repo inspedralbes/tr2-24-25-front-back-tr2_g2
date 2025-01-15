@@ -3,7 +3,7 @@
     <Loading v-if="loading" />
     <div v-else>
       <div
-        v-if="selectedPost"
+        v-if="selectedrequest"
         class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 dark:bg-gray-900"
       >
         <button
@@ -33,43 +33,43 @@
         </button>
         <div
           v-if="
-            selectedPost.reports === 0 ||
-            selectedPost.text_ia === 0 ||
-            selectedPost.image_ia === 0
+            selectedrequest.reports === 0 ||
+            selectedrequest.text_ia === 0 ||
+            selectedrequest.image_ia === 0
           "
         >
           <header class="flex items-center p-4 border-b">
             <img
-              :src="back_url + getAuthorProfile(selectedPost.user_id)"
+              :src="back_url + getAuthorProfile(selectedrequest.user_id)"
               alt="Avatar"
               class="w-12 h-12 rounded-full mr-4"
             />
             <div>
               <h2 class="font-bold text-lg">
-                {{ getAuthorName(selectedPost.user_id) }}
+                {{ getAuthorName(selectedrequest.user_id) }}
               </h2>
               <p class="text-gray-500 text-sm dark:text-white mb-6">
-                {{ getAuthorHandle(selectedPost.user_id) }} ·
-                {{ timeSince(selectedPost.created_at) }}
+                {{ getAuthorHandle(selectedrequest.user_id) }} ·
+                {{ timeSince(selectedrequest.created_at) }}
               </p>
             </div>
           </header>
 
           <main class="p-4 space-y-4">
-            <h1 class="text-xl font-bold">{{ selectedPost.title }}</h1>
+            <h1 class="text-xl font-bold">{{ selectedrequest.title }}</h1>
             <p
               class="text-gray-800 text-lg whitespace-pre-line dark:text-gray-300"
             >
-              {{ selectedPost.description }}
+              {{ selectedrequest.description }}
             </p>
 
             <div
-              v-if="selectedPost.image != null"
+              v-if="selectedrequest.image != null"
               class="rounded-lg overflow-hidden"
             >
               <img
-                :src="`${community_url}${selectedPost.image}`"
-                alt="Post Image"
+                :src="`${employmentExchange_url}${selectedrequest.image}`"
+                alt="request Image"
                 class="w-full"
               />
             </div>
@@ -120,7 +120,9 @@
           </div>
           <ul>
             <li
-              v-for="comment in getCommentsWithPostId(selectedPost.id).filter(
+              v-for="comment in getCommentsWithrequestId(
+                selectedrequest.id
+              ).filter(
                 (comment) =>
                   (!comment.commentReply_id && comment.reported === 0) ||
                   comment.text_ia === 0
@@ -218,74 +220,115 @@
         </div>
       </div>
 
-      <div v-else>
-        <div
-          v-for="post in posts.sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-          )"
-          :key="post.id"
-          class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 dark:bg-gray-900"
-        >
-          <div v-if="post.reports === 0">
-            <header class="flex items-center p-4 border-b">
+      <div
+        v-else
+        v-for="request in requests.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        )"
+        :key="request.id"
+        class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 dark:bg-gray-900"
+      >
+        <div v-if="request.reports === 0">
+          <header class="flex items-center p-4 border-b">
+            <img
+              :src="back_url + getAuthorProfile(request.user_id)"
+              alt="Avatar"
+              class="w-12 h-12 rounded-full mr-4"
+            />
+            <div>
+              <h2 class="font-bold text-lg">
+                {{ getAuthorName(request.user_id) }}
+              </h2>
+              <p class="text-gray-500 text-sm dark:text-white">
+                {{ getAuthorHandle(request.user_id) }} ·
+                {{ timeSince(request.created_at) }}
+              </p>
+            </div>
+          </header>
+
+          <main class="p-4 space-y-4">
+            <h1 class="text-xl font-bold">{{ request.title }}</h1>
+            <p
+              class="text-gray-800 text-lg whitespace-pre-line dark:text-gray-300"
+            >
+              {{ request.description }}
+            </p>
+
+            <div
+              v-if="request.image != null"
+              class="rounded-lg overflow-hidden"
+            >
               <img
-                :src="back_url + getAuthorProfile(post.user_id)"
-                alt="Avatar"
-                class="w-12 h-12 rounded-full mr-4"
+                :src="`${employmentExchange_url}${request.image}`"
+                alt="request Image"
+                class="w-full"
               />
-              <div>
-                <h2 class="font-bold text-lg">
-                  {{ getAuthorName(post.user_id) }}
-                </h2>
-                <p class="text-gray-500 text-sm dark:text-white">
-                  {{ getAuthorHandle(post.user_id) }} ·
-                  {{ timeSince(post.created_at) }}
+              <button
+                class="block mx-auto mt-2 px-2 py-2 text-sm text-blue-500 hover:text-blue-600 focus:outline-none"
+                @click="toggleExpand(request.id)"
+              >
+                {{
+                  expandedRequests.includes(request.id)
+                    ? "Veure menys"
+                    : "Veure més"
+                }}
+              </button>
+            </div>
+
+            <!-- Mostrar disponibilidad cuando expandido -->
+            <div v-if="expandedRequests.includes(request.id)" class="mt-6">
+              <h2 class="text-lg font-semibold text-center text-white mb-4">
+                Disponibilitat
+              </h2>
+              <div
+                class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md"
+              >
+                <p class="text-gray-800 dark:text-gray-300 text-center">
+                  <span
+                    v-for="(day, index) in parseAvailability(
+                      request.availability
+                    )"
+                    :key="index"
+                    class="block py-2 border-b border-gray-300 dark:border-gray-700"
+                  >
+                    <strong class="text-gray-900 dark:text-gray-200">{{
+                      day.day
+                    }}</strong>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                      de {{ day.startTime }} a {{ day.endTime }}
+                    </span>
+                  </span>
                 </p>
               </div>
-            </header>
+            </div>
+          </main>
 
-            <main class="p-4 space-y-4">
-              <h1 class="text-xl font-bold">{{ post.title }}</h1>
-              <p
-                class="text-gray-800 text-lg whitespace-pre-line dark:text-gray-300"
+          <footer class="p-4 border-t flex justify-between items-center">
+            <div class="flex justify-around text-gray-500 dark:text-gray-300">
+              <button
+                class="flex items-center space-x-1 hover:text-gray-500"
+                @click="showrequestWithComments(request)"
               >
-                {{ post.description }}
-              </p>
-
-              <div v-if="post.image != null" class="rounded-lg overflow-hidden">
-                <img
-                  :src="`${community_url}${post.image}`"
-                  alt="Post Image"
-                  class="w-full"
-                />
-              </div>
-            </main>
-
-            <footer class="p-4 border-t">
-              <div class="flex justify-around text-gray-500 dark:text-gray-300">
-                <button
-                  class="flex items-center space-x-1 hover:text-gray-500"
-                  @click="showPostWithComments(post)"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-                    />
-                  </svg>
-                  <span>{{ getCommentsWithPostId(post.id).length }}</span>
-                </button>
-              </div>
-            </footer>
-          </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                  />
+                </svg>
+                <span>{{ getCommentsWithrequestId(request.id).length }}</span>
+              </button>
+            </div>
+
+            <!-- Botón "Ver más" -->
+          </footer>
         </div>
       </div>
     </div>
@@ -293,24 +336,26 @@
 </template>
   
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted, defineProps, computed } from "vue";
 import {
   getUsers,
-  getCommunityComments,
-  postCommunityComments,
+  getEmploymentExchangeComments,
+  postEmploymentExchangeComments,
 } from "../services/communicationManager";
 import socketBack from "../services/socketBack.js";
 import { useAppStore } from "@/stores/index";
 import Loading from "@/components/Loading.vue"; // Import the Loading component
 
-const community_url = import.meta.env.VITE_URL_BACK_COMMUNITY;
+const employmentExchange_url = import.meta.env
+  .VITE_URL_BACK_EMPLOYMENT_EXCHANGE;
 const back_url = import.meta.env.VITE_URL_BACK;
 const users = ref([]);
 const comments = ref([]);
-const selectedPost = ref(null);
+const selectedrequest = ref(null);
 const loading = ref(true); // Add loading state
 const commentLoading = ref(false); // Add comment loading state
 const publicationLoading = ref(false); // Add publication loading state
+const expandedRequests = ref([]);
 
 const commentInput = ref(null);
 const replyInputs = ref({});
@@ -318,8 +363,23 @@ const replyInputs = ref({});
 var myUser = useAppStore().getUser();
 
 const props = defineProps({
-  posts: Array,
+  requests: Array,
 });
+
+const toggleExpand = (id) => {
+  const index = expandedRequests.value.indexOf(id);
+  if (index > -1) {
+    expandedRequests.value.splice(index, 1);
+  } else {
+    expandedRequests.value.push(id);
+  }
+};
+
+// const parsedAvailability = JSON.parse(props.requests[0].availability).map(
+//   (day) => {
+//     return `${day.day} de ${day.start} a ${day.end}`;
+//   }
+// );
 
 const getAuthorName = (userId) => {
   const user = users.value.find((user) => user.id === userId);
@@ -336,9 +396,9 @@ const getAuthorProfile = (userId) => {
   return user.profile;
 };
 
-const getCommentsWithPostId = (postId) => {
+const getCommentsWithrequestId = (requestId) => {
   const list = comments.value.filter(
-    (comment) => comment.publication_id === postId
+    (comment) => comment.publication_id === requestId
   );
   list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   return list;
@@ -357,11 +417,11 @@ const sendCommentInMongo = async (ID) => {
     const comment = {
       comment: message,
       user_id: myUser.id,
-      publication_id: selectedPost.value.id,
+      publication_id: selectedrequest.value.id,
       commentReply_id: null,
       created_at: new Date().toISOString(),
     };
-    await postCommunityComments(comment);
+    await postEmploymentExchangeComments(comment);
     console.log(comment);
     socketBack.emit("newComment", comment);
     commentInput.value.value = "";
@@ -371,11 +431,11 @@ const sendCommentInMongo = async (ID) => {
     const replyComment = {
       comment: message,
       user_id: myUser.id,
-      publication_id: selectedPost.value.id,
+      publication_id: selectedrequest.value.id,
       commentReply_id: ID,
       created_at: new Date().toISOString(),
     };
-    await postCommunityComments(replyComment);
+    await postEmploymentExchangeComments(replyComment);
     socketBack.emit("newComment", replyComment);
     replyInputs.value[ID] = "";
   }
@@ -401,27 +461,45 @@ function timeSince(date) {
   return "ara mateix";
 }
 
-const showPostWithComments = (post) => {
-  selectedPost.value = post;
+const showrequestWithComments = (request) => {
+  selectedrequest.value = request;
 };
 
 function goMain() {
-  selectedPost.value = null;
+  selectedrequest.value = null;
 }
+
+const parseAvailability = (availability) => {
+  // Si availability es una cadena, la parseamos
+  if (typeof availability === "string") {
+    try {
+      // Parseamos la cadena JSON y devolvemos los días correctamente formateados
+      const days = JSON.parse(availability);
+      return days.map((day) => ({
+        day: day.day,
+        startTime: day.startTime,
+        endTime: day.endTime,
+      }));
+    } catch (e) {
+      console.error("Error al parsear la disponibilidad:", e);
+      return [];
+    }
+  }
+  return [];
+};
 
 onMounted(async () => {
   loading.value = true;
   users.value = await getUsers();
-  comments.value = await getCommunityComments();
+  comments.value = await getEmploymentExchangeComments();
   console.log("comments", comments.value);
-  console.log("posts", props.posts);
-  console.log("posts", props.posts[0].image);
+  console.log("requests", props.requests[0].availability);
   socketBack.on("updateComments", async () => {
     console.log("New comment received");
-    comments.value = await getCommunityComments();
+    comments.value = await getEmploymentExchangeComments();
     users.value = await getUsers();
   });
-  if (props.posts.length > 0) {
+  if (props.requests.length > 0) {
     loading.value = false;
   }
 });
