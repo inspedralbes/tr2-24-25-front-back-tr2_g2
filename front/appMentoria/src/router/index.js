@@ -17,7 +17,7 @@ import reportCommentsPage from '@/views/reportCommentsPage.vue'
 import notificationPage from '../views/notifiationPage.vue'
 import myPublications from '../views/myPublications.vue'
 import myRequests from '../views/myRequests.vue'
-import servicePage from '../views/servicePage.vue'
+import servicePage from '../views/servicesListPage.vue'
 
 const routes = [
   {

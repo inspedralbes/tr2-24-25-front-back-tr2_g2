@@ -117,9 +117,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import ToggleDarkMode from "./ToggleDarkMode.vue";
-import { useAppStore } from "@/stores/index";
 import { ref, onMounted, reactive } from "vue";
 import ToggleDarkMode from "./ToggleDarkMode.vue";
 import { useAppStore } from "@/stores/index";
