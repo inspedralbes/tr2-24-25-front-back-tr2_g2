@@ -1,11 +1,11 @@
 <template>
-  <div class="flex flex-col p-6 bg-white dark:bg-gray-800">
+  <div class="flex flex-col p-6 bg-white dark:bg-neutral-800 dark:text-white">
     <div
-      class="relative w-full max-w-3xl mx-auto bg-white dark:bg-gray-700 shadow-md rounded-lg"
+      class="relative w-full max-w-3xl mx-auto bg-white dark:bg-neutral-800 shadow-md rounded-lg"
     >
       <!-- Header con Filtros -->
       <div
-        class="p-4 border-b flex flex-col md:flex-row justify-between items-center dark:border-gray-600"
+        class="p-4 border-b flex flex-col md:flex-row justify-between items-center dark:border-neutral-700"
       >
         <h2 class="text-lg font-semibold text-gray-700 dark:text-white">
           Notificacions
@@ -17,8 +17,8 @@
             class="px-3 py-1 text-sm rounded-md"
             :class="
               filter === 'all'
-                ? 'bg-gray-400 text-black dark:bg-gray-800 dark:text-black'
-                : 'bg-gray-200 dark:bg-gray-600 dark:text-black'
+                ? 'bg-gray-400 text-black dark:bg-neutral-700 dark:text-white'
+                : 'bg-gray-200 dark:bg-neutral-600 dark:text-white'
             "
             @click="filter = 'all'"
           >
@@ -28,8 +28,8 @@
             class="px-3 py-1 text-sm rounded-md"
             :class="
               filter === 'Comentari'
-                ? 'bg-blue-400 text-white dark:bg-blue-700 dark:text-black'
-                : 'bg-blue-200 dark:bg-blue-700 dark:text-black'
+                ? 'bg-blue-400 text-white dark:bg-blue-900 dark:text-white'
+                : 'bg-blue-200 dark:bg-blue-900 dark:text-white'
             "
             @click="filter = 'Comentari'"
           >
@@ -39,29 +39,18 @@
             class="px-3 py-1 text-sm rounded-md"
             :class="
               filter.includes('Petició') || filter.includes('Publicació')
-                ? 'bg-red-400 text-white dark:bg-red-700 dark:text-black'
-                : 'bg-red-200 dark:bg-red-700 dark:text-black'
+                ? 'bg-red-400 text-white dark:bg-red-900 dark:text-white'
+                : 'bg-red-200 dark:bg-red-500 dark:text-white'
             "
             @click="togglePublicationsFilter"
           >
             Publicacions
           </button>
-          <button
-            class="px-3 py-1 text-sm rounded-md"
-            :class="
-              filter === 'Chat'
-                ? 'bg-green-400 text-black dark:bg-emerald-700 dark:text-black'
-                : 'bg-green-200 dark:bg-emerald-400 dark:text-black'
-            "
-            @click="filter = 'Chat'"
-          >
-            Chat
-          </button>
         </div>
       </div>
 
       <!-- Lista de Notificaciones -->
-      <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+      <ul class="divide-y divide-gray-200 dark:divide-neutral-700">
         <NotificationItem
           v-for="notification in filteredNotifications"
           :key="notification.id"
@@ -89,13 +78,14 @@
       <!-- Sin Notificaciones -->
       <div
         v-if="filteredNotifications.length === 0"
-        class="p-4 text-center text-gray-500 dark:text-gray-400"
+        class="p-4 text-center text-gray-500 dark:text-neutral-400"
       >
         No hi ha notificacions per mostrar.
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
@@ -255,23 +245,4 @@ onMounted(fetchNotifications);
 </script>
 
 <style scoped>
-button.bg-gray-400 {
-  background-color: #b0b0b0;
-}
-button.bg-blue-400 {
-  background-color: #4a90e2;
-}
-button.bg-red-400 {
-  background-color: #e74c3c;
-}
-
-button.bg-gray-200 {
-  background-color: #e0e0e0;
-}
-button.bg-blue-200 {
-  background-color: #d6eaff;
-}
-button.bg-red-200 {
-  background-color: #fcdede;
-}
 </style>

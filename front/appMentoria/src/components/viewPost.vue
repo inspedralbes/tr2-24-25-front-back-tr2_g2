@@ -67,7 +67,11 @@
               v-if="selectedPost.image != null"
               class="rounded-lg overflow-hidden"
             >
-              <img :src="selectedPost.image" alt="Post Image" class="w-full" />
+              <img
+                :src="`${community_url}${selectedPost.image}`"
+                alt="Post Image"
+                class="w-full"
+              />
             </div>
           </main>
         </div>
@@ -249,7 +253,11 @@
               </p>
 
               <div v-if="post.image != null" class="rounded-lg overflow-hidden">
-                <img :src="post.image" alt="Post Image" class="w-full" />
+                <img
+                  :src="`${community_url}${post.image}`"
+                  alt="Post Image"
+                  class="w-full"
+                />
               </div>
             </main>
 
@@ -295,6 +303,7 @@ import socketBack from "../services/socketBack.js";
 import { useAppStore } from "@/stores/index";
 import Loading from "@/components/Loading.vue"; // Import the Loading component
 
+const community_url = import.meta.env.VITE_URL_BACK_COMMUNITY;
 const users = ref([]);
 const comments = ref([]);
 const selectedPost = ref(null);
@@ -400,14 +409,19 @@ function goMain() {
 }
 
 onMounted(async () => {
+  loading.value = true;
   users.value = await getUsers();
   comments.value = await getCommunityComments();
-  loading.value = false;
   console.log("comments", comments.value);
+  console.log("posts", props.posts);
+  console.log("posts", props.posts[0].image);
   socketBack.on("updateComments", async () => {
     console.log("New comment received");
     comments.value = await getCommunityComments();
     users.value = await getUsers();
   });
+  if (props.posts.length > 0) {
+    loading.value = false;
+  }
 });
 </script>
