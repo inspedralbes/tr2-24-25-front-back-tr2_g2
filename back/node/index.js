@@ -953,6 +953,28 @@ app.get('/typesUsers', async (req, res) => {
     }
 });
 
+app.get('/comments', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM comments');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+app.get('/publications', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM publications');
+        connection.end();
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 // Route for refresh access token
 app.post('/refresh', async (req, res) => {
     console.log('Refresh token 0:', req.body);
