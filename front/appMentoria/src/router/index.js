@@ -18,6 +18,7 @@ import notificationPage from '../views/notifiationPage.vue'
 import myPublications from '../views/myPublications.vue'
 import myRequests from '../views/myRequests.vue'
 import servicePage from '../views/servicesListPage.vue'
+import stadisticsPage from '@/views/stadisticsPage.vue';
 
 const routes = [
   {
@@ -80,7 +81,6 @@ const routes = [
     name: 'admin',
     component: adminPanel,
   },
-
   {
     path: '/reportUserPage',
     name: 'reportUserPage',
@@ -115,6 +115,11 @@ const routes = [
     path: '/services',
     name: 'servicePage',
     component: servicePage,
+  },
+  {
+    path: '/stadistics',
+    name: 'stadisticsPage',
+    component: stadisticsPage
   }
 ];
 

@@ -84,8 +84,8 @@ INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, 
 
 -- Inserciones para users (administradores)
 INSERT INTO users (typesUsers_id, name, email, password, banner, profile, city, verified, status, review, class_id) VALUES 
-(3, 'Administradora A', 'adminA@example.com', 'admina', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, NULL),
-(3, 'Administrador B', 'adminB@example.com', 'adminb', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, NULL);
+(3, 'Administradora A', 'adminA@example.com', 'admina', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, 1),
+(3, 'Administrador B', 'adminB@example.com', 'adminb', '/upload/banner_default.png', '/upload/profile_default.png', 'Barcelona, Espanya', true, 'approved', 0.0, 1);
 
 -- Inserciones para usersQualifications
 INSERT INTO usersQualifications (user_id, qualification_id) VALUES 
