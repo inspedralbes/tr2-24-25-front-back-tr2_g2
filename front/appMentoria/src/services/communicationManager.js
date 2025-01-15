@@ -659,3 +659,25 @@ export const deleteUserValidation = async (id) => {
     return { error: "Network error. Please try again later." };
   }
 };
+
+
+export const updateUserValidation = async (id) => {
+  console.log("ID enviado a backend:", id); // Depuración
+  try {
+    const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return { error: `HTTP error! status: ${response.status}` };
+    }
+
+    return { message: "Usuari verificat correctament" };
+  } catch (error) {
+    console.error("Network error:", error);
+    return { error: "Network error. Please try again later." };
+  }
+};

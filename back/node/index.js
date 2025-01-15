@@ -857,6 +857,27 @@ app.delete('/verified/users/:id', async (req, res) => {
       res.status(500).json({ error: "Error en la base de datos" });
     }
   });
+
+
+app.put('/verified/users/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute('UPDATE users SET verified = 1 WHERE id = ?', [id]);
+        connection.end();
+
+        if (result.affectedRows === 0) return res.status(404).send({ message: 'Usuario no encontrado' });
+
+        res.status(200).send({ message: 'Usuario verificado exitosamente' });
+
+    } catch (error) {
+        console.error('Error en la base de datos:', error);
+        res.status(500).json({ error: 'Error en la base de datos' });
+    }
+});
   
 
 // Function to verify token

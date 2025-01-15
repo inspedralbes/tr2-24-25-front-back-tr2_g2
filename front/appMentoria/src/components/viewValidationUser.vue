@@ -48,8 +48,8 @@
             <img :src="user.profile" alt="User Profile" class="w-16 h-16 object-cover rounded-full">
           </div>
           <div class="flex justify-end">
-            <button @click="validateUser(user.user)" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 mr-2">Validar</button>
-          <button @click="deleteUser(user.user)" class="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600">Eliminar</button>
+            <button @click="validateUser(user.id, user.typesUsers_id)" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 mr-2">Validar</button>
+          <button @click="deleteUser(user.id)" class="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600">Eliminar</button>
           </div>
         </div>
       </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { fetchUserValidation, deleteUserInDb, fetchAllClasses } from "@/services/communicationManager";
+import { fetchUserValidation, deleteUserInDb, fetchAllClasses, updateUserValidation } from "@/services/communicationManager";
 
 export default {
   data() {
@@ -98,14 +98,17 @@ export default {
   methods: {
     async validateUser(id, typesUsers_id) {
       try {
-        //const response = await this.validateUser(id, typesUsers_id);
+        const response = await updateUserValidation(id, typesUsers_id);
         if (response.error) {
           console.error(response.error);
+          await fetchUserValidation();
+
         } else {
-          console.log("Estat actualitzat correctament");
+          console.log("Usuari validat correctament");
+          await this.refreshUsers();
         }
       } catch (error) {
-        console.error("Error al actualitzar l'estat:", error);
+        console.error("Error al validar el usuari:", error);
       }
     },
 
@@ -120,6 +123,16 @@ export default {
         }
       } catch (error) {
         console.error("Error al eliminar el usuari:", error);
+      }
+    },
+
+    async refreshUsers() {
+      try {
+        const data = await fetchUserValidation();
+        console.log("Pending users:", data);
+        this.users = data;
+      } catch (error) {
+        console.error("Error al refrescar la lista de usuarios:", error);
       }
     },
     getClassById(classId) {
