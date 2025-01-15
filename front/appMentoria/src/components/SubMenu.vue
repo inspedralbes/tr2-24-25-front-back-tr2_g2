@@ -26,6 +26,19 @@
               <button href="javascript:void(0)" tabindex="2"
                 class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                 role="menuitem">Mis Peticions</button>
+                <div v-if="userTypes == 2" class="py-1">
+                  <button @click="$router.push('/report')" tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Admin</button>
+                </div>
+                <div v-if="userTypes == 3" class="py-1">
+                  <button @click="$router.push('/report')" tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Admin</button>
+                    <button tabindex="3"
+                    class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
+                    role="menuitem">Estadisticas</button>
+                </div>
             </div>
             <div class="py-1">
               <div class="flex justify-between px-4 py-2">
@@ -67,17 +80,21 @@ const router = useRouter();
 var user = reactive({});
 var profile = ref(null);
 var name = ref(null);
+var userTypes = ref('');
 
 onMounted(() => {
   user.value = appStore.getUser();
   profile.value = user.value.profile;
   name.value = user.value.name;
+  userTypes.value = appStore.getTypeUser();
+  console.log("Greetings loved ones",userTypes.value);
 });
 
 const handleLogout = async () => {
   await logout();
   router.push('/login');
 };
+
 </script>
 
 <style>

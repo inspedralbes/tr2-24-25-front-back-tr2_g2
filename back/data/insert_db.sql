@@ -106,18 +106,18 @@ INSERT INTO reviews (reviewed_user_id, reviewer_user_id, rating) VALUES
 -- Inserciones para publications
 INSERT INTO publications (typesPublications_id, title, description, user_id, reports) VALUES 
 (1, 'Introducció al SQL', 'Aprèn les bases del SQL.', 1, 0), 
-(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 1), 
-(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 2), 
-(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 3), 
-(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 4);
+(1, 'Bases de Dades Avançades', 'Endinsa\'t en la gestió de bases de dades.', 2, 0), 
+(1, 'Tendències en Data Science', 'Últimes tendències en ciència de dades.', 3, 1), 
+(1, 'Introducció al Machine Learning', 'Una guia per a principiants al machine learning.', 4, 0), 
+(1, 'Ressenyes Tecnològiques', 'Ressenyes dels últims productes tecnològics.', 5, 0);
 
 -- Inserciones para comments
 INSERT INTO comments (publication_id, user_id, commentReply_id, comment) VALUES 
 (1, 2, NULL, 'Molt informatiu!'), 
 (2, 3, 1, 'Gràcies pels detalls.'), 
-(3, 4, 2, 'Gran lectura!'), 
-(4, 5, 3, 'Article útil.'), 
-(5, 1, 4, 'Ben escrit.');
+(3, 4, NULL, 'Gran lectura!'), 
+(4, 5, NULL, 'Article útil.'), 
+(5, 1, NULL, 'Ben escrit.');
 
 -- Inserciones para reportsPublications
 INSERT INTO reportsPublications (publication_id, user_id, report) VALUES 
@@ -169,3 +169,21 @@ INSERT INTO teachersClasses (user_id, class_id) VALUES
 (22, 22), 
 (23, 23), 
 (24, 23);
+
+-- Inserts for reportsPublications
+INSERT INTO reportsPublications (publicationId, userId, reportReason, reportDate) VALUES
+(1, 1, 'Inappropriate content', '2023-01-01'),
+(2, 2, 'Spam', '2023-01-02'),
+(3, 3, 'Harassment', '2023-01-03');
+
+-- Inserts for reportsComments
+INSERT INTO reportsComments (commentId, userId, reportReason, reportDate) VALUES
+(1, 1, 'Offensive language', '2023-01-01'),
+(2, 2, 'Spam', '2023-01-02'),
+(3, 3, 'Harassment', '2023-01-03');
+
+-- Inserts for reportsUsers
+INSERT INTO reportsUsers (userId, reportReason, reportDate) VALUES
+(1, 'Multiple account abuse', '2023-01-01'),
+(2, 'Inappropriate behavior', '2023-01-02'),
+(3, 'Spam', '2023-01-03');
