@@ -398,7 +398,7 @@ const getAuthorProfile = (userId) => {
 
 const getCommentsWithrequestId = (requestId) => {
   const list = comments.value.filter(
-    (comment) => comment.publication_id === requestId
+    (comment) => comment.publication_id === requestId && comment.reported === 0
   );
   list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   return list;

@@ -46,7 +46,7 @@
           >
             Publicacions
           </button>
-          <button
+          <!-- <button
             class="px-3 py-1 text-sm rounded-md"
             :class="
               filter === 'Chat'
@@ -56,7 +56,7 @@
             @click="filter = 'Chat'"
           >
             Chat
-          </button>
+          </button> -->
         </div>
       </div>
 
