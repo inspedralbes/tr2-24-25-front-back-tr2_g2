@@ -15,3 +15,9 @@
 
 /services/iaimage/node_modules
 /services/iaimage/.env
+
+/services/iatext/node_modules
+/services/iatext/.env
+
+/services/notifications/node_modules
+/services/notifications/.env
