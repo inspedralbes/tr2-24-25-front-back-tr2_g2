@@ -1,22 +1,25 @@
 <template>
     <Header></Header>
-    <div v-if="!isLoading || images.comments || images.publications || images.users" class="bg-gray-100 dark:bg-gray-900 min-h-screen py-12 px-6">
+    <div v-if="!isLoading" class="bg-gray-100 dark:bg-gray-900 min-h-screen py-12 px-6">
         <!-- Encabezado -->
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
             Estadístiques
         </h1>
 
         <!-- Contenedor Principal -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <div class="space-y-8 max-w-4xl mx-auto">
             <!-- Gráfico de Usuarios -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                     Gràfics d'Usuaris
                 </h2>
-                <div class="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <img v-if="images.users.length" :src="images.users[0]" alt="Gràfic d'usuaris"
-                        class="h-full w-auto rounded-md object-contain" />
-                    <p v-else class="text-gray-400 dark:text-gray-300">Carregant...</p>
+                <div class="space-y-4">
+                    <img v-for="(image, index) in images.users" 
+                         :key="index" 
+                         :src="image" 
+                         alt="Gràfic d'usuaris"
+                         class="w-full rounded-md object-contain cursor-pointer"
+                         @click="openImage(image)" />
                 </div>
             </div>
 
@@ -25,10 +28,13 @@
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                     Gràfics de Comentaris
                 </h2>
-                <div class="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <img v-if="images.comments.length" :src="images.comments[0]" alt="Gràfic de comentaris"
-                        class="h-full w-auto rounded-md object-contain" />
-                    <p v-else class="text-gray-400 dark:text-gray-300">Carregant...</p>
+                <div class="space-y-4">
+                    <img v-for="(image, index) in images.comments" 
+                         :key="index" 
+                         :src="image" 
+                         alt="Gràfic de comentaris"
+                         class="w-full rounded-md object-contain cursor-pointer"
+                         @click="openImage(image)" />
                 </div>
             </div>
 
@@ -37,20 +43,33 @@
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                     Gràfics de Publicacions
                 </h2>
-                <div class="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <img v-if="images.publications.length" :src="images.publications[0]" alt="Gràfic de publicacions"
-                        class="h-full w-auto rounded-md object-contain" />
-                    <p v-else class="text-gray-400 dark:text-gray-300">Carregant...</p>
+                <div class="space-y-4">
+                    <img v-for="(image, index) in images.publications" 
+                         :key="index" 
+                         :src="image" 
+                         alt="Gràfic de publicacions"
+                         class="w-full rounded-md object-contain cursor-pointer"
+                         @click="openImage(image)" />
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Loading -->
     <div v-else class="flex items-center justify-center min-h-screen bg-white dark:bg-neutral-800">
         <Loading />
     </div>
 
+    <!-- NavBar -->
     <NavBar />
+
+    <!-- Modal para ampliar imágenes -->
+    <div v-if="selectedImage" 
+         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <img :src="selectedImage" alt="Imagen ampliada" class="max-w-full max-h-full rounded-lg">
+        <button @click="closeImage" 
+                class="absolute top-4 right-4 text-white text-xl">&times;</button>
+    </div>
 </template>
 
 <script setup>
@@ -61,6 +80,7 @@ import { ref, onMounted } from 'vue';
 
 const URLSTADISTICS = import.meta.env.VITE_URL_BACK_STADISTICS;
 let isLoading = ref(true);
+const selectedImage = ref(null);
 
 const images = ref({
     comments: [],
@@ -80,14 +100,32 @@ const fetchImages = async () => {
         images.value.users = data.users.map(img => `${URLSTADISTICS}${img}`);
     } catch (error) {
         console.error('Error cargando las imágenes:', error);
-    }  finally {
+    } finally {
         isLoading.value = false;
     }
 };
 
+// Abrir imagen en modal
+const openImage = (image) => {
+    selectedImage.value = image;
+};
+
+// Cerrar modal
+const closeImage = () => {
+    selectedImage.value = null;
+};
+
 // Cargar las imágenes cuando el componente se monta
-onMounted( async () => {
+onMounted(async () => {
     fetchImages();
-    
 });
 </script>
+
+<style scoped>
+img {
+    transition: transform 0.2s;
+}
+img:hover {
+    transform: scale(1.05);
+}
+</style>
