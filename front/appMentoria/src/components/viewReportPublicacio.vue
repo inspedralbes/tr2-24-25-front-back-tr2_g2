@@ -166,17 +166,25 @@ export default {
   },
   methods: {
     async updateReportStatus(id, status) {
-      try {
-        const response = await updateReportPublication(id, status);
+    const report = this.reports.find((r) => r.id === id);
+    try {
+        const response = await updateReportPublication(
+            id,
+            status,
+            report.publication_id,
+            report.user_id,
+            report.report
+        );
         if (response.error) {
-          console.error(response.error);
+            console.error(response.error);
         } else {
-          console.log("Estat actualitzat correctament");
+            console.log("Estado actualizado correctamente");
         }
-      } catch (error) {
-        console.error("Error al actualitzar l'estat:", error);
-      }
-    },
+    } catch (error) {
+        console.error("Error al actualizar el estado:", error);
+    }
+},
+
     async deleteReport(id) {
       try {
         const response = await deleteReportPublication(id);

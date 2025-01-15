@@ -737,7 +737,7 @@ export const createReportPublication = async (
 };
 
 // Update a report publication by ID
-export const updateReportPublication = async (id, status) => {
+export const updateReportPublication = async (id, status, publication_id, user_id, report) => {
     try {
         const response = await fetch(
             `${COMMUNITY_URL}/reports/publications/${id}`,
@@ -746,7 +746,12 @@ export const updateReportPublication = async (id, status) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ status }),
+                body: JSON.stringify({
+                    status,
+                    publication_id,
+                    user_id,
+                    report,
+                }),
             }
         );
 
@@ -760,6 +765,7 @@ export const updateReportPublication = async (id, status) => {
         return { error: "Network error. Please try again later." };
     }
 };
+
 
 // Delete a report publication by ID
 export const deleteReportPublication = async (id) => {

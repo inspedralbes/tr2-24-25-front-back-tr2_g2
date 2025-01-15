@@ -623,24 +623,31 @@ app.post('/reports/publications', async (req, res) => {
 });
 
 app.put('/reports/publications/:id', async (req, res) => {
+    console.log('Body:', req.body); 
     const { id } = req.params;
     const { publication_id, user_id, report, status } = req.body;
-
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'UPDATE reportsPublications SET publication_id = ?, user_id = ?, report = ?, status = ? WHERE id = ?',
-            [publication_id, user_id, report, status, id]
-        );
-        connection.end();
-
-        if (result.affectedRows == 0) return res.status(404).json({ error: 'ReportPublication not found' });
-
-        res.json({ message: 'ReportPublication updated successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Database error' });
+  
+    // Verifica que todos los parámetros estén definidos
+    if (publication_id === undefined || user_id === undefined || report === undefined || status === undefined) {
+      return res.status(400).json({ error: 'Missing required parameters' });
     }
-});
+  
+    try {
+      const connection = await mysql.createConnection(dbConfig);
+      const [result] = await connection.execute(
+        'UPDATE reportsPublications SET publication_id = ?, user_id = ?, report = ?, status = ? WHERE id = ?',
+        [publication_id, user_id, report, status, id]
+      );
+      connection.end();
+  
+      if (result.affectedRows == 0) return res.status(404).json({ error: 'ReportPublication not found' });
+  
+      res.json({ message: 'ReportPublication updated successfully' });
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
+  });
 
 app.delete('/reports/publications/:id', async (req, res) => {
     const { id } = req.params;
