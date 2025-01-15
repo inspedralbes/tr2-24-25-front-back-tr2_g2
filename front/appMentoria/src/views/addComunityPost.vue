@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen dark:bg-neutral-900 dark:text-white">
+    <!-- Botón de retroceso -->
     <button
       @click="goBack"
       class="py-2 px-4 fixed top-0 left-0 mt-3 ml-4 z-20 text-gray-800 dark:text-white"
@@ -18,14 +19,19 @@
       </svg>
     </button>
 
+    <!-- Encabezado fijo -->
     <Header class="fixed top-0 left-0 right-0 z-10"></Header>
 
-    <main class="flex-grow flex items-center justify-center min-h-screen mx-24">
+    <!-- Contenido principal -->
+    <main
+      class="flex-grow flex items-center justify-center pt-20 pb-20 mx-4 overflow-auto"
+    >
       <div
         class="max-w-xl w-full bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-md"
       >
         <h1 class="text-2xl font-bold mb-4 text-center">Crear Publicació</h1>
 
+        <!-- Campo del título -->
         <div class="mb-4">
           <label
             for="title"
@@ -42,6 +48,7 @@
           />
         </div>
 
+        <!-- Campo de descripción -->
         <div class="mb-4">
           <label
             for="description"
@@ -58,6 +65,7 @@
           ></textarea>
         </div>
 
+        <!-- Subida de imagen -->
         <div class="mb-4">
           <label
             for="image-upload"
@@ -74,6 +82,7 @@
           />
         </div>
 
+        <!-- Vista previa de la imagen -->
         <div v-if="imagePreview" class="mb-4">
           <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Vista prèvia:
@@ -85,6 +94,7 @@
           />
         </div>
 
+        <!-- Botón de publicación -->
         <button
           @click="submitPost"
           class="w-full py-2 px-4 bg-blue-500 dark:bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -93,9 +103,12 @@
         </button>
       </div>
     </main>
+
+    <!-- Barra de navegación fija -->
+    <NavBar class="fixed bottom-0 left-0 right-0"></NavBar>
   </div>
-  <!-- <NavBar></NavBar> -->
 </template>
+
 
 
 <script setup>
