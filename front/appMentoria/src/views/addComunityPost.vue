@@ -1,11 +1,24 @@
 <template>
   <div class="flex flex-col min-h-screen">
     <button @click="goBack" class="py-2 px-4 fixed top-0 left-0 mt-3 ml-4 z-20">
-      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g
+          id="SVGRepo_tracerCarrier"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></g>
         <g id="SVGRepo_iconCarrier">
-          <path d="M5 1H4L0 5L4 9H5V6H11C12.6569 6 14 7.34315 14 9C14 10.6569 12.6569 12 11 12H4V14H11C13.7614 14 16 11.7614 16 9C16 6.23858 13.7614 4 11 4H5V1Z" fill="#ffffff"></path>
+          <path
+            d="M5 1H4L0 5L4 9H5V6H11C12.6569 6 14 7.34315 14 9C14 10.6569 12.6569 12 11 12H4V14H11C13.7614 14 16 11.7614 16 9C16 6.23858 13.7614 4 11 4H5V1Z"
+            fill="#ffffff"
+          ></path>
         </g>
       </svg>
     </button>
@@ -16,7 +29,10 @@
       <div class="max-w-xl w-full bg-white p-6 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold mb-4 text-center">Crear Publicació</h1>
         <div class="mb-4">
-          <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            for="title"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
             Títol:
           </label>
           <input
@@ -28,7 +44,10 @@
           />
         </div>
         <div class="mb-4">
-          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            for="description"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
             Descripció:
           </label>
           <textarea
@@ -40,7 +59,10 @@
           ></textarea>
         </div>
         <div class="mb-4">
-          <label for="image-upload" class="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            for="image-upload"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
             Pujar imatge:
           </label>
           <input
@@ -53,7 +75,11 @@
         </div>
         <div v-if="imagePreview" class="mb-4">
           <p class="text-sm font-medium text-gray-700 mb-2">Vista prèvia:</p>
-          <img :src="imagePreview" alt="Vista prèvia de la imatge" class="w-full h-auto rounded-lg shadow-md" />
+          <img
+            :src="imagePreview"
+            alt="Vista prèvia de la imatge"
+            class="w-full h-auto rounded-lg shadow-md"
+          />
         </div>
         <button
           @click="submitPost"
@@ -67,16 +93,18 @@
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { postCommunityPublication } from '@/services/communicationManager';
+import Header from "@/components/Header.vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { postCommunityPublication } from "@/services/communicationManager";
+import { useAppStore } from "@/stores/index";
 
 const router = useRouter();
-const title = ref('');
-const description = ref('');
+const title = ref("");
+const description = ref("");
 const imageFile = ref(null);
 const imagePreview = ref(null);
+const user_id = useAppStore().getUser()?.id;
 
 function goBack() {
   router.back();
@@ -91,37 +119,37 @@ function handleImageUpload(event) {
 }
 
 async function submitPost() {
-    if (!title.value || !description.value || !imageFile.value) {
-      alert('Por favor, completa todos los campos y sube una imagen.');
+  if (!title.value || !description.value || !imageFile.value) {
+    alert("Por favor, completa todos los campos y sube una imagen.");
+    return;
+  }
+
+  console.log("userid", user_id);
+
+  const formData = new FormData();
+  formData.append("typesPublications_id", 1);
+  formData.append("title", title.value);
+  formData.append("description", description.value);
+  formData.append("user_id", user_id);
+  formData.append("image", imageFile.value);
+
+  try {
+    const response = await postCommunityPublication(formData);
+    console.log("response", response);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error al crear la publicación:", errorData);
+      alert("Error al crear la publicación.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append('typesPublications_id', 1);
-    formData.append('title', title.value);
-    formData.append('description', description.value);
-    formData.append('user_id', 1);
-    formData.append('image', imageFile.value);
-
-
-    try {
-      const response = await postCommunityPublication(formData);
-
-        if (!response.ok) {
-            const errorData = await response.json();
-             console.error('Error al crear la publicación:', errorData);
-            alert('Error al crear la publicación.');
-            return;
-        }
-
-        const responseData = await response.json();
-         console.log('Publicación creada con éxito:', responseData);
-         router.push('/')
-    
-      } catch (error) {
-          console.error('Error al enviar la publicación:', error);
-            alert('Error al enviar la publicación.');
-    }
+    const responseData = await response.json();
+    console.log("Publicación creada con éxito:", responseData);
+    router.push("/");
+  } catch (error) {
+    console.error("Error al enviar la publicación:", error);
+    alert("Error al enviar la publicación.");
+  }
 }
 </script>
 

@@ -13,9 +13,6 @@
 /services/comment/node_modules
 /services/comment/.env
 
-/services/notifications/node_modules
-/services/notifications/.env
-
 /services/iaimage/node_modules
 /services/iaimage/.env
 

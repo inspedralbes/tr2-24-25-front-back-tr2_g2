@@ -13,6 +13,9 @@ import adminPanel from '../views/adminPanel.vue'
 import reportUserPage from '@/views/reportUserPage.vue'
 import reportPublicacioPage from '@/views/reportPublicacioPage.vue'
 import reportCommentsPage from '@/views/reportCommentsPage.vue'
+import notificationPage from '../views/notifiationPage.vue'
+import myPublications from '../views/myPublications.vue'
+import myRequests from '../views/myRequests.vue'
 
 const routes = [
   {
@@ -55,6 +58,27 @@ const routes = [
     name: 'reportPage',
     component: reportPage,
   },
+  {
+    path: '/mypublications',
+    name: 'mypublications',
+    component: myPublications,
+  },
+  {
+    path: "/notifications",
+    name: "notifications",
+    component: notificationPage,
+  },
+  {
+    path: '/myrequests',
+    name: 'myrequests',
+    component: myRequests,
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: adminPanel,
+  },
+
   {
     path: '/reportUserPage',
     name: 'reportUserPage',

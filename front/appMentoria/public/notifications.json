@@ -1,0 +1,21 @@
+[
+    {
+      "name": "Juan Pérez",
+      "message": "Estoy vendiendo un auto en buen estado.",
+      "avatar": "https://via.placeholder.com/40",
+      "icon": "fas fa-car"
+    },
+    {
+      "name": "Ana López",
+      "message": "Clases de inglés online para principiantes.",
+      "avatar": "https://via.placeholder.com/40",
+      "icon": "fas fa-book"
+    },
+    {
+      "name": "Carlos García",
+      "message": "Servicio de limpieza profesional.",
+      "avatar": "https://via.placeholder.com/40",
+      "icon": "fas fa-broom"
+    }
+  ]
+  
