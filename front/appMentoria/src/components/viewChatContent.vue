@@ -6,9 +6,7 @@
       <div class="relative flex items-center space-x-4">
         <div class="relative ps-5">
           <img
-            :src="`${BACK_URL}${
-              users.find((user) => user.id === userElla)?.profile
-            }`"
+            :src=updateProfile(userElla)
             alt=""
             class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
           />
