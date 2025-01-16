@@ -362,7 +362,6 @@ const sendCommentInMongo = async (ID) => {
       created_at: new Date().toISOString(),
     };
     await postCommunityComments(comment);
-    console.log(comment);
     socketBack.emit("newComment", comment);
     commentInput.value.value = "";
   } else {
@@ -413,9 +412,6 @@ onMounted(async () => {
   loading.value = true;
   users.value = await getUsers();
   comments.value = await getCommunityComments();
-  console.log("comments", comments.value);
-  console.log("posts", props.posts);
-  console.log("posts", props.posts[0].image);
   socketBack.on("updateComments", async () => {
     console.log("New comment received");
     comments.value = await getCommunityComments();

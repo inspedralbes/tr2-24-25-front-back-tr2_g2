@@ -152,7 +152,6 @@ export default {
           console.error(response.error);
         } else {
           this.reports = this.reports.filter((report) => report.id !== id);
-          console.log("Informe eliminat correctament");
         }
       } catch (error) {
         console.error("Error al eliminar l'informe:", error);

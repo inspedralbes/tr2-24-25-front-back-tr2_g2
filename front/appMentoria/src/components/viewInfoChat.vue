@@ -126,7 +126,6 @@ const getAuthorProfile = (userId) => {
 };
 
 onMounted(() => {
-  console.log(users.value);
   selectedChatId.value = false;
 });
 </script>

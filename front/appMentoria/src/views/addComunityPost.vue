@@ -144,8 +144,6 @@ async function submitPost() {
     return;
   }
 
-  console.log("userid", user_id);
-
   const formData = new FormData();
   formData.append("typesPublications_id", 1);
   formData.append("title", title.value);
@@ -155,7 +153,6 @@ async function submitPost() {
 
   try {
     const response = await postCommunityPublication(formData);
-    console.log("response", response);
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Error al crear la publicación:", errorData);
@@ -164,7 +161,6 @@ async function submitPost() {
     }
 
     const responseData = await response.json();
-    console.log("Publicación creada con éxito:", responseData);
     router.push("/");
   } catch (error) {
     console.error("Error al enviar la publicación:", error);

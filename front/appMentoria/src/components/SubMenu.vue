@@ -70,7 +70,8 @@
                 >
                   Admin
                 </button>
-                <button @click="$router.push('/stadistics')"
+                <button
+                  @click="$router.push('/stadistics')"
                   tabindex="3"
                   class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5 text-left"
                   role="menuitem"
@@ -138,7 +139,6 @@ onMounted(() => {
   profile.value = user.value.profile;
   name.value = user.value.name;
   userTypes.value = appStore.getTypeUser();
-  console.log("Greetings loved ones", userTypes.value);
 });
 
 const handleLogout = async () => {

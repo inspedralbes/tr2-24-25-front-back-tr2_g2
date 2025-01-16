@@ -16,9 +16,6 @@ export const refreshToken = async () => {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
 
-        console.log('Renovando token...');
-        console.log(refreshToken);
-
         const response = await fetch(`${BACK_URL}/refresh`, {
             method: 'POST',
             headers: {
@@ -33,7 +30,6 @@ export const refreshToken = async () => {
 
         const data = await response.json();
 
-        console.log('Token renovado:', data);
 
         // Guardar el nuevo token
         useAppStore().setAccessToken(data.accessToken);
@@ -49,7 +45,6 @@ export const refreshToken = async () => {
 
 // Login API firebase
 export const loginAPI = async (user) => {
-    console.log(user, `communicationManager.js`);
     try {
         const response = await fetch(`${BACK_URL}/loginAPI`, {
             method: "POST",
@@ -72,7 +67,6 @@ export const loginAPI = async (user) => {
 
 // Login with my app
 export const loginDB = async (user) => {
-    console.log(user, `communicationManager.js`);
     try {
         const response = await fetch(`${BACK_URL}/login`, {
             method: 'POST',
@@ -95,7 +89,6 @@ export const loginDB = async (user) => {
 
 // Refresh Login
 export const getUserForRefreshLogin = async (user) => {
-    console.log(user.email, `communicationManager.js`);
     try {
         const response = await fetch(`${BACK_URL}/user?email=${encodeURIComponent(user.email)}`, {
             method: 'GET',
@@ -106,7 +99,6 @@ export const getUserForRefreshLogin = async (user) => {
         });
 
         if (response.status == 401) {
-            console.log('Token expirado, intentando renovar...');
             const refreshResult = await refreshToken();
 
             if (refreshResult.error) {
@@ -117,7 +109,6 @@ export const getUserForRefreshLogin = async (user) => {
         }
 
         if (!response.ok) {
-            console.log('Error en la petición:', response);
             return { error: `HTTP error! status: ${response.status}` };
         }
 
@@ -130,12 +121,9 @@ export const getUserForRefreshLogin = async (user) => {
 
 // Logout for my app
 export const logout = async () => {
-    console.log('Cerrando sesión...');
     try {
         const refreshToken = localStorage.getItem('refreshToken');
         const accessToken = localStorage.getItem('accessToken');
-
-        console.log('Tokens:', refreshToken, accessToken);
 
         const response = await fetch(`${BACK_URL}/logout`, {
             method: 'POST',
@@ -147,7 +135,6 @@ export const logout = async () => {
         });
 
         if (response.status === 401) {
-            console.log('Token expirado, intentando renovar...');
             const refreshResult = await refreshToken();
 
             if (refreshResult.error) {
@@ -159,7 +146,6 @@ export const logout = async () => {
         }
 
         if (!response.ok) {
-            console.log('Error en la petición:', response);
             return { error: `HTTP error! status: ${response.status}` };
         }
 
@@ -182,9 +168,6 @@ export const logout = async () => {
 // Create new data user
 export const createNewDataUser = async (userData) => {
 
-    console.log(userData, `communicationManager.js`);
-    console.log(`userPinia`, useAppStore().user);
-
     let sendUserData = {
         userPinia: useAppStore().user,
         userData: userData,
@@ -201,7 +184,6 @@ export const createNewDataUser = async (userData) => {
         });
 
         if (response.status === 401) {
-            console.log('Token expirado, intentando renovar...');
             const refreshResult = await refreshToken();
 
             if (refreshResult.error) {
@@ -231,7 +213,6 @@ export const postCommunityPublication = async (formdata) => {
             body: formdata,
         });
 
-        console.log(response);
         return response;
     } catch (error) {
         console.error(error);
@@ -244,8 +225,6 @@ export const postEmploymentExchangePublication = async (formData) => {
             method: 'POST',
             body: formData,
         });
-        console.log(response);
-        console.log('response', response);
         return response;
     } catch (error) {
         console.error(error);
@@ -296,7 +275,6 @@ export const getUsersForOther = async () => {
             },
         });
         const data = await response;
-        console.log(data);
         return data;
     } catch (error) {
         console.error("Network error:", error);
@@ -369,7 +347,6 @@ export const postCommunityComments = async (comment) => {
             },
             body: JSON.stringify(comment),
         });
-        console.log(response);
         return response.json();
     } catch (error) {
         console.error(error);
@@ -386,7 +363,6 @@ export const postEmploymentExchangeComments = async (comment) => {
             },
             body: JSON.stringify(comment),
         });
-        console.log(response);
         return response.json();
     } catch (error) {
         console.error(error);
@@ -397,7 +373,6 @@ export const postEmploymentExchangeComments = async (comment) => {
 export const fetchMessages = async (chatId) => {
     try {
         const response = await fetch(`${CHAT_URL}/getChat/${chatId}`);
-        console.log(`${CHAT_URL}/getChat/${chatId}`);
         const data = await response.json();
         const chatData = ref({});
         chatData.value = data[0];
@@ -409,7 +384,6 @@ export const fetchMessages = async (chatId) => {
                 timestamp: interaction.timestamp,
             })
         );
-        console.log("chatData:", chatData.value);
         return chatData;
     } catch (error) {
         console.error("Error fetching messages:", error);
@@ -422,18 +396,12 @@ export const sendMessageInMongo = async (
     currentUser,
     messageInput
 ) => {
-    console.log(
-        "sendMessageInMongo:",
-        chatData._rawValue,
-        currentUser,
-        messageInput
-    );
+
     const newMessage = {
         message: messageInput,
         userId: currentUser,
         timestamp: new Date().toISOString(),
     };
-    console.log(chatData._rawValue);
 
     try {
         await fetch(`${CHAT_URL}/addChat`, {
@@ -483,7 +451,6 @@ export const chatButton = async (userid2, router) => {
         interactions: [],
         __v: 0,
     };
-    console.log(newMessage);
     try {
         const response = await fetch(`${CHAT_URL}/newChat`, {
             method: "POST",
@@ -514,7 +481,6 @@ export const fetchAllUserReports = async () => {
         }
 
         return await response.json();
-        console.log(response.json());
     } catch (error) {
         console.error("Network error:", error);
         return { error: "Network error. Please try again later." };
@@ -855,7 +821,6 @@ export const fetchUserValidation = async () => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const pendingUsers = await response.json();
-        console.log("Pending users:", pendingUsers);
         return pendingUsers;
     } catch (error) {
         console.error("Network error:", error);
@@ -922,7 +887,6 @@ export const deleteUserInDb = async (id) => {
 };
 
 export const deleteUserValidation = async (id) => {
-    console.log("ID enviado a backend:", id); // Depuración
     try {
         const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
             method: "DELETE",
@@ -944,7 +908,6 @@ export const deleteUserValidation = async (id) => {
 
 
 export const updateUserValidation = async (id) => {
-    console.log("ID enviado a backend:", id); // Depuración
     try {
         const response = await fetch(`${BACK_URL}/verified/users/${id}`, {
             method: "PUT",
@@ -965,7 +928,6 @@ export const updateUserValidation = async (id) => {
 };
 
 export const getServices = async () => {
-    console.log("hodaaaaaaaaaa");
     try {
         const response = await fetch(`${MICROOSERVICES_URL}/getProcess`, {
             method: "GET",
@@ -974,7 +936,6 @@ export const getServices = async () => {
             },
         });
         const data = await response.json();
-        console.log("data", data);
         return data;
     } catch (error) {
         console.error("Network error:", error);
@@ -1016,8 +977,6 @@ export const getNotifications = async (userID) => {
 };
 
 export const updateNotificationRevision = async (id) => {
-    console.log(NOTIFICATIONS_URL); // Asegúrate de que este valor sea correcto
-    console.log(id); // Debe imprimir el ID de la notificación esperada
 
     try {
         const response = await fetch(`${NOTIFICATIONS_URL}/notifications/${id}`, {
@@ -1038,7 +997,6 @@ export const updateNotificationRevision = async (id) => {
 };
 
 export const getMyPublications = async (userID) => {
-    console.log("userID", userID);
     try {
         const response = await fetch(`${COMMUNITY_URL}/getMyPublications?user_id=${userID}`, {
             method: 'GET',
@@ -1054,7 +1012,6 @@ export const getMyPublications = async (userID) => {
 }
 
 export const getMyPeticions = async (userID) => {
-    console.log("userID", userID);
     try {
         const response = await fetch(`${EMPLOYMENTEXCHANGE_URL}/getMyPublications?user_id=${userID}`, {
             method: 'GET',

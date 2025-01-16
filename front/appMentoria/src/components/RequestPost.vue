@@ -273,8 +273,6 @@ async function submitPostPeticio() {
     return;
   }
 
-  console.log("userid", user_id);
-
   const formData = new FormData();
   formData.append("typesPublications_id", 2);
   formData.append("title", title.value);
@@ -283,23 +281,18 @@ async function submitPostPeticio() {
   formData.append("user_id", user_id);
   formData.append("image", imageFile.value);
 
-  console.log("formdata", formData);
-
   try {
     const response = await postEmploymentExchangePublication(formData);
-    console.log("response", response);
+
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Error al crear la publicación:", errorData);
       alert("Error al crear la publicación.");
       return;
     }
 
     const responseData = await response.json();
-    console.log("Publicación creada con éxito:", responseData);
     router.push("/requests");
   } catch (error) {
-    console.error("Error al enviar la publicación:", error);
     alert("Error al enviar la publicación.");
   }
 }
@@ -316,7 +309,6 @@ function goBack() {
 //     availabilities: availabilities.value,
 //     user_id: "",
 //   };
-//   console.log(JSON.stringify(formData));
 // };
 </script>
 

@@ -138,8 +138,6 @@ const fetchNotifications = async () => {
 
 // Determinar el tipo de notificación
 const getNotificationType = (notification) => {
-  console.log("notification", notification);
-
   // Si tiene comment_id, es un comentario
   if (notification.comment_id) {
     return "Comentari";
@@ -171,26 +169,22 @@ const getNotificationType = (notification) => {
 // Obtener el tag de la notificación
 // Obtener el tag de la notificación
 const getNotificationTag = (notification) => {
-  console.log("Descripción de la notificación:", notification.description); // Verificar el contenido de description
+  // Verificar el contenido de description
 
   // Verificar si la descripción existe y convertir a minúsculas para la comparación
   const description = notification.description?.toLowerCase() || "";
 
   // Verificar si la descripción contiene alguno de los términos
   if (description.includes("publicació")) {
-    console.log("Tag asignado: Publicació");
     return "Publicació";
   }
   if (description.includes("comentari")) {
-    console.log("Tag asignado: Comentari");
     return "Comentari";
   }
   if (description.includes("petició")) {
-    console.log("Tag asignado: Petició");
     return "Petició";
   }
 
-  console.log("Tag asignado: No se encontró ningún tag específico");
   return "";
 };
 
@@ -232,13 +226,11 @@ const markAsRead = async (id) => {
   try {
     // Llamada PUT para actualizar la notificación en el servidor
     const response = await updateNotificationRevision(id);
-    console.log("response", response);
     if (!response.ok) {
       throw new Error("Error al marcar como leída");
     }
 
     const responseData = await response.json();
-    console.log("responseData", responseData);
     // Actualizar la notificación localmente (marcarla como leída)
     await fetchNotifications();
   } catch (error) {

@@ -59,7 +59,6 @@ const fetchpeticions = async () => {
     }
 
     const data = await getMyPeticions(user_id);
-    console.log("data", data);
     if (!Array.isArray(data)) {
       console.error(
         "Error: La respuesta del servidor no es una lista válida.",

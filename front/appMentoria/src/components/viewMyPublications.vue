@@ -59,7 +59,6 @@ const fetchPublications = async () => {
     }
 
     const data = await getMyPublications(user_id);
-    console.log("data", data);
     if (!Array.isArray(data)) {
       console.error(
         "Error: La respuesta del servidor no es una lista válida.",
@@ -91,7 +90,6 @@ const handleMarkAsRead = (id) => {
 };
 
 const handleRemove = (id) => {
-  console.log("Removing publication:", id);
   publications.value = publications.value.filter((p) => p.id !== id);
 };
 

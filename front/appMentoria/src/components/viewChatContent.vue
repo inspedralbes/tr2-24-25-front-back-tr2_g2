@@ -255,16 +255,12 @@ const updateProfile = (userId) => {
 onMounted(async () => {
   scrollToBottom();
   socketChat.on("receiveMessage", (newMessage) => {
-    console.log("itsworking");
     interactions.value.push(newMessage);
     scrollToBottom();
   });
   chatData.value = await fetchMessages(props.chatId);
   interactions.value = chatData.value._rawValue.interactions;
-  console.log(interactions.value);
   scrollToBottom();
-
-  console.log("users: ", props.users);
 });
 watch(interactions, () => {
   scrollToBottom();

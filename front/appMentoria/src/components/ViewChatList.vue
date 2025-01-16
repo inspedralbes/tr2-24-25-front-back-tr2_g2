@@ -35,16 +35,12 @@ const fetchChatsNow = async (userId) => {
     const result = await fetchChats(userId);
     chats.value = result.chats;
     chatsInfo.value = result.chatsInfo;
-    console.log(chats.value);
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 };
 
 onMounted(async () => {
   users.value = await getUsers();
   socketChat.on("receiveMessage", async (newMessage) => {
-    console.log("Nuevo mensaje recibido", newMessage);
     await fetchChatsNow(userId);
   });
   await fetchChatsNow(userId);
