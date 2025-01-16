@@ -127,7 +127,7 @@ app.post('/comments', async (req, res) => {
             if (reasons.length > 0) {
                 const notificationDescription = `S'ha generat un report del teu comentari en una publicació. Reason: ${commentAnalysis.reason}`;
                 const [resultReport] = await connection.execute(
-                    `INSERT INTO reportscomments (comment_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                    `INSERT INTO reportsComments (comment_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
                     [comment_id, user_id, report, 'pending']
                 );
 
@@ -385,7 +385,7 @@ app.post('/publications', async (req, res) => {
                 const notificationDescription = `S'ha generat un report al postejar una petició. Reason: ${reasons.join(', ')}.`;
 
                 const [resultReport] = await connection.execute(
-                    `INSERT INTO reportspublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
+                    `INSERT INTO reportsPublications (publication_id, user_id, report, status) VALUES (?, ?, ?, ?)`,
                     [publication_id, user_id, report, 'pending']
                 );
 

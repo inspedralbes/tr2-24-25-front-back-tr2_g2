@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS comments (
 );
 
 -- Table 11: reportsPublications (depends on publications and users)
-CREATE TABLE IF NOT EXISTS reportsPublications (
+CREATE TABLE IF NOT EXISTS reportspublications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publication_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS reportsPublications (
 );
 
 -- Table 12: reportsComments (depends on comments and users)
-CREATE TABLE IF NOT EXISTS reportsComments (
+CREATE TABLE IF NOT EXISTS reportscomments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS reportsComments (
 );
 
 -- Table 13: reportsUsers (depends on users)
-CREATE TABLE IF NOT EXISTS reportsUsers (
+CREATE TABLE IF NOT EXISTS reportsusers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reported_user_id INT NOT NULL,
     user_id INT NOT NULL,
