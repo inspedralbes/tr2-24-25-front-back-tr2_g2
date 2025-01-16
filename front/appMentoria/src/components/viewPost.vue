@@ -339,7 +339,8 @@ const getAuthorHandle = (userId) => {
 const getAuthorProfile = (userId) => {
   try {
     const user = users.value.find((user) => user.id === userId);
-    if (user.profile.includes("/upload/", 0)) {
+    let profileimage;
+    if (user.profile.startsWith("/")) {
       profileimage = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
     } else {
       profileimage = user.profile;
