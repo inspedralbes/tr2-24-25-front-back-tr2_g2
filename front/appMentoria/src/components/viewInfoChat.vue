@@ -46,7 +46,7 @@
       :chatId="selectedChatId"
       :users="users"
       :userMio="userId"
-      :userOtro="userIdLaOtra"
+      :userElla="userIdLaOtra"
       :BACK_URL="BACK_URL"
       @closeChat="selectedChatId = false"
       class="overlay"
