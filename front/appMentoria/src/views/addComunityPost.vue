@@ -96,10 +96,16 @@
 
         <!-- Botón de publicación -->
         <button
+          type="button"
           @click="submitPost"
           class="w-full py-2 px-4 bg-blue-500 dark:bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          :disabled="isLoading"
         >
-          Publicar
+          <span
+            v-if="isLoading"
+            class="spinner-border spinner-border-sm"
+          ></span>
+          <span v-else>Publicar</span>
         </button>
       </div>
     </main>
@@ -125,6 +131,7 @@ const description = ref("");
 const imageFile = ref(null);
 const imagePreview = ref(null);
 const user_id = useAppStore().getUser()?.id;
+const isLoading = ref(false);
 
 function goBack() {
   router.back();
@@ -144,6 +151,7 @@ async function submitPost() {
     return;
   }
 
+  isLoading.value = true;
   const formData = new FormData();
   formData.append("typesPublications_id", 1);
   formData.append("title", title.value);
@@ -155,7 +163,6 @@ async function submitPost() {
     const response = await postCommunityPublication(formData);
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Error al crear la publicación:", errorData);
       alert("Error al crear la publicación.");
       return;
     }
@@ -164,7 +171,8 @@ async function submitPost() {
     router.push("/");
   } catch (error) {
     console.error("Error al enviar la publicación:", error);
-    alert("Error al enviar la publicación.");
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>

@@ -129,10 +129,20 @@
     </section>
 
     <!-- Calendar (marginal adjustment) -->
-     
-    <div
+
+    <!-- <div
       v-if="user.value.availibility"
       :class="{ '-mt-24 pb-24': !user.value.discord_link && !user.value.github_link }"
+    >
+      <Calendar :availibilityJson="JSON.stringify(user.value.availibility)" />
+    </div> -->
+
+    <div
+      v-if="user.value.availibility"
+      :class="{
+        '-mt-24': !user.value.discord_link && !user.value.github_link,
+        'pb-24': true,
+      }"
     >
       <Calendar :availibilityJson="JSON.stringify(user.value.availibility)" />
     </div>

@@ -159,8 +159,13 @@
             type="button"
             @click="submitPostPeticio"
             class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-white py-2 px-10 rounded-md transition duration-300 gap-2 dark:bg-blue-700 dark:hover:bg-blue-800"
+            :disabled="isLoading"
           >
-            Post
+            <span
+              v-if="isLoading"
+              class="spinner-border spinner-border-sm"
+            ></span>
+            <span v-else>Post</span>
           </button>
           <span class="text-gray-500 text-sm dark:text-gray-300">
             Max 280 characters
@@ -184,6 +189,7 @@ const title = ref("");
 const description = ref("");
 const imageFile = ref(null);
 const availabilities = ref([]);
+const isLoading = ref(false);
 const user_id = useAppStore().getUser()?.id;
 
 const hours = ref([
@@ -272,6 +278,7 @@ async function submitPostPeticio() {
     alert("Por favor, completa todos los campos");
     return;
   }
+  isLoading.value = true; // Activar indicador de carga
 
   const formData = new FormData();
   formData.append("typesPublications_id", 2);
@@ -285,15 +292,19 @@ async function submitPostPeticio() {
     const response = await postEmploymentExchangePublication(formData);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      alert("Error al crear la publicación.");
+      const errorData = await response.json(); // Manejo del error del servidor
+      alert(
+        "Error al crear la publicación: " + (errorData.message || "Desconocido")
+      );
       return;
     }
 
     const responseData = await response.json();
-    router.push("/requests");
+    router.push("/requests"); // Redirigir después de completar
   } catch (error) {
-    alert("Error al enviar la publicación.");
+    alert("Error al enviar la publicación: " + error.message);
+  } finally {
+    isLoading.value = false; // Asegurarse de desactivar el indicador de carga
   }
 }
 

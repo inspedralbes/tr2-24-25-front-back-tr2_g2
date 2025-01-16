@@ -1,6 +1,11 @@
 <template>
   <div>
-    <Loading v-if="loading" />
+    <div
+      v-if="loading"
+      class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800"
+    >
+      <Loading />
+    </div>
     <div v-else>
       <div
         v-if="selectedPost"
@@ -332,8 +337,17 @@ const getAuthorHandle = (userId) => {
 };
 
 const getAuthorProfile = (userId) => {
-  const user = users.value.find((user) => user.id === userId);
-  return user.profile;
+  try {
+    const user = users.value.find((user) => user.id === userId);
+    if (user.profile.includes("/upload/", 0)) {
+      profileimage = `${import.meta.env.VITE_URL_BACK}${user.profile}`;
+    } else {
+      profileimage = user.profile;
+    }
+    return profileimage;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const getCommentsWithPostId = (postId) => {
