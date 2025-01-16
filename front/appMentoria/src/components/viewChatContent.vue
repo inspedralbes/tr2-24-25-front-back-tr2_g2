@@ -7,7 +7,7 @@
         <div class="relative ps-5">
           <img
             :src="`${BACK_URL}${
-              users.find((user) => user._id === userElla)?.profile
+              users.find((user) => user.id === userElla)?.profile
             }`"
             alt=""
             class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
@@ -26,11 +26,11 @@
         <div class="flex flex-col leading-tight">
           <div class="text-2xl mt-1 flex items-center">
             <span class="text-gray-700 mr-3 dark:text-white">{{
-              users.find((user) => user._id === userElla)?.name
+              users.find((user) => user.id === userElla)?.name
             }}</span>
           </div>
           <span class="text-lg text-gray-600 dark:text-white">{{
-            users.find((user) => user._id === userElla)?.email.split("@")[0]
+            users.find((user) => user.id === userElla)?.email.split("@")[0]
           }}</span>
         </div>
       </div>
@@ -239,7 +239,7 @@ const sendMessageInMongoNow = () => {
 };
 
 const updateProfile = (userId) => {
-  const user = users.value.find((user) => user._id === userId);
+  const user = users.value.find((user) => user.id === userId);
 
   if (user && user.profile) {
     if (user.profile.startsWith("/")) {
