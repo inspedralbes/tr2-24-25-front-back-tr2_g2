@@ -46,7 +46,7 @@
         >
           <header class="flex items-center p-4 border-b">
             <img
-              :src="back_url + getAuthorProfile(selectedrequest.user_id)"
+              :src="getAuthorProfile(selectedrequest.user_id)"
               alt="Avatar"
               class="w-12 h-12 rounded-full mr-4"
             />
@@ -137,7 +137,7 @@
               class="border-b py-2 flex items-start space-x-4 m-4"
             >
               <img
-                :src="back_url + getAuthorProfile(comment.user_id)"
+                :src="getAuthorProfile(comment.user_id)"
                 alt="Avatar"
                 class="w-8 h-8 rounded-full"
               />
@@ -163,7 +163,7 @@
                     class="flex items-start space-x-4 mb-4 mr-10"
                   >
                     <img
-                      :src="back_url + getAuthorProfile(reply.user_id)"
+                      :src="getAuthorProfile(reply.user_id)"
                       alt="Avatar"
                       class="w-8 h-8 rounded-full"
                     />
@@ -237,7 +237,7 @@
         <div v-if="request.reports === 0">
           <header class="flex items-center p-4 border-b">
             <img
-              :src="back_url + getAuthorProfile(request.user_id)"
+              :src="getAuthorProfile(request.user_id)"
               alt="Avatar"
               class="w-12 h-12 rounded-full mr-4"
             />
