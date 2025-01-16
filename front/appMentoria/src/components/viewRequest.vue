@@ -492,8 +492,6 @@ onMounted(async () => {
   loading.value = true;
   users.value = await getUsers();
   comments.value = await getEmploymentExchangeComments();
-  console.log("comments", comments.value);
-  console.log("requests", props.requests[0].availability);
   socketBack.on("updateComments", async () => {
     console.log("New comment received");
     comments.value = await getEmploymentExchangeComments();
