@@ -6,19 +6,19 @@ const { Server: SocketIO } = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
-const { spawn, exec } = require('child_process');
-const { log, error } = require('console');
+const { spawn } = require('child_process');
 const { DateTime } = require('luxon');
 
 dotenv.config();
+
 // Inicialización del servidor y configuración
 const app = express();
 app.use(express.json());
 app.use(cors());
-const PORT = process.env.PORT;
+const PORT = 24848;
 
-// `__dirname` está disponible automáticamente en CommonJS
-const route = "../node"
+// Ruta base absoluta
+const route = path.resolve(__dirname, "../node");
 const services = [];
 const server = http.createServer(app);
 
@@ -40,9 +40,19 @@ io.on('connection', (socket) => {
     });
 });
 
+// Función para encontrar el archivo ejecutable
+function findExecutable(servicePath) {
+    const possibleFiles = ['index.js', 'server.js', 'server.mjs'];
+    for (const file of possibleFiles) {
+        if (fs.existsSync(path.join(servicePath, file))) {
+            return file;
+        }
+    }
+    return null;
+}
+
 // Cargar los servicios
 fs.readdirSync(path.join(route, 'services')).forEach(file => {
-
     services.push({
         id: uuidv4(),
         name: file,
@@ -53,10 +63,7 @@ fs.readdirSync(path.join(route, 'services')).forEach(file => {
         logError: [],
         process: null,
     });
-
 });
-
-
 
 // Rutas de la API
 app.get('/getProcess', (req, res) => {
@@ -69,8 +76,19 @@ app.get('/startService/:id', (req, res) => {
 
     if (service) {
         const servicePath = path.join(route, 'services', service.name);
-        const logDir = path.join(servicePath, 'logs');
+        const executable = findExecutable(servicePath);
 
+        if (!executable) {
+            return res.status(404).send('No se encontró un archivo ejecutable válido');
+        }
+
+        // Cargar el archivo .env del servicio si existe
+        const envPath = path.join(servicePath, '.env');
+        if (fs.existsSync(envPath)) {
+            dotenv.config({ path: envPath });
+        }
+
+        const logDir = path.join(servicePath, 'logs');
         if (!fs.existsSync(logDir)) {
             fs.mkdirSync(logDir, { recursive: true });
         }
@@ -78,9 +96,13 @@ app.get('/startService/:id', (req, res) => {
         const logErrorFilePath = path.join(logDir, 'error_logs.log');
         const messageFilePath = path.join(logDir, 'messages.log');
 
-        //SPAWN
-        const processData = spawn('node', [path.join(__dirname, 'services') + `/${service.name}/index.js`], {
-            cwd: path.join(__dirname, 'services') + `/${service.name}`,
+        // Spawn del proceso
+        const processData = spawn('node', [path.join(servicePath, executable)], {
+            cwd: servicePath,
+            env: {
+                ...process.env, // Incluye las variables de entorno actuales
+                PORT: process.env.PORT, // Ejemplo de puerto configurado
+            },
         });
         service.process = processData;
         service.status = 'running';
@@ -130,19 +152,6 @@ app.get('/startService/:id', (req, res) => {
     }
 });
 
-// app.put('/changeEnabledProcess/:id', (req, res) => {
-//     const id = req.params.id;
-//     const service = services.find(service => service.id === id);
-
-//     if (service) {
-//         service.enabled = 'invisible';
-//         service.log.push({ message: `${service.name} is invisible for students` });
-//         res.send(service);
-//     } else {
-//         res.status(404).send('Service not found');
-//     }
-// });
-
 app.get('/getStatusService/:id', (req, res) => {
     const id = req.params.id;
     const service = services.find(service => service.id === id);
@@ -161,10 +170,12 @@ app.get('/stopService/:id', (req, res) => {
     if (service) {
         service.status = 'stopped';
         service.enabled = 'disabled';
-        service.log.push({ message: `${service.name} is stopped`, timestamp: DateTime.now().setZone('Europe/Paris').toFormat('dd/MM/yyyy HH:mm:ss') });
+        service.log.push({
+            message: `${service.name} is stopped`,
+            timestamp: DateTime.now().setZone('Europe/Paris').toFormat('dd/MM/yyyy HH:mm:ss')
+        });
         service.process.kill();
         res.send(service);
-
     } else {
         res.status(404).send('Service not found');
     }

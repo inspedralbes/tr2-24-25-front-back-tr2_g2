@@ -7,7 +7,7 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = 24845;
 
 app.use(cors());
 app.use(express.json()); // Asegúrate de que el middleware para parsear JSON esté configurado

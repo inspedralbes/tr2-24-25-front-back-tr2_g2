@@ -8,7 +8,7 @@ const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3008;
+const port = 24846;
 
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());

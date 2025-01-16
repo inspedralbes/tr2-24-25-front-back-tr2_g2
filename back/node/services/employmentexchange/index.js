@@ -11,7 +11,7 @@ const { text } = require('stream/consumers');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3003;
+const port = 24843;
 
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
@@ -82,7 +82,7 @@ app.post('/comments', async (req, res) => {
     if (running == true) {
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://localhost:3005/classify-comment';
+            const serverIA = 'http://conexus.dam.inspedralbes.cat:24845/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -151,7 +151,7 @@ app.post('/comments', async (req, res) => {
 
                 try {
                     console.log("notification fetch");
-                    const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                    const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -212,7 +212,7 @@ app.post('/comments', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch('http://localhost:3008/notifications', {
+            const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
@@ -300,7 +300,7 @@ app.post('/publications', async (req, res) => {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://localhost:3005/classify-comment';
+            const serverIA = 'http://conexus.dam.inspedralbes.cat:24845/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -329,7 +329,7 @@ app.post('/publications', async (req, res) => {
 
         // Manejo de imagen
         // Llamada a la IA para analizar la imagen
-        const serverMjsUrl = 'http://localhost:3006/classify-image';
+        const serverMjsUrl = 'http://conexus.dam.inspedralbes.cat:24844/classify-image';
 
         let imageAnalysis = null;
         try {
@@ -410,7 +410,7 @@ app.post('/publications', async (req, res) => {
 
                 try {
                     console.log("Hola 5");
-                    const notificationResponse = await fetch('http://localhost:3008/notifications', {
+                    const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -469,7 +469,7 @@ app.post('/publications', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch('http://localhost:3008/notifications', {
+            const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
@@ -604,8 +604,8 @@ app.delete('/reports/publications/:id', async (req, res) => {
 async function checkIA() {
 
     var running = true;
-    const serverIAtext = 'http://localhost:3005/';
-    const serverIAimage = 'http://localhost:3006/';
+    const serverIAtext = 'http://conexus.dam.inspedralbes.cat:24844/';
+    const serverIAimage = 'http://conexus.dam.inspedralbes.cat:24845/';
 
     try {
         const responseText = await fetch(serverIAtext);

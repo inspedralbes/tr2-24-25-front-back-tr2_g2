@@ -18,7 +18,7 @@ const refreshKey = process.env.REFRESH_KEY;
 const refreshTokensDB = new Set();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 24849;
 
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());

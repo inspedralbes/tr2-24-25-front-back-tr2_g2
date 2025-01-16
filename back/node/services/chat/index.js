@@ -8,7 +8,7 @@ const path = require('path');
 require('dotenv').config();
 
 
-const PORT = process.env.PORT;
+const PORT = 24841;
 
 const app = express();
 const server = createServer(app);
