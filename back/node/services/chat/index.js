@@ -29,7 +29,7 @@ app.use(cors({
     allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
 }));
 
-mongoose.connect(process.env.MONGO_URI, { dbName: 'Chat' })
+mongoose.connect( "mongodb+srv://a23cliferand:Jupiter1@cluster0.f8wpt.mongodb.net/", { dbName: 'Chat' })
   .then(() => console.log('Conexión exitosa a MongoDB'))
   .catch(err => console.error('Error de conexión a MongoDB:', err));
 

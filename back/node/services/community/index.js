@@ -27,10 +27,10 @@ app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
 const dbConfig = {
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASS,
-    database: process.env.MYSQL_DB
+    host: "localhost",
+    user: "a21sarmarbau_mentories",
+    password: "Chocolate1",
+    database: "a21sarmarbau_mentories"
 };
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */
