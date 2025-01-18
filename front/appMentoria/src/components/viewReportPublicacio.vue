@@ -138,9 +138,7 @@
 
 
 <script>
-import { updateReportPublication } from "@/services/communicationManager";
-import { deleteReportPublication } from "@/services/communicationManager";
-import { fetchAllReportsPublications } from "@/services/communicationManager";
+import { fetchAllReportsPublications, updateReportPublication, deleteReportPublication } from "@/services/communicationManager";
 
 export default {
   data() {
@@ -166,25 +164,17 @@ export default {
   },
   methods: {
     async updateReportStatus(id, status) {
-    const report = this.reports.find((r) => r.id === id);
-    try {
-        const response = await updateReportPublication(
-            id,
-            status,
-            report.publication_id,
-            report.user_id,
-            report.report
-        );
+      try {
+        const response = await updateReportPublication(id, status);
         if (response.error) {
-            console.error(response.error);
+          console.error(response.error);
         } else {
-            console.log("Estado actualizado correctamente");
+          console.log("Estat actualitzat correctament");
         }
-    } catch (error) {
-        console.error("Error al actualizar el estado:", error);
-    }
-},
-
+      } catch (error) {
+        console.error("Error al actualitzar l'estat:", error);
+      }
+    },
     async deleteReport(id) {
       try {
         const response = await deleteReportPublication(id);
