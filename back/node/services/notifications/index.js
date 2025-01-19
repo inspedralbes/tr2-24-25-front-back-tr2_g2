@@ -8,7 +8,7 @@ const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
-const port = 24846;
+const port = process.env.PORT;
 
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
@@ -21,14 +21,15 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     next();
 });
+
 // app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
 const dbConfig = {
-    host: "localhost",
-    user: "a21sarmarbau_mentories",
-    password: "Chocolate1",
-    database: "a21sarmarbau_mentories"
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASS,
+    database: process.env.MYSQL_DB
 };
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */

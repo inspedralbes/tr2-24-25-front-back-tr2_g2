@@ -11,7 +11,10 @@ const { text } = require('stream/consumers');
 require('dotenv').config();
 
 const app = express();
-const port = 24843;
+const port = process.env.PORT;
+const IA_TEXT_URL = process.env.IA_TEXT_URL;
+const IA_IMAGE_URL = process.env.IA_IMAGE_URL;
+const NOTIFICATION_URL = process.env.NOTIFICATION_URL;
 
 /* ----------------------------------------- SERVER APP ----------------------------------------- */
 app.use(express.json());
@@ -28,10 +31,10 @@ app.use(fileUpload());
 
 /* ----------------------------------------- DATABASE ----------------------------------------- */
 const dbConfig = {
-    host: "localhost",
-    user: "a21sarmarbau_mentories",
-    password: "Chocolate1",
-    database: "a21sarmarbau_mentories"
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASS,
+    database: process.env.MYSQL_DB
 };
 
 /* ----------------------------------------- ROUTES ----------------------------------------- */
@@ -82,7 +85,7 @@ app.post('/comments', async (req, res) => {
     if (running == true) {
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://conexus.dam.inspedralbes.cat:24845/classify-comment';
+            const serverIA = IA_TEXT_URL + '/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -151,7 +154,7 @@ app.post('/comments', async (req, res) => {
 
                 try {
                     console.log("notification fetch");
-                    const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
+                    const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -212,7 +215,7 @@ app.post('/comments', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
+            const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
@@ -300,7 +303,7 @@ app.post('/publications', async (req, res) => {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = 'http://conexus.dam.inspedralbes.cat:24845/classify-comment';
+            const serverIA = IA_TEXT_URL + '/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -329,7 +332,7 @@ app.post('/publications', async (req, res) => {
 
         // Manejo de imagen
         // Llamada a la IA para analizar la imagen
-        const serverMjsUrl = 'http://conexus.dam.inspedralbes.cat:24844/classify-image';
+        const serverMjsUrl = IA_IMAGE_URL + '/classify-image';
 
         let imageAnalysis = null;
         try {
@@ -410,7 +413,7 @@ app.post('/publications', async (req, res) => {
 
                 try {
                     console.log("Hola 5");
-                    const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
+                    const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -469,7 +472,7 @@ app.post('/publications', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch('http://conexus.dam.inspedralbes.cat:24846/notifications', {
+            const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
@@ -604,8 +607,8 @@ app.delete('/reports/publications/:id', async (req, res) => {
 async function checkIA() {
 
     var running = true;
-    const serverIAtext = 'http://conexus.dam.inspedralbes.cat:24844/';
-    const serverIAimage = 'http://conexus.dam.inspedralbes.cat:24845/';
+    const serverIAtext = IA_TEXT_URL + '/';
+    const serverIAimage = IA_IMAGE_URL + '/';
 
     try {
         const responseText = await fetch(serverIAtext);

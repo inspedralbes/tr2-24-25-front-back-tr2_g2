@@ -7,7 +7,7 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const port = 24845;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json()); // Asegúrate de que el middleware para parsear JSON esté configurado
@@ -20,6 +20,7 @@ function extractJsonContent(responseText) {
     const jsonEnd = responseText.lastIndexOf("}") + 1;
     return responseText.substring(jsonStart, jsonEnd);
 }
+
 let totalTokensAcumulados = 0;
 
 function checkPublications() {
@@ -29,7 +30,6 @@ function checkPublications() {
 app.get("/", (req, res) => {
     res.send("Hello World! I am a comment service");
 });
-
 
 app.post("/classify-comment", async (req, res) => {
     try {
@@ -93,8 +93,6 @@ app.post("/classify-comment", async (req, res) => {
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 });
-
-
 
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);

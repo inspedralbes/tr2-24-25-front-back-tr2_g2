@@ -8,7 +8,7 @@ const path = require('path');
 require('dotenv').config();
 
 
-const PORT = 24841;
+const PORT = process.env.PORT;
 
 const app = express();
 const server = createServer(app);
@@ -29,7 +29,7 @@ app.use(cors({
     allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
 }));
 
-mongoose.connect( "mongodb+srv://a23cliferand:Jupiter1@cluster0.f8wpt.mongodb.net/", { dbName: 'Chat' })
+mongoose.connect( process.env.MONGO_URI, { dbName: 'Chat' })
   .then(() => console.log('Conexión exitosa a MongoDB'))
   .catch(err => console.error('Error de conexión a MongoDB:', err));
 

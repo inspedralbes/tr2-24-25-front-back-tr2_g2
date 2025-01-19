@@ -11,7 +11,7 @@ import fileUpload from 'express-fileupload';
 dotenv.config();
 
 const app = express();
-const port = 24844;
+const port = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
