@@ -47,25 +47,6 @@ const messageSchema = new mongoose.Schema({
 
 const Message = mongoose.model('Message', messageSchema);
 
-const checkAndInsertData = async () => {
-  try {
-    const count = await Message.countDocuments();
-    if (count === 0) {
-      const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../data/chatDataExample.json'), 'utf8'));
-      const sanitizedData = data.map(({ _id, ...rest }) => rest);
-      await Message.insertMany(sanitizedData);
-      console.log('Datos insertados en la base de datos');
-    } else {
-      const messages = await Message.find();
-      console.log('Datos existentes en la base de datos:', messages);
-    }
-  } catch (err) {
-    console.error('Error al verificar o insertar datos:', err);
-  }
-};
-
-checkAndInsertData();
-
 app.get('/getChats', async (req, res) => {
   try {
     const messages = await Message.find();
