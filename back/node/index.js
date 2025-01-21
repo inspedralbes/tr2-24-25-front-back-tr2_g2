@@ -233,7 +233,9 @@ app.get('/users', async (req, res) => {
                 users.email,
                 users.banner,
                 users.profile,
-                qualifications.name AS qualification
+                qualifications.name AS qualification,
+                users.discord_link,
+                users.github_link
             FROM 
                 users
             LEFT JOIN 
