@@ -26,7 +26,7 @@ services:
       - chat
       - community
       - employmentexchange
-      # - stadistics
+      - stadistics
 
   chat:
     build:
@@ -64,29 +64,40 @@ services:
     ports:
       - 3003:3003
 
-  # stadistics:
-  #   build: 
-  #     context: ./back/node/services/stadistics
-  #     dockerfile: ../../dev.Dockerfile
-  #   command: sh -c "cp .env.DEV .env && npm install && npm run dev"
-  #   volumes:
-  #     - ./back/node/services/stadistics:/usr/src/app
-  #   working_dir: /usr/src/app
-  #   ports:
-  #     - 3010:3010
+  notifications:
+    build:
+      context: ./back/node/services/notifications
+      dockerfile: ../../dev.Dockerfile
+    command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+    volumes:
+      - ./back/node/services/notifications:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3006:3006
 
-  # ia:
+  # statistics:
   #   build: 
-  #     context: ./back/node/services/IA
+  #     context: ./back/node/services/statistics
   #     dockerfile: ../../dev.Dockerfile
   #   command: sh -c "cp .env.DEV .env && npm install && npm run dev"
   #   volumes:
-  #     - ./back/node/services/IA:/usr/src/app
+  #     - ./back/node/services/statistics:/usr/src/app
   #   working_dir: /usr/src/app
   #   ports:
-  #     - 3004:3004
+  #     - 3007:3007
+
+  # ia-text:
+  #   build: 
+  #     context: ./back/node/services/iatext
+  #     dockerfile: ../../dev.Dockerfile
+  #   command: sh -c "cp .env.DEV .env && npm install && npm run dev"
+  #   volumes:
+  #     - ./back/node/services/iatext:/usr/src/app
+  #   working_dir: /usr/src/app
+  #   ports:
+  #     - 3005:3005
   
-  iaimage:
+  ia-image:
     build:
       context: ./back/node/services/iaimage
       dockerfile: ../../dev.Dockerfile
@@ -95,7 +106,7 @@ services:
       - ./back/node/services/iaimage:/usr/src/app
     working_dir: /usr/src/app
     ports:
-      - 3006:3006
+      - 3004:3004
 
   tr2g2-mongodb:
     image: mongo
