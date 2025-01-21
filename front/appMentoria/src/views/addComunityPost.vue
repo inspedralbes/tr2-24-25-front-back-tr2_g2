@@ -98,14 +98,33 @@
         <button
           type="button"
           @click="submitPost"
-          class="w-full py-2 px-4 bg-blue-500 dark:bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          class="w-full py-2 px-4 bg-blue-500 dark:bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 flex justify-center items-center"
           :disabled="isLoading"
         >
-          <span
-            v-if="isLoading"
-            class="spinner-border spinner-border-sm"
-          ></span>
-          <span v-else>Publicar</span>
+          <span v-if="!isLoading">Publicar</span>
+          <span v-else class="flex items-center gap-2">
+            <svg
+              class="animate-spin h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+            Publicant...
+          </span>
         </button>
       </div>
     </main>
@@ -123,6 +142,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { postCommunityPublication } from "@/services/communicationManager";
 import { useAppStore } from "@/stores/index";
+import Loading from "@/components/Loading.vue";
 import NavBar from "@/components/NavBar.vue";
 
 const router = useRouter();
@@ -168,7 +188,12 @@ async function submitPost() {
     }
 
     const responseData = await response.json();
-    router.push("/");
+    console.log("resposta publicació:", responseData);
+    console.log("response data message", responseData.message);
+    router.push({
+      path: "/",
+      state: { message: responseData.message },
+    });
   } catch (error) {
     console.error("Error al enviar la publicación:", error);
   } finally {

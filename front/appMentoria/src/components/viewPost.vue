@@ -324,6 +324,7 @@ var myUser = useAppStore().getUser();
 
 const props = defineProps({
   posts: Array,
+  message: String,
 });
 
 const getAuthorName = (userId) => {

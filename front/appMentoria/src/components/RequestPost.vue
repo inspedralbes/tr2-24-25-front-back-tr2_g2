@@ -158,18 +158,34 @@
           <button
             type="button"
             @click="submitPostPeticio"
-            class="flex justify-center items-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 text-white py-2 px-10 rounded-md transition duration-300 gap-2 dark:bg-blue-700 dark:hover:bg-blue-800"
+            class="w-full py-2 px-4 bg-blue-500 dark:bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 flex justify-center items-center"
             :disabled="isLoading"
           >
-            <span
-              v-if="isLoading"
-              class="spinner-border spinner-border-sm"
-            ></span>
-            <span v-else>Post</span>
+            <span v-if="!isLoading">Publicar</span>
+            <span v-else class="flex items-center gap-2">
+              <svg
+                class="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
+              Publicant...
+            </span>
           </button>
-          <span class="text-gray-500 text-sm dark:text-gray-300">
-            Max 280 characters
-          </span>
         </div>
       </form>
     </div>

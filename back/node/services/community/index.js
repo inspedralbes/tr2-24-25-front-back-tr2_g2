@@ -154,7 +154,7 @@ app.post('/comments', async (req, res) => {
 
                 try {
                     console.log("notification fetch");
-                    const notificationResponse = await fetch(NOTIFICATION_URL+'/notifications', {
+                    const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -215,7 +215,7 @@ app.post('/comments', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch(NOTIFICATION_URL+'/notifications', {
+            const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
@@ -304,7 +304,7 @@ app.post('/publications', async (req, res) => {
         // Llamada a la IA para analizar título y descripción
         const analyzeContent = async (content) => {
             console.log("HOLA 1");
-            const serverIA = IA_TEXT_URL+'/classify-comment';
+            const serverIA = IA_TEXT_URL + '/classify-comment';
             try {
                 const response = await fetch(serverIA, {
                     method: 'POST',
@@ -333,7 +333,7 @@ app.post('/publications', async (req, res) => {
 
         // Manejo de imagen
         // Llamada a la IA para analizar la imagen
-        const serverMjsUrl = IA_IMAGE_URL+'/classify-image';
+        const serverMjsUrl = IA_IMAGE_URL + '/classify-image';
 
         let imageAnalysis = null;
         try {
@@ -416,7 +416,7 @@ app.post('/publications', async (req, res) => {
 
                 try {
                     console.log("Hola 5");
-                    const notificationResponse = await fetch(NOTIFICATION_URL+'/notifications', {
+                    const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(notificationPayload),
@@ -433,6 +433,7 @@ app.post('/publications', async (req, res) => {
             }
 
             res.status(201).json({
+                message: 'publicació creada correctament!',
                 publication_id: publication_id,
                 titleAnalysis,
                 descriptionAnalysis,
@@ -455,6 +456,7 @@ app.post('/publications', async (req, res) => {
             );
             const publication_id = result.insertId;
             res.status(201).json({
+                message: 'publicació creada, pendent de revisar!',
                 publication_id: publication_id,
                 text_ia: 0,
                 image_ia: 0,
@@ -477,7 +479,7 @@ app.post('/publications', async (req, res) => {
         }
 
         try {
-            const notificationResponse = await fetch(NOTIFICATION_URL+'/notifications', {
+            const notificationResponse = await fetch(NOTIFICATION_URL + '/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(notificationIAnoResponse),
