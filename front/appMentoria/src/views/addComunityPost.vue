@@ -188,7 +188,12 @@ async function submitPost() {
     }
 
     const responseData = await response.json();
-    router.push("/");
+    console.log("resposta publicació:", responseData);
+    console.log("response data message", responseData.message);
+    router.push({
+      path: "/",
+      state: { message: responseData.message },
+    });
   } catch (error) {
     console.error("Error al enviar la publicación:", error);
   } finally {
