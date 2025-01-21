@@ -47,6 +47,10 @@ const messageSchema = new mongoose.Schema({
 
 const Message = mongoose.model('Message', messageSchema);
 
+app.get('/', (req, res) => {
+  res.send('Hello World! I am a chat service');
+});
+
 app.get('/getChats', async (req, res) => {
   try {
     const messages = await Message.find();

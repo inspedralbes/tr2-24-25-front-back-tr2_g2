@@ -10,9 +10,6 @@
 /services/employmentexchange/node_modules
 /services/employmentexchange/.env
 
-/services/comment/node_modules
-/services/comment/.env
-
 /services/iaimage/node_modules
 /services/iaimage/.env
 
@@ -22,8 +19,5 @@
 /services/notifications/node_modules
 /services/notifications/.env
 
-/services/stadistics/node_modules
-/services/stadistics/.env
-
-/services/iatext/node_modules
-/services/iatext/.env
+/services/statistics/node_modules
+/services/statistics/.env
